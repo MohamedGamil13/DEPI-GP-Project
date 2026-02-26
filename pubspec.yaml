@@ -43,7 +43,10 @@ dependencies:
   firebase_storage:
     ^13.0.6
     # this for bloc
-  flutter_bloc: ^9.1.1
+  flutter_bloc:
+    ^9.1.1
+    #for DI
+  get_it: ^9.2.1
 
 dev_dependencies:
   flutter_test:
