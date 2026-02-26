@@ -1,5 +1,6 @@
 import 'package:go_router/go_router.dart';
 import 'package:skillbridge/core/routing/app_screens.dart';
+import 'package:skillbridge/features/home/home_screen.dart';
 
 final GoRouter router = GoRouter(
   initialLocation: AppScreens.homeScreen,
@@ -13,12 +14,11 @@ final GoRouter router = GoRouter(
   //   return null; // مفيش redirect
   // },
   routes: <RouteBase>[
-    // GoRoute(
-    //   path: AppScreens.onboardingScreen,
-    //   builder: (context, state) {
-    //     return HomeScreen()
-    //     );
-    //   },
-    // ),
+    GoRoute(
+      path: AppScreens.homeScreen,
+      builder: (context, state) {
+        return HomeScreen();
+      },
+    ),
   ],
 );
