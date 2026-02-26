@@ -1,9 +1,10 @@
 import 'package:go_router/go_router.dart';
 import 'package:skillbridge/core/routing/app_screens.dart';
 import 'package:skillbridge/features/home/home_screen.dart';
+import 'package:skillbridge/features/splash/splash_screen.dart';
 
 final GoRouter router = GoRouter(
-  initialLocation: AppScreens.homeScreen,
+  initialLocation: AppScreens.splashScreen,
   //  redirect: (context, state) {
   //   final isLoggedIn = FirebaseAuth.instance.currentUser != null;
   //   final isAuthRoute = state.matchedLocation == AppScreens.loginScreen
@@ -18,6 +19,12 @@ final GoRouter router = GoRouter(
       path: AppScreens.homeScreen,
       builder: (context, state) {
         return HomeScreen();
+      },
+    ),
+    GoRoute(
+      path: AppScreens.splashScreen,
+      builder: (context, state) {
+        return SplashScreen();
       },
     ),
   ],
