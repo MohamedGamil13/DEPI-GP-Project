@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:skillbridge/core/routing/app_navigator.dart';
 import 'package:skillbridge/core/theme/app_styles.dart';
 import 'package:skillbridge/core/utils/constants/app_constants.dart';
 
@@ -19,6 +20,11 @@ class _SplashViewBodyState extends State<SplashViewBody>
   void initState() {
     super.initState();
     initController();
+    Future.delayed(AppConstants.splashViewNavigation, () {
+      if (mounted) {
+        context.gosignIn();
+      }
+    });
   }
 
   @override

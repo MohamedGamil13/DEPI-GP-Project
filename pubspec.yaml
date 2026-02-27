@@ -47,6 +47,8 @@ dependencies:
     ^9.1.1
     #for DI
   get_it: ^9.2.1
+  #for icons
+  font_awesome_flutter: ^10.12.0
 
 dev_dependencies:
   flutter_test:
