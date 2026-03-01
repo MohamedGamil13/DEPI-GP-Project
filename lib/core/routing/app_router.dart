@@ -1,5 +1,8 @@
 import 'package:go_router/go_router.dart';
 import 'package:skillbridge/core/routing/app_screens.dart';
+import 'package:skillbridge/core/routing/routing_stream_refresh.dart';
+import 'package:skillbridge/core/utils/locator/service_locator.dart';
+import 'package:skillbridge/core/utils/services/firebase_auth_service_repo.dart';
 import 'package:skillbridge/features/auth/presentation/screens/forgot_password_screen.dart';
 import 'package:skillbridge/features/auth/presentation/screens/sign_in_screen.dart';
 import 'package:skillbridge/features/auth/presentation/screens/sign_up_screen.dart';
@@ -8,15 +11,21 @@ import 'package:skillbridge/features/splash/splash_screen.dart';
 
 final GoRouter router = GoRouter(
   initialLocation: AppScreens.splashScreen,
-  //  redirect: (context, state) {
-  //   final isLoggedIn = FirebaseAuth.instance.currentUser != null;
-  //   final isAuthRoute = state.matchedLocation == AppScreens.loginScreen
-  //                    || state.matchedLocation == AppScreens.registerScreen;
+  redirect: (context, state) {
+    final isLoggedIn = getIt<AuthService>().currentUser != null;
+    final isOnAuthRoute = [
+      AppScreens.signinScreen,
+      AppScreens.signupScreen,
+      AppScreens.forgetPasswordScreen,
+    ].contains(state.matchedLocation);
 
-  //   if (!isLoggedIn && !isAuthRoute) return AppScreens.loginScreen;
-  //   if (isLoggedIn && isAuthRoute)  return AppScreens.homeScreen;
-  //   return null; // مفيش redirect
-  // },
+    if (!isLoggedIn && !isOnAuthRoute) return AppScreens.signinScreen;
+    if (isLoggedIn && isOnAuthRoute) return AppScreens.homeScreen;
+    return null;
+  },
+  refreshListenable: GoRouterRefreshStream(
+    getIt<AuthService>().authStateChanges,
+  ),
   routes: <RouteBase>[
     GoRoute(
       path: AppScreens.homeScreen,

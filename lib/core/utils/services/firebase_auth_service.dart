@@ -1,35 +1,64 @@
+// core/services/firebase_auth_service.dart
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:skillbridge/core/errors/auth_errors.dart';
+import 'package:skillbridge/core/models/auth_user_model.dart';
+import 'package:skillbridge/core/utils/services/firebase_auth_service_repo.dart';
 
-class FirebaseAuthService {
+class FirebaseAuthService implements AuthService {
   final FirebaseAuth _auth;
 
-  // inject via constructor — don't hardcode instance
   FirebaseAuthService(this._auth);
 
-  User? get currentUser => _auth.currentUser;
-  Future<UserCredential> register(String email, String password) async {
+  @override
+  Stream<AuthUser?> get authStateChanges => _auth.authStateChanges().map(
+    (user) => user == null ? null : _mapUser(user),
+  ); //to know
+
+  @override
+  AuthUser? get currentUser {
+    final user = _auth.currentUser;
+    return user == null ? null : _mapUser(user);
+  }
+
+  @override
+  Future<AuthUser> register(String email, String password) async {
+    _validateInputs(email, password);
     try {
-      return await _auth.createUserWithEmailAndPassword(
-        email: email,
+      final credential = await _auth.createUserWithEmailAndPassword(
+        email: email.trim(),
         password: password,
       );
+      // Auto-send verification on register
+      await credential.user?.sendEmailVerification();
+      return _mapUser(credential.user!);
     } on FirebaseAuthException catch (e) {
       throw _mapException(e);
     }
   }
 
-  Future<UserCredential> signIn(String email, String password) async {
+  @override
+  Future<AuthUser> signIn(String email, String password) async {
+    _validateInputs(email, password);
     try {
-      return await _auth.signInWithEmailAndPassword(
-        email: email,
+      final credential = await _auth.signInWithEmailAndPassword(
+        email: email.trim(),
         password: password,
       );
+      final user = credential.user!;
+
+      // ✅ Guard: block unverified users at the service layer
+      if (!user.emailVerified) {
+        await _auth.signOut();
+        throw const UnverifiedEmailException();
+      }
+
+      return _mapUser(user);
     } on FirebaseAuthException catch (e) {
       throw _mapException(e);
     }
   }
 
+  @override
   Future<void> signOut() async {
     try {
       await _auth.signOut();
@@ -38,44 +67,68 @@ class FirebaseAuthService {
     }
   }
 
+  @override
   Future<void> sendVerificationEmail() async {
+    final user = _auth.currentUser;
+    // ✅ Throw explicitly instead of silently swallowing null
+    if (user == null) throw const UnauthenticatedException();
     try {
-      await currentUser?.sendEmailVerification();
+      await user.sendEmailVerification();
     } on FirebaseAuthException catch (e) {
       throw _mapException(e);
     }
   }
 
-  AuthException _mapException(FirebaseAuthException e) {
-    switch (e.code) {
-      case 'weak-password':
-        return AuthException(code: e.code, message: 'Password is too weak.');
-      case 'email-already-in-use':
-        return AuthException(code: e.code, message: 'Email already in use.');
-      case 'user-not-found':
-        return AuthException(
-          code: e.code,
-          message: 'No user found for that email.',
-        );
-      case 'wrong-password':
-        return AuthException(code: e.code, message: 'Incorrect password.');
-      case 'invalid-email':
-        return AuthException(code: e.code, message: 'Invalid email address.');
-      case 'user-disabled':
-        return AuthException(
-          code: e.code,
-          message: 'This account has been disabled.',
-        );
-      case 'too-many-requests':
-        return AuthException(
-          code: e.code,
-          message: 'Too many attempts. Try again later.',
-        );
-      default:
-        return AuthException(
-          code: e.code,
-          message: 'An unexpected error occurred.',
-        );
+  @override
+  Future<void> sendPasswordResetEmail(String email) async {
+    if (email.trim().isEmpty) throw const InvalidEmailException();
+    try {
+      await _auth.sendPasswordResetEmail(email: email.trim());
+    } on FirebaseAuthException catch (e) {
+      throw _mapException(e);
     }
+  }
+
+  @override
+  Future<void> deleteAccount() async {
+    final user = _auth.currentUser;
+    if (user == null) throw const UnauthenticatedException();
+    try {
+      await user.delete();
+    } on FirebaseAuthException catch (e) {
+      throw _mapException(e);
+    }
+  }
+
+  AuthUser _mapUser(User user) => AuthUser(
+    uid: user.uid,
+    email: user.email,
+    isEmailVerified: user.emailVerified,
+    displayName: user.displayName,
+    photoUrl: user.photoURL,
+  );
+
+  void _validateInputs(String email, String password) {
+    if (email.trim().isEmpty || password.isEmpty) {
+      throw const InvalidEmailException();
+    }
+  }
+
+  AuthException _mapException(FirebaseAuthException e) {
+    return switch (e.code) {
+      'weak-password' => const WeakPasswordException(),
+      'email-already-in-use' => const EmailAlreadyInUseException(),
+      'user-not-found' => const UserNotFoundException(),
+      'wrong-password' => const WrongPasswordException(),
+      'invalid-credential' =>
+        const WrongPasswordException(), // Firebase v10+ merges these
+      'invalid-email' => const InvalidEmailException(),
+      'user-disabled' => const UserDisabledException(),
+      'too-many-requests' => const TooManyRequestsException(),
+      _ => UnknownAuthException(
+        code: e.code,
+        message: e.message ?? 'Unexpected error.',
+      ),
+    };
   }
 }
