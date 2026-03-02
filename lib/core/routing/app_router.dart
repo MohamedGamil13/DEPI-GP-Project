@@ -15,6 +15,8 @@ final GoRouter router = GoRouter(
   initialLocation: AppScreens.splashScreen,
   redirect: (context, state) {
     final bool isLoggedIn = getIt<AuthService>().currentUser != null;
+    final bool isSplash = state.matchedLocation == AppScreens.splashScreen;
+    if (isSplash) return null; //to start with splash
     final bool isOnAuthRoute = [
       AppScreens.signinScreen,
       AppScreens.signupScreen,
