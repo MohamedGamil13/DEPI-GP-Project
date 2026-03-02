@@ -6,7 +6,7 @@ class GoRouterRefreshStream extends ChangeNotifier {
   late final StreamSubscription<dynamic> _sub;
 
   GoRouterRefreshStream(Stream<dynamic> stream) {
-    _sub = stream.asBroadcastStream().listen((_) => notifyListeners());
+    _sub = stream.listen((_) => notifyListeners());
   }
 
   @override
@@ -15,3 +15,4 @@ class GoRouterRefreshStream extends ChangeNotifier {
     super.dispose();
   }
 }
+//this is work as adapter for know firebasechage

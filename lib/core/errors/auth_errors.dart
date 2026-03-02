@@ -1,6 +1,3 @@
-// core/errors/auth_exception.dart
-
-/// Sealed = exhaustive switch in Dart 3, no unknown subclasses
 sealed class AuthException implements Exception {
   final String code;
   final String message;

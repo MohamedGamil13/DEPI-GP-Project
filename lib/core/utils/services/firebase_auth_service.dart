@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:skillbridge/core/errors/auth_errors.dart';
 import 'package:skillbridge/core/models/auth_user_model.dart';
 import 'package:skillbridge/core/utils/services/firebase_auth_service_repo.dart';
+import 'package:skillbridge/core/utils/validator/app_validator.dart';
 
 class FirebaseAuthService implements AuthService {
   final FirebaseAuth _auth;
@@ -22,17 +23,21 @@ class FirebaseAuthService implements AuthService {
 
   @override
   Future<AuthUser> register(String email, String password) async {
-    _validateInputs(email, password);
-    try {
-      final credential = await _auth.createUserWithEmailAndPassword(
-        email: email.trim(),
-        password: password,
-      );
-      // Auto-send verification on register
-      await credential.user?.sendEmailVerification();
-      return _mapUser(credential.user!);
-    } on FirebaseAuthException catch (e) {
-      throw _mapException(e);
+    String? isnull = AppValidator.validateEmail(email);
+    if (isnull == null) {
+      try {
+        final credential = await _auth.createUserWithEmailAndPassword(
+          email: email.trim(),
+          password: password,
+        );
+        // Auto-send verification on register
+        await credential.user?.sendEmailVerification();
+        return _mapUser(credential.user!);
+      } on FirebaseAuthException catch (e) {
+        throw _mapException(e);
+      }
+    } else {
+      throw const InvalidEmailException();
     }
   }
 

@@ -12,8 +12,8 @@ import 'package:skillbridge/features/splash/splash_screen.dart';
 final GoRouter router = GoRouter(
   initialLocation: AppScreens.splashScreen,
   redirect: (context, state) {
-    final isLoggedIn = getIt<AuthService>().currentUser != null;
-    final isOnAuthRoute = [
+    final bool isLoggedIn = getIt<AuthService>().currentUser != null;
+    final bool isOnAuthRoute = [
       AppScreens.signinScreen,
       AppScreens.signupScreen,
       AppScreens.forgetPasswordScreen,
