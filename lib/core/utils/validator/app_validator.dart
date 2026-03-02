@@ -1,9 +1,8 @@
 /// A utility class containing static methods for common text field validations.
 /// These validators are designed to be used directly in Flutter [TextFormField] widgets.
 class AppValidator {
-  
   /// Validates if a required field is left empty.
-  /// 
+  ///
   /// Optionally takes a [fieldName] to customize the error message.
   static String? validateRequired(String? value, {String? fieldName}) {
     if (value == null || value.trim().isEmpty) {
@@ -13,7 +12,7 @@ class AppValidator {
   }
 
   /// Validates a full name input.
-  /// 
+  ///
   /// Checks if the field is empty and ensures that at least a first and last name
   /// have been provided (separated by a space).
   static String? validateFullName(String? value) {
@@ -28,7 +27,7 @@ class AppValidator {
   }
 
   /// Validates an email address using a standard regular expression.
-  /// 
+  ///
   /// Returns an error string if the email is incorrectly formatted or empty.
   static String? validateEmail(String? value) {
     if (value == null || value.trim().isEmpty) {
@@ -45,7 +44,7 @@ class AppValidator {
   }
 
   /// Validates a password field with common security requirements.
-  /// 
+  ///
   /// Requirements:
   /// - Minimum 8 characters in length
   /// - At least one uppercase letter
@@ -56,7 +55,7 @@ class AppValidator {
       return 'Password is required';
     }
     if (value.length < 8) {
-      return 'Password must be at least 8 characters long';
+      return 'Password must be at least 8 characters ';
     }
     if (!value.contains(RegExp(r'[A-Z]'))) {
       return 'Password must contain at least one uppercase letter';
@@ -71,9 +70,12 @@ class AppValidator {
   }
 
   /// Validates a password confirmation field.
-  /// 
+  ///
   /// Compares the [value] against the [originalPassword] to ensure they match.
-  static String? validateConfirmPassword(String? value, String? originalPassword) {
+  static String? validateConfirmPassword(
+    String? value,
+    String? originalPassword,
+  ) {
     if (value == null || value.trim().isEmpty) {
       return 'Please confirm your password';
     }
@@ -84,7 +86,7 @@ class AppValidator {
   }
 
   /// Validates a phone number.
-  /// 
+  ///
   /// Expects a phone number containing 10-15 digits, ignoring spaces and dashes.
   /// An optional leading '+' is allowed.
   static String? validatePhoneNumber(String? value) {
@@ -101,14 +103,14 @@ class AppValidator {
   }
 
   /// Validates a field that can accept either a phone number or an email address.
-  /// 
+  ///
   /// This is commonly used in Sign In screens where users can authenticate
   /// using either piece of information.
   static String? validatePhoneOrEmail(String? value) {
     if (value == null || value.trim().isEmpty) {
       return 'Phone or Email is required';
     }
-    
+
     // If the input contains an '@' or english letters, we assume it is an email
     if (value.contains('@') || value.contains(RegExp(r'[a-zA-Z]'))) {
       final emailError = validateEmail(value);

@@ -1,3 +1,4 @@
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skillbridge/core/routing/app_screens.dart';
 import 'package:skillbridge/core/routing/routing_stream_refresh.dart';
@@ -6,6 +7,7 @@ import 'package:skillbridge/core/utils/services/firebase_auth_service_repo.dart'
 import 'package:skillbridge/features/auth/presentation/screens/forgot_password_screen.dart';
 import 'package:skillbridge/features/auth/presentation/screens/sign_in_screen.dart';
 import 'package:skillbridge/features/auth/presentation/screens/sign_up_screen.dart';
+import 'package:skillbridge/features/auth/presentation/viewmodel/auth_cubit.dart';
 import 'package:skillbridge/features/home/home_screen.dart';
 import 'package:skillbridge/features/splash/splash_screen.dart';
 
@@ -42,19 +44,28 @@ final GoRouter router = GoRouter(
     GoRoute(
       path: AppScreens.signinScreen,
       builder: (context, state) {
-        return const SignInScreen();
+        return BlocProvider(
+          create: (context) => AuthCubit(getIt<AuthService>()),
+          child: const SignInScreen(),
+        );
       },
     ),
     GoRoute(
       path: AppScreens.signupScreen,
       builder: (context, state) {
-        return const SignUpScreen();
+        return BlocProvider(
+          create: (context) => AuthCubit(getIt<AuthService>()),
+          child: const SignUpScreen(),
+        );
       },
     ),
     GoRoute(
       path: AppScreens.forgetPasswordScreen,
       builder: (context, state) {
-        return const ForgotPasswordScreen();
+        return BlocProvider(
+          create: (context) => AuthCubit(getIt<AuthService>()),
+          child: const ForgotPasswordScreen(),
+        );
       },
     ),
   ],

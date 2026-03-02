@@ -26,11 +26,12 @@ class FirebaseAuthService implements AuthService {
     String? isnull = AppValidator.validateEmail(email);
     if (isnull == null) {
       try {
-        final credential = await _auth.createUserWithEmailAndPassword(
-          email: email.trim(),
-          password: password,
-        );
-        // Auto-send verification on register
+        final UserCredential credential = await _auth
+            .createUserWithEmailAndPassword(
+              email: email.trim(),
+              password: password,
+            );
+
         await credential.user?.sendEmailVerification();
         return _mapUser(credential.user!);
       } on FirebaseAuthException catch (e) {
@@ -51,7 +52,6 @@ class FirebaseAuthService implements AuthService {
       );
       final user = credential.user!;
 
-      // ✅ Guard: block unverified users at the service layer
       if (!user.emailVerified) {
         await _auth.signOut();
         throw const UnverifiedEmailException();
@@ -75,7 +75,7 @@ class FirebaseAuthService implements AuthService {
   @override
   Future<void> sendVerificationEmail() async {
     final user = _auth.currentUser;
-    // ✅ Throw explicitly instead of silently swallowing null
+
     if (user == null) throw const UnauthenticatedException();
     try {
       await user.sendEmailVerification();
@@ -111,7 +111,7 @@ class FirebaseAuthService implements AuthService {
     isEmailVerified: user.emailVerified,
     displayName: user.displayName,
     photoUrl: user.photoURL,
-  );
+  ); //convert from firebase user to our authUser model
 
   void _validateInputs(String email, String password) {
     if (email.trim().isEmpty || password.isEmpty) {
@@ -125,8 +125,7 @@ class FirebaseAuthService implements AuthService {
       'email-already-in-use' => const EmailAlreadyInUseException(),
       'user-not-found' => const UserNotFoundException(),
       'wrong-password' => const WrongPasswordException(),
-      'invalid-credential' =>
-        const WrongPasswordException(), // Firebase v10+ merges these
+      'invalid-credential' => const WrongPasswordException(),
       'invalid-email' => const InvalidEmailException(),
       'user-disabled' => const UserDisabledException(),
       'too-many-requests' => const TooManyRequestsException(),

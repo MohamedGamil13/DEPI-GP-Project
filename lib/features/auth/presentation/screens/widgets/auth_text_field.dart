@@ -7,6 +7,7 @@ class AuthTextField extends StatefulWidget {
   final bool obscure;
   final bool showToggle;
   final TextEditingController? controller;
+  final String? Function(String?)? validator;
 
   const AuthTextField({
     super.key,
@@ -15,6 +16,7 @@ class AuthTextField extends StatefulWidget {
     this.obscure = false,
     this.showToggle = false,
     this.controller,
+    this.validator,
   });
 
   @override
@@ -32,50 +34,59 @@ class _AuthTextFieldState extends State<AuthTextField> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 52,
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Row(
-        children: [
-          const SizedBox(width: 14),
-          Icon(widget.prefixIcon, size: 18, color: AppColors.textLight),
-          const SizedBox(width: 10),
-          Expanded(
-            child: TextField(
-              cursorColor: Colors.blue,
-              controller: widget.controller,
-              obscureText: _obscure,
-              style: const TextStyle(fontSize: 14, color: AppColors.textDark),
-              decoration: InputDecoration(
-                hintText: widget.hint,
-                hintStyle: const TextStyle(
-                  fontSize: 14,
+    return TextFormField(
+      validator: widget.validator,
+      controller: widget.controller,
+      obscureText: _obscure,
+      cursorColor: AppColors.primaryColor,
+      style: const TextStyle(fontSize: 14, color: AppColors.textDark),
+      decoration: InputDecoration(
+        hintText: widget.hint,
+        hintStyle: const TextStyle(fontSize: 14, color: AppColors.textLight),
+
+        // Prefix Icon
+        prefixIcon: Icon(
+          widget.prefixIcon,
+          size: 18,
+          color: AppColors.textLight,
+        ),
+
+        // Suffix Toggle for obscure (password)
+        suffixIcon: widget.showToggle
+            ? IconButton(
+                icon: Icon(
+                  _obscure
+                      ? Icons.visibility_outlined
+                      : Icons.visibility_off_outlined,
+                  size: 18,
                   color: AppColors.textLight,
                 ),
-                border: InputBorder.none,
-                isDense: true,
-                contentPadding: EdgeInsets.zero,
-              ),
-            ),
-          ),
-          if (widget.showToggle) ...[
-            GestureDetector(
-              onTap: () => setState(() => _obscure = !_obscure),
-              child: Icon(
-                _obscure
-                    ? Icons.visibility_outlined
-                    : Icons.visibility_off_outlined,
-                size: 18,
-                color: AppColors.textLight,
-              ),
-            ),
-            const SizedBox(width: 14),
-          ],
-        ],
+                onPressed: () => setState(() => _obscure = !_obscure),
+              )
+            : null,
+
+        // Borders
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppColors.border),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppColors.primaryColor),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.red),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.red, width: 1.5),
+        ),
+
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
       ),
     );
   }
