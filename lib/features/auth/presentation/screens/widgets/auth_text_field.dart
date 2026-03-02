@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:skillbridge/core/theme/app_colors.dart';
+import 'package:skillbridge/core/theme/app_styles.dart';
 
 class AuthTextField extends StatefulWidget {
   final String hint;
@@ -39,10 +40,10 @@ class _AuthTextFieldState extends State<AuthTextField> {
       controller: widget.controller,
       obscureText: _obscure,
       cursorColor: AppColors.primaryColor,
-      style: const TextStyle(fontSize: 14, color: AppColors.textDark),
+      style: AppStyles.font14w600,
       decoration: InputDecoration(
         hintText: widget.hint,
-        hintStyle: const TextStyle(fontSize: 14, color: AppColors.textLight),
+        hintStyle: AppStyles.font14w600.copyWith(color: AppColors.textLight),
 
         // Prefix Icon
         prefixIcon: Icon(

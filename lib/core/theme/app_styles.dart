@@ -7,5 +7,15 @@ abstract class AppStyles {
     fontSize: 40,
     color: AppColors.primaryColor,
   );
+  static const TextStyle font14w600 = TextStyle(
+    fontSize: 14,
+    fontWeight: FontWeight.w600,
+    color: AppColors.textDark,
+  );
+  static const TextStyle font14Regular = TextStyle(
+    fontSize: 14,
+    color: AppColors.textDark,
+  );
+
   AppStyles._(); //to prevent any one  to take an instance from this class
 }

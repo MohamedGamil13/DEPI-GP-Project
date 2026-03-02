@@ -1,4 +1,3 @@
-// core/services/firebase_auth_service.dart
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:skillbridge/core/errors/auth_errors.dart';
 import 'package:skillbridge/core/models/auth_user_model.dart';
@@ -13,7 +12,7 @@ class FirebaseAuthService implements AuthService {
   @override
   Stream<AuthUser?> get authStateChanges => _auth.authStateChanges().map(
     (user) => user == null ? null : _mapUser(user),
-  ); //to know
+  );
 
   @override
   AuthUser? get currentUser {
@@ -23,33 +22,36 @@ class FirebaseAuthService implements AuthService {
 
   @override
   Future<AuthUser> register(String email, String password) async {
-    String? isnull = AppValidator.validateEmail(email);
-    if (isnull == null) {
-      try {
-        final UserCredential credential = await _auth
-            .createUserWithEmailAndPassword(
-              email: email.trim(),
-              password: password,
-            );
+    String? emailError = AppValidator.validateEmail(email);
 
-        await credential.user?.sendEmailVerification();
-        return _mapUser(credential.user!);
-      } on FirebaseAuthException catch (e) {
-        throw _mapException(e);
-      }
-    } else {
+    if (emailError != null) {
       throw const InvalidEmailException();
+    }
+
+    try {
+      final credential = await _auth.createUserWithEmailAndPassword(
+        email: email.trim(),
+        password: password,
+      );
+
+      await credential.user?.sendEmailVerification();
+
+      return _mapUser(credential.user!);
+    } on FirebaseAuthException catch (e) {
+      throw _mapException(e);
     }
   }
 
   @override
   Future<AuthUser> signIn(String email, String password) async {
     _validateInputs(email, password);
+
     try {
       final credential = await _auth.signInWithEmailAndPassword(
         email: email.trim(),
         password: password,
       );
+
       final user = credential.user!;
 
       if (!user.emailVerified) {
@@ -76,7 +78,10 @@ class FirebaseAuthService implements AuthService {
   Future<void> sendVerificationEmail() async {
     final user = _auth.currentUser;
 
-    if (user == null) throw const UnauthenticatedException();
+    if (user == null) {
+      throw const UnauthenticatedException();
+    }
+
     try {
       await user.sendEmailVerification();
     } on FirebaseAuthException catch (e) {
@@ -86,7 +91,10 @@ class FirebaseAuthService implements AuthService {
 
   @override
   Future<void> sendPasswordResetEmail(String email) async {
-    if (email.trim().isEmpty) throw const InvalidEmailException();
+    if (email.trim().isEmpty) {
+      throw const InvalidEmailException();
+    }
+
     try {
       await _auth.sendPasswordResetEmail(email: email.trim());
     } on FirebaseAuthException catch (e) {
@@ -97,7 +105,11 @@ class FirebaseAuthService implements AuthService {
   @override
   Future<void> deleteAccount() async {
     final user = _auth.currentUser;
-    if (user == null) throw const UnauthenticatedException();
+
+    if (user == null) {
+      throw const UnauthenticatedException();
+    }
+
     try {
       await user.delete();
     } on FirebaseAuthException catch (e) {
@@ -111,7 +123,7 @@ class FirebaseAuthService implements AuthService {
     isEmailVerified: user.emailVerified,
     displayName: user.displayName,
     photoUrl: user.photoURL,
-  ); //convert from firebase user to our authUser model
+  );
 
   void _validateInputs(String email, String password) {
     if (email.trim().isEmpty || password.isEmpty) {
@@ -123,15 +135,22 @@ class FirebaseAuthService implements AuthService {
     return switch (e.code) {
       'weak-password' => const WeakPasswordException(),
       'email-already-in-use' => const EmailAlreadyInUseException(),
-      'user-not-found' => const UserNotFoundException(),
-      'wrong-password' => const WrongPasswordException(),
-      'invalid-credential' => const WrongPasswordException(),
+
+      // 🔐 Unified error for login security
+      'user-not-found' ||
+      'wrong-password' ||
+      'invalid-credential' => const UnknownAuthException(
+        code: 'invalid-credential',
+        message: 'Email or password is incorrect.',
+      ),
+
       'invalid-email' => const InvalidEmailException(),
       'user-disabled' => const UserDisabledException(),
       'too-many-requests' => const TooManyRequestsException(),
+
       _ => UnknownAuthException(
         code: e.code,
-        message: e.message ?? 'Unexpected error.',
+        message: e.message ?? 'Unexpected authentication error.',
       ),
     };
   }
