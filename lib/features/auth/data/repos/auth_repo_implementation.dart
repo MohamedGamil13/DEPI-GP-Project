@@ -35,4 +35,14 @@ class AuthRepoImplementation extends AuthRepo {
       return Failure(e);
     }
   }
+
+  @override
+  Future<Result<void>> sendVerificationEmail() async {
+    try {
+      await authService.sendVerificationEmail();
+      return const Success(null);
+    } on AuthException catch (e) {
+      return Failure(e);
+    }
+  }
 }

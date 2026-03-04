@@ -9,9 +9,7 @@ part 'auth_state.dart';
 class AuthCubit extends Cubit<AuthState> {
   final AuthService authService;
   AuthCubit(this.authService) : super(AuthInitial());
-  //   Future<Result<AuthUser>> signIn(String email, String password);
-  // Future<Result<AuthUser>> signUp(String email, String password);
-  // Future<Result<void>> sendPasswordResetEmail(String email);
+
   Future<void> signUp(String email, String password) async {
     emit(AuthLoading());
     try {
@@ -40,6 +38,18 @@ class AuthCubit extends Cubit<AuthState> {
     emit(AuthLoading());
     try {
       await authService.sendPasswordResetEmail(email);
+      emit(AuthSendPasswordSucees());
+    } on AuthException catch (e) {
+      emit(AuthFaliure(errorMassege: e.message));
+    } catch (e) {
+      emit(AuthFaliure(errorMassege: e.toString()));
+    }
+  }
+
+  Future<void> sendVerificationEmail() async {
+    emit(AuthLoading());
+    try {
+      await authService.sendVerificationEmail();
       emit(AuthSendPasswordSucees());
     } on AuthException catch (e) {
       emit(AuthFaliure(errorMassege: e.message));

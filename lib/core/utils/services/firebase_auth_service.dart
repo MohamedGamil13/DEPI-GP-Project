@@ -135,8 +135,6 @@ class FirebaseAuthService implements AuthService {
     return switch (e.code) {
       'weak-password' => const WeakPasswordException(),
       'email-already-in-use' => const EmailAlreadyInUseException(),
-
-      // 🔐 Unified error for login security
       'user-not-found' ||
       'wrong-password' ||
       'invalid-credential' => const UnknownAuthException(
