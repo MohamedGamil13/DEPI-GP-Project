@@ -1,15 +1,19 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:skillbridge/core/routing/app_router.dart';
 import 'package:skillbridge/core/utils/locator/service_locator.dart';
+import 'package:skillbridge/core/utils/observers/bloc_observer.dart';
 import 'package:skillbridge/firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await ScreenUtil.ensureScreenSize();
+  Bloc.observer = AppBlocObserver();
   setupLocator();
+
   runApp(const SkillBridge());
 }
 
