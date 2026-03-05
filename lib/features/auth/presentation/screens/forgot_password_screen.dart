@@ -40,6 +40,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
             if (state is AuthSendPasswordSuccess) {
               AppSnackBar.success(context, "Reset link sent to your email");
+              context.gosignIn();
             }
           },
           child: SingleChildScrollView(
