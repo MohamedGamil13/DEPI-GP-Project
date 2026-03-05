@@ -14,6 +14,5 @@ abstract class AppColors {
   static const Color textMedium = Color(0xFF555555);
   static const Color primaryLight = Color(0xFFE8F0FF);
   static const Color watermark = Color(0xFFCCDDFF);
-
   AppColors._(); //to prevent any one  to take an instance from this class
 }

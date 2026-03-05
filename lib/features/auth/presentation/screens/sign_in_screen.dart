@@ -35,8 +35,8 @@ class _SignInScreenState extends State<SignInScreen> {
       body: SafeArea(
         child: BlocListener<AuthCubit, AuthState>(
           listener: (context, state) {
-            if (state is AuthFaliure) {
-              AppSnackBar.error(context, state.errorMassege);
+            if (state is AuthFailure) {
+              AppSnackBar.error(context, state.errorMessage);
             }
           },
           child: Center(

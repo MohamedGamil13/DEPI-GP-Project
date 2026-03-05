@@ -4,6 +4,7 @@ import 'package:skillbridge/core/routing/app_screens.dart';
 import 'package:skillbridge/core/routing/routing_stream_refresh.dart';
 import 'package:skillbridge/core/utils/locator/service_locator.dart';
 import 'package:skillbridge/core/utils/services/firebase_auth_service_repo.dart';
+import 'package:skillbridge/features/auth/data/repos/auth_repo.dart';
 import 'package:skillbridge/features/auth/presentation/screens/forgot_password_screen.dart';
 import 'package:skillbridge/features/auth/presentation/screens/sign_in_screen.dart';
 import 'package:skillbridge/features/auth/presentation/screens/sign_up_screen.dart';
@@ -47,7 +48,7 @@ final GoRouter router = GoRouter(
       path: AppScreens.signinScreen,
       builder: (context, state) {
         return BlocProvider(
-          create: (context) => AuthCubit(getIt<AuthService>()),
+          create: (context) => AuthCubit(getIt<AuthRepo>()),
           child: const SignInScreen(),
         );
       },
@@ -56,7 +57,7 @@ final GoRouter router = GoRouter(
       path: AppScreens.signupScreen,
       builder: (context, state) {
         return BlocProvider(
-          create: (context) => AuthCubit(getIt<AuthService>()),
+          create: (context) => AuthCubit(getIt<AuthRepo>()),
           child: const SignUpScreen(),
         );
       },
@@ -65,7 +66,7 @@ final GoRouter router = GoRouter(
       path: AppScreens.forgetPasswordScreen,
       builder: (context, state) {
         return BlocProvider(
-          create: (context) => AuthCubit(getIt<AuthService>()),
+          create: (context) => AuthCubit(getIt<AuthRepo>()),
           child: const ForgotPasswordScreen(),
         );
       },

@@ -1,60 +1,61 @@
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
-import 'package:skillbridge/core/errors/auth_errors.dart';
 import 'package:skillbridge/core/models/auth_user_model.dart';
-import 'package:skillbridge/core/utils/services/firebase_auth_service_repo.dart';
+import 'package:skillbridge/core/utils/validator/result.dart';
+import 'package:skillbridge/features/auth/data/repos/auth_repo.dart';
 
 part 'auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
-  final AuthService authService;
-  AuthCubit(this.authService) : super(AuthInitial());
+  final AuthRepo authRepo;
+
+  AuthCubit(this.authRepo) : super(AuthInitial());
 
   Future<void> signUp(String email, String password) async {
     emit(AuthLoading());
-    try {
-      final AuthUser user = await authService.register(email, password);
-      emit(AuthSucess(user: user));
-    } on AuthException catch (e) {
-      emit(AuthFaliure(errorMassege: e.message));
-    } catch (e) {
-      emit(AuthFaliure(errorMassege: e.toString()));
+    final result = await authRepo.signUp(email, password);
+
+    switch (result) {
+      case Success(:final data):
+        emit(AuthSuccess(user: data));
+      case Failure(:final exception):
+        emit(AuthFailure(errorMessage: exception.message));
     }
   }
 
   Future<void> signIn(String email, String password) async {
     emit(AuthLoading());
-    try {
-      final AuthUser user = await authService.signIn(email, password);
-      emit(AuthSucess(user: user));
-    } on AuthException catch (e) {
-      emit(AuthFaliure(errorMassege: e.message));
-    } catch (e) {
-      emit(AuthFaliure(errorMassege: e.toString()));
+    final result = await authRepo.signIn(email, password);
+
+    switch (result) {
+      case Success(:final data):
+        emit(AuthSuccess(user: data));
+      case Failure(:final exception):
+        emit(AuthFailure(errorMessage: exception.message));
     }
   }
 
   Future<void> sendPasswordResetEmail(String email) async {
     emit(AuthLoading());
-    try {
-      await authService.sendPasswordResetEmail(email);
-      emit(AuthSendPasswordSucees());
-    } on AuthException catch (e) {
-      emit(AuthFaliure(errorMassege: e.message));
-    } catch (e) {
-      emit(AuthFaliure(errorMassege: e.toString()));
+    final result = await authRepo.sendPasswordResetEmail(email);
+
+    switch (result) {
+      case Success():
+        emit(AuthSendPasswordSuccess());
+      case Failure(:final exception):
+        emit(AuthFailure(errorMessage: exception.message));
     }
   }
 
   Future<void> sendVerificationEmail() async {
     emit(AuthLoading());
-    try {
-      await authService.sendVerificationEmail();
-      emit(AuthSendPasswordSucees());
-    } on AuthException catch (e) {
-      emit(AuthFaliure(errorMassege: e.message));
-    } catch (e) {
-      emit(AuthFaliure(errorMassege: e.toString()));
+    final result = await authRepo.sendVerificationEmail();
+
+    switch (result) {
+      case Success():
+        emit(AuthSendPasswordSuccess());
+      case Failure(:final exception):
+        emit(AuthFailure(errorMessage: exception.message));
     }
   }
 }

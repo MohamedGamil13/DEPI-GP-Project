@@ -5,18 +5,16 @@ abstract class AuthState {}
 
 class AuthInitial extends AuthState {}
 
-class AuthSucess extends AuthState {
+class AuthSuccess extends AuthState {
   final AuthUser user;
-
-  AuthSucess({required this.user});
+  AuthSuccess({required this.user});
 }
 
-class AuthFaliure extends AuthState {
-  final String errorMassege;
-
-  AuthFaliure({required this.errorMassege});
+class AuthFailure extends AuthState {
+  final String errorMessage;
+  AuthFailure({required this.errorMessage});
 }
 
 class AuthLoading extends AuthState {}
 
-class AuthSendPasswordSucees extends AuthState {}
+class AuthSendPasswordSuccess extends AuthState {}
