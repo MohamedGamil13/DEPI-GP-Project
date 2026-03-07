@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "649211504330",
+    "project_id": "servimarket-83d3a",
+    "storage_bucket": "servimarket-83d3a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:649211504330:android:6215a56773e611acdaf633",
+        "android_client_info": {
+          "package_name": "com.example.skillbridge"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAIvy223ubdd6lX_LCBaSAQKwzgfsiyMXk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
