@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
-import 'package:skillbridge/core/utils/services/firebase_auth_service.dart';
-import 'package:skillbridge/core/utils/services/firebase_auth_service_repo.dart';
+import 'package:skillbridge/core/utils/services/auth/firebase_auth_service.dart';
+import 'package:skillbridge/core/utils/services/auth/firebase_auth_service_repo.dart';
 import 'package:skillbridge/features/auth/data/repos/auth_repo.dart';
 import 'package:skillbridge/features/auth/data/repos/auth_repo_implementation.dart';
 import 'package:skillbridge/features/auth/presentation/viewmodel/auth_cubit.dart';
