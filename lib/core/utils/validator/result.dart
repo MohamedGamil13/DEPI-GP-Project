@@ -1,4 +1,4 @@
-import 'package:skillbridge/core/errors/auth_errors.dart';
+import 'package:skillbridge/core/errors/auth_exception.dart';
 
 sealed class Result<T> {
   const Result();

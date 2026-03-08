@@ -1,4 +1,4 @@
-import 'package:skillbridge/core/errors/auth_errors.dart';
+import 'package:skillbridge/core/errors/auth_exception.dart';
 import 'package:skillbridge/core/models/auth_user_model.dart';
 import 'package:skillbridge/core/utils/validator/result.dart';
 import 'package:skillbridge/features/auth/data/repos/auth_repo.dart';
