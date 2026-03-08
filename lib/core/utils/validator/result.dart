@@ -1,4 +1,4 @@
-import 'package:skillbridge/core/errors/auth_exception.dart';
+import 'package:skillbridge/core/errors/app_exception.dart';
 
 sealed class Result<T> {
   const Result();
@@ -10,6 +10,6 @@ final class Success<T> extends Result<T> {
 }
 
 final class Failure<T> extends Result<T> {
-  final AuthException exception;
+  final AppException exception;
   const Failure(this.exception);
 }
