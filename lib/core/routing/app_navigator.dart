@@ -8,4 +8,5 @@ extension AppNavigator on BuildContext {
   void gosignIn() => go(AppScreens.signinScreen);
   void gosignUp() => go(AppScreens.signupScreen);
   void goForgetPassword() => go(AppScreens.forgetPasswordScreen);
+  void goAddPost() => go(AppScreens.postAdScreen);
 }
