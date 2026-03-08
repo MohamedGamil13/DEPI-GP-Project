@@ -20,6 +20,19 @@ class AdModel {
     required this.adCity,
     required this.adID,
   });
+  Map<String, dynamic> toJson() {
+    return {
+      "adID": adID,
+      "title": title,
+      "description": description,
+      "city": city,
+      "photos": photos,
+      "price": price,
+      "category": category.name,
+      "relevantSkills": relevantSkills?.map((skill) => skill.name).toList(),
+      "adCity": adCity.name,
+    };
+  }
 }
 
 enum AdCategory {
