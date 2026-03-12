@@ -8,7 +8,7 @@ import 'package:skillbridge/features/auth/presentation/screens/forgot_password_s
 import 'package:skillbridge/features/auth/presentation/screens/sign_in_screen.dart';
 import 'package:skillbridge/features/auth/presentation/screens/sign_up_screen.dart';
 import 'package:skillbridge/features/auth/presentation/viewmodel/auth_cubit.dart';
-import 'package:skillbridge/features/home/home_screen.dart';
+import 'package:skillbridge/features/home/presentation/screens/home_screen.dart';
 import 'package:skillbridge/features/splash/splash_screen.dart';
 
 final GoRouter router = GoRouter(
