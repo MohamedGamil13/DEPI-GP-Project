@@ -20,6 +20,7 @@ class AdModel {
     required this.adCity,
     required this.adID,
   });
+
   Map<String, dynamic> toJson() {
     return {
       "adID": adID,
@@ -47,6 +48,30 @@ class AdModel {
           ?.map((s) => RelevantSkills.values.byName(s))
           .toList(),
       adCity: AdCity.values.byName(json['adCity']),
+    );
+  }
+
+  AdModel copyWith({
+    int? adID,
+    String? title,
+    String? description,
+    String? city,
+    List<String>? photos,
+    double? price,
+    AdCategory? category,
+    List<RelevantSkills>? relevantSkills,
+    AdCity? adCity,
+  }) {
+    return AdModel(
+      adID: adID ?? this.adID,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      city: city ?? this.city,
+      photos: photos ?? this.photos,
+      price: price ?? this.price,
+      category: category ?? this.category,
+      relevantSkills: relevantSkills ?? this.relevantSkills,
+      adCity: adCity ?? this.adCity,
     );
   }
 }

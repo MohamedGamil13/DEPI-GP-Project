@@ -1,35 +1,57 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:get_it/get_it.dart';
 import 'package:skillbridge/core/utils/services/auth/firebase_auth_service.dart';
 import 'package:skillbridge/core/utils/services/auth/firebase_auth_service_repo.dart';
 import 'package:skillbridge/core/utils/services/firestore/firestore_repo.dart';
 import 'package:skillbridge/core/utils/services/firestore/firestore_repo_service.dart';
+import 'package:skillbridge/core/utils/services/storage/firebase_storage_service.dart';
+import 'package:skillbridge/core/utils/services/storage/storage_service.dart';
 import 'package:skillbridge/features/auth/data/repos/auth_repo.dart';
 import 'package:skillbridge/features/auth/data/repos/auth_repo_implementation.dart';
 import 'package:skillbridge/features/auth/presentation/viewmodel/auth_cubit.dart';
+import 'package:skillbridge/features/post_ad/data/repos/post_ad_repo.dart';
+import 'package:skillbridge/features/post_ad/data/repos/post_ad_repo_impl.dart';
+import 'package:skillbridge/features/post_ad/presentation/viewModel/ad_posting_cubit.dart';
 
 GetIt getIt =
     GetIt.instance; //take an intance from get_it => i use this package for DI
 
 void setupLocator() {
-  //for firebase auth instance => used in AuthService
+  // Firebase instances
   getIt.registerLazySingleton<FirebaseAuth>(() => FirebaseAuth.instance);
-
-  //for authService instance => used in auth repo
-  getIt.registerLazySingleton<AuthService>(
-    () => FirebaseAuthService(getIt<FirebaseAuth>()),
-  );
-  //for auth repo => used in cubit
-  getIt.registerLazySingleton<AuthRepo>(
-    () => AuthRepoImplementation(authService: getIt<AuthService>()),
-  );
-  getIt.registerFactory<AuthCubit>(() => AuthCubit(getIt<AuthRepo>()));
   getIt.registerLazySingleton<FirebaseFirestore>(
     () => FirebaseFirestore.instance,
   );
+  getIt.registerLazySingleton<FirebaseStorage>(() => FirebaseStorage.instance);
+
+  // Services
+  getIt.registerLazySingleton<AuthService>(
+    () => FirebaseAuthService(getIt<FirebaseAuth>()),
+  );
   getIt.registerLazySingleton<FirestoreRepo>(
     () => FirestoreService(db: getIt<FirebaseFirestore>()),
+  );
+  getIt.registerLazySingleton<StorageService>(
+    () => FirebaseStorageService(storage: getIt<FirebaseStorage>()),
+  );
+
+  // Repos
+  getIt.registerLazySingleton<AuthRepo>(
+    () => AuthRepoImplementation(authService: getIt<AuthService>()),
+  );
+  getIt.registerLazySingleton<PostAdRepo>(
+    () => PostAdRepoImplementation(
+      firestoreRepo: getIt<FirestoreRepo>(),
+      storageService: getIt<StorageService>(),
+    ),
+  );
+
+  // Cubits
+  getIt.registerFactory<AuthCubit>(() => AuthCubit(getIt<AuthRepo>()));
+  getIt.registerFactory<AdPostingCubit>(
+    () => AdPostingCubit(getIt<PostAdRepo>()),
   );
 }
 //our flow => auth methods(firebase or something else) >  AuthService(deal with any authsevice from any source) => Auth repo(deal with authService only) => Auth cubit(deal with repo only) => UI
