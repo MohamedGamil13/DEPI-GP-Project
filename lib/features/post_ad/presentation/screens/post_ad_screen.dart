@@ -8,7 +8,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:skillbridge/core/models/ad_model.dart';
 import 'package:skillbridge/core/routing/app_navigator.dart';
 import 'package:skillbridge/core/theme/app_colors.dart';
-import 'package:skillbridge/core/theme/app_styles.dart';
 import 'package:skillbridge/core/utils/helpers/snackbar_manger.dart';
 import 'package:skillbridge/core/utils/validator/app_validator.dart';
 import 'package:skillbridge/features/auth/presentation/screens/widgets/field_label.dart';
@@ -16,6 +15,7 @@ import 'package:skillbridge/features/auth/presentation/screens/widgets/primary_b
 import 'package:skillbridge/features/post_ad/presentation/viewModel/ad_posting_cubit.dart';
 import 'package:skillbridge/features/post_ad/presentation/widgets/category_dropdown.dart';
 import 'package:skillbridge/features/post_ad/presentation/widgets/photo_upload_section.dart';
+import 'package:skillbridge/features/post_ad/presentation/widgets/post_ad_app_bar.dart';
 import 'package:skillbridge/features/post_ad/presentation/widgets/post_ad_text_field.dart';
 import 'package:skillbridge/features/post_ad/presentation/widgets/skills_section.dart';
 
@@ -55,55 +55,6 @@ class _PostAdScreenState extends State<PostAdScreen> {
     super.dispose();
   }
 
-  Future<void> _pickImages(AdPostingCubit cubit) async {
-    final picker = ImagePicker();
-    final picked = await picker.pickMultiImage();
-    if (picked.isNotEmpty) {
-      cubit.addImages(picked.map((xf) => File(xf.path)).toList());
-    }
-  }
-
-  Future<void> _onPublish(BuildContext context, AdPostingCubit cubit) async {
-    final state = cubit.state;
-    if (!_formKey.currentState!.validate()) return;
-
-    if (state.selectedCategory == null) {
-      AppSnackBar.error(context, 'Please select a category');
-      return;
-    }
-
-    final selectedSkills = state.skills
-        .where((s) => s.isSelected)
-        .map(
-          (s) => RelevantSkills.values.firstWhere(
-            (e) => e.name.toLowerCase() == s.label.toLowerCase(),
-            orElse: () => RelevantSkills.web,
-          ),
-        )
-        .toList();
-
-    final ad = AdModel(
-      adID: DateTime.now().millisecondsSinceEpoch,
-      title: _titleController.text.trim(),
-      description: _descriptionController.text.trim(),
-      city: _cityController.text.trim(),
-      photos: [],
-      price: double.parse(_priceController.text.trim()),
-      category: AdCategory.values.firstWhere(
-        (e) => e.name.toLowerCase() == state.selectedCategory!.toLowerCase(),
-        orElse: () => AdCategory.services,
-      ),
-      relevantSkills: selectedSkills,
-      adCity: AdCity.values.firstWhere(
-        (e) =>
-            e.name.toLowerCase() == _cityController.text.trim().toLowerCase(),
-        orElse: () => AdCity.cairo,
-      ),
-    );
-
-    await cubit.publishNewAd(adModel: ad);
-  }
-
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<AdPostingCubit, AdPostingState>(
@@ -121,7 +72,7 @@ class _PostAdScreenState extends State<PostAdScreen> {
 
         return Scaffold(
           backgroundColor: AppColors.white,
-          appBar: const _PostAdAppBar(),
+          appBar: const PostAdAppBar(),
           body: Form(
             key: _formKey,
             child: SingleChildScrollView(
@@ -236,37 +187,53 @@ class _PostAdScreenState extends State<PostAdScreen> {
       },
     );
   }
-}
 
-class _PostAdAppBar extends StatelessWidget implements PreferredSizeWidget {
-  @override
-  final Size preferredSize = const Size.fromHeight(kToolbarHeight + 1);
+  Future<void> _onPublish(BuildContext context, AdPostingCubit cubit) async {
+    final state = cubit.state;
+    if (!_formKey.currentState!.validate()) return;
 
-  const _PostAdAppBar();
+    if (state.selectedCategory == null) {
+      AppSnackBar.error(context, 'Please select a category');
+      return;
+    }
 
-  @override
-  Widget build(BuildContext context) {
-    return AppBar(
-      backgroundColor: AppColors.white,
-      elevation: 0,
-      scrolledUnderElevation: 0,
-      centerTitle: true,
-      leading: GestureDetector(
-        onTap: () => context.pop(),
-        child: Container(
-          margin: EdgeInsets.all(10.w),
-          decoration: BoxDecoration(
-            border: Border.all(color: AppColors.border),
-            borderRadius: BorderRadius.circular(10.r),
+    final selectedSkills = state.skills
+        .where((s) => s.isSelected)
+        .map(
+          (s) => RelevantSkills.values.firstWhere(
+            (e) => e.name.toLowerCase() == s.label.toLowerCase(),
+            orElse: () => RelevantSkills.web,
           ),
-          child: Icon(Icons.arrow_back, size: 18.sp, color: AppColors.textDark),
-        ),
+        )
+        .toList();
+
+    final ad = AdModel(
+      adID: DateTime.now().millisecondsSinceEpoch,
+      title: _titleController.text.trim(),
+      description: _descriptionController.text.trim(),
+      city: _cityController.text.trim(),
+      photos: [],
+      price: double.parse(_priceController.text.trim()),
+      category: AdCategory.values.firstWhere(
+        (e) => e.name.toLowerCase() == state.selectedCategory!.toLowerCase(),
+        orElse: () => AdCategory.services,
       ),
-      title: const Text('Post an Ad', style: AppStyles.font17Bold),
-      bottom: PreferredSize(
-        preferredSize: const Size.fromHeight(1),
-        child: Container(height: 1, color: AppColors.border),
+      relevantSkills: selectedSkills,
+      adCity: AdCity.values.firstWhere(
+        (e) =>
+            e.name.toLowerCase() == _cityController.text.trim().toLowerCase(),
+        orElse: () => AdCity.cairo,
       ),
     );
+
+    await cubit.publishNewAd(adModel: ad);
+  }
+
+  Future<void> _pickImages(AdPostingCubit cubit) async {
+    final picker = ImagePicker();
+    final picked = await picker.pickMultiImage();
+    if (picked.isNotEmpty) {
+      cubit.addImages(picked.map((xf) => File(xf.path)).toList());
+    }
   }
 }
