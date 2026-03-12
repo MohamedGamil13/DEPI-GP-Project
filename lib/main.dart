@@ -27,6 +27,7 @@ class SkillBridge extends StatelessWidget {
       minTextAdapt: true,
       splitScreenMode: true,
       child: MaterialApp.router(
+        title: 'ServiMarket',
         debugShowCheckedModeBanner: false,
         routerConfig: router,
       ),

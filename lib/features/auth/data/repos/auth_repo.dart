@@ -1,5 +1,5 @@
 import 'package:skillbridge/core/models/auth_user_model.dart';
-import 'package:skillbridge/core/utils/services/firebase_auth_service_repo.dart';
+import 'package:skillbridge/core/utils/services/auth/firebase_auth_service_repo.dart';
 import 'package:skillbridge/core/utils/validator/result.dart';
 
 abstract class AuthRepo {
