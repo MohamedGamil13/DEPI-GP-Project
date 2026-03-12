@@ -25,11 +25,11 @@ void setupLocator() {
     () => AuthRepoImplementation(authService: getIt<AuthService>()),
   );
   getIt.registerFactory<AuthCubit>(() => AuthCubit(getIt<AuthRepo>()));
-  getIt.registerLazySingleton<FirestoreRepo>(
-    () => FirestoreService(db: getIt<FirebaseFirestore>()),
-  );
   getIt.registerLazySingleton<FirebaseFirestore>(
     () => FirebaseFirestore.instance,
+  );
+  getIt.registerLazySingleton<FirestoreRepo>(
+    () => FirestoreService(db: getIt<FirebaseFirestore>()),
   );
 }
 //our flow => auth methods(firebase or something else) >  AuthService(deal with any authsevice from any source) => Auth repo(deal with authService only) => Auth cubit(deal with repo only) => UI

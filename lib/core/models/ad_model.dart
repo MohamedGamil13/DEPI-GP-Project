@@ -39,12 +39,14 @@ class AdModel {
       title: json['title'],
       description: json['description'],
       city: json['city'],
-      photos: json['photos'],
-      price: json['price'],
-      category: json['category'],
-      relevantSkills: json['relevantSkills'],
-      adCity: json['adCity'],
+      photos: List<String>.from(json['photos']),
+      price: (json['price'] as num).toDouble(),
       adID: json['adID'],
+      category: AdCategory.values.byName(json['category']),
+      relevantSkills: (json['relevantSkills'] as List?)
+          ?.map((s) => RelevantSkills.values.byName(s))
+          .toList(),
+      adCity: AdCity.values.byName(json['adCity']),
     );
   }
 }

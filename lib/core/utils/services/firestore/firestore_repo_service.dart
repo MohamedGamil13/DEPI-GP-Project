@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:skillbridge/core/errors/database_exception.dart';
 import 'package:skillbridge/core/models/ad_model.dart';
@@ -13,13 +11,8 @@ class FirestoreService implements FirestoreRepo {
   @override
   Future<Result<void>> addPost(AdModel post) async {
     try {
-      db
-          .collection(AppConstants.adPostsCollection)
-          .add(post.toJson())
-          .then(
-            (DocumentReference doc) =>
-                log('DocumentSnapshot added with ID: ${doc.id}'),
-          );
+      db.collection(AppConstants.adPostsCollection).add(post.toJson());
+
       return const Success(null);
     } on FirebaseException catch (e) {
       throw _mapException(e);

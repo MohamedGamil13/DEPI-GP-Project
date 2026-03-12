@@ -9,5 +9,4 @@ abstract interface class FirestoreRepo {
   Future<Result<AdModel>> searchForPost(String title);
   // Future<Result<List<AdModel>>> ();
   // Future<Result<List<AdModel>>> getData();
-  FirestoreRepo._();
 }
