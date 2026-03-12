@@ -6,11 +6,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:skillbridge/core/models/ad_model.dart';
+import 'package:skillbridge/core/routing/app_navigator.dart';
 import 'package:skillbridge/core/theme/app_colors.dart';
+import 'package:skillbridge/core/theme/app_styles.dart';
+import 'package:skillbridge/core/utils/helpers/snackbar_manger.dart';
+import 'package:skillbridge/core/utils/validator/app_validator.dart';
 import 'package:skillbridge/features/auth/presentation/screens/widgets/field_label.dart';
 import 'package:skillbridge/features/auth/presentation/screens/widgets/primary_button.dart';
-import 'package:skillbridge/features/post_ad/data/models/skill_tag.dart';
-import 'package:skillbridge/features/post_ad/presentation/viewmodel/ad_posting_cubit.dart';
+import 'package:skillbridge/features/post_ad/presentation/viewModel/ad_posting_cubit.dart';
 import 'package:skillbridge/features/post_ad/presentation/widgets/category_dropdown.dart';
 import 'package:skillbridge/features/post_ad/presentation/widgets/photo_upload_section.dart';
 import 'package:skillbridge/features/post_ad/presentation/widgets/post_ad_text_field.dart';
@@ -29,21 +32,6 @@ class _PostAdScreenState extends State<PostAdScreen> {
   final _descriptionController = TextEditingController();
   final _priceController = TextEditingController();
   final _cityController = TextEditingController();
-
-  final List<File> _selectedImages = [];
-  String? _selectedCategory;
-  List<SkillTag> _skills = [
-    const SkillTag(label: 'React', isSelected: true),
-    const SkillTag(label: 'Python', isSelected: true),
-    const SkillTag(label: 'Cleaning'),
-    const SkillTag(label: 'JavaScript'),
-    const SkillTag(label: 'Gardening'),
-    const SkillTag(label: 'Design'),
-    const SkillTag(label: 'Marketing'),
-    const SkillTag(label: 'Education'),
-  ];
-
-  static const int _maxImages = 3;
 
   static const List<String> _categories = [
     'Technology',
@@ -67,47 +55,24 @@ class _PostAdScreenState extends State<PostAdScreen> {
     super.dispose();
   }
 
-  void _onAddImages(List<File> files) {
-    setState(() {
-      final remaining = _maxImages - _selectedImages.length;
-      _selectedImages.addAll(files.take(remaining));
-    });
-  }
-
-  void _onRemoveImage(int index) {
-    setState(() => _selectedImages.removeAt(index));
-  }
-
-  void _onCategoryChanged(String? value) {
-    setState(() => _selectedCategory = value);
-  }
-
-  void _onToggleSkill(int index) {
-    setState(() {
-      _skills = List.of(_skills)
-        ..[index] = _skills[index].copyWith(
-          isSelected: !_skills[index].isSelected,
-        );
-    });
-  }
-
-  Future<void> _pickImages() async {
+  Future<void> _pickImages(AdPostingCubit cubit) async {
     final picker = ImagePicker();
     final picked = await picker.pickMultiImage();
     if (picked.isNotEmpty) {
-      _onAddImages(picked.map((xf) => File(xf.path)).toList());
+      cubit.addImages(picked.map((xf) => File(xf.path)).toList());
     }
   }
 
-  Future<void> _onPublish() async {
+  Future<void> _onPublish(BuildContext context, AdPostingCubit cubit) async {
+    final state = cubit.state;
     if (!_formKey.currentState!.validate()) return;
 
-    if (_selectedCategory == null) {
-      _showError('Please select a category');
+    if (state.selectedCategory == null) {
+      AppSnackBar.error(context, 'Please select a category');
       return;
     }
 
-    final selectedSkills = _skills
+    final selectedSkills = state.skills
         .where((s) => s.isSelected)
         .map(
           (s) => RelevantSkills.values.firstWhere(
@@ -125,49 +90,18 @@ class _PostAdScreenState extends State<PostAdScreen> {
       photos: [],
       price: double.parse(_priceController.text.trim()),
       category: AdCategory.values.firstWhere(
-        (e) => e.name.toLowerCase() == _selectedCategory!.toLowerCase(),
+        (e) => e.name.toLowerCase() == state.selectedCategory!.toLowerCase(),
         orElse: () => AdCategory.services,
       ),
       relevantSkills: selectedSkills,
-      adCity: AdCity.cairo,
-    );
-
-    await context.read<AdPostingCubit>().publishNewAd(
-      adModel: ad,
-      images: _selectedImages,
-    );
-  }
-
-  void _showSuccess(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        backgroundColor: AppColors.primaryColor,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12.r),
-        ),
-        content: Text(
-          message,
-          style: const TextStyle(
-            color: AppColors.white,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
+      adCity: AdCity.values.firstWhere(
+        (e) =>
+            e.name.toLowerCase() == _cityController.text.trim().toLowerCase(),
+        orElse: () => AdCity.cairo,
       ),
     );
-  }
 
-  void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        backgroundColor: AppColors.errorColor,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12.r),
-        ),
-        content: Text(message, style: const TextStyle(color: AppColors.white)),
-      ),
-    );
+    await cubit.publishNewAd(adModel: ad);
   }
 
   @override
@@ -175,13 +109,14 @@ class _PostAdScreenState extends State<PostAdScreen> {
     return BlocConsumer<AdPostingCubit, AdPostingState>(
       listener: (context, state) {
         if (state is AdPostingSuccess) {
-          _showSuccess('Ad published successfully!');
-          Navigator.of(context).pop();
+          AppSnackBar.success(context, 'Ad published successfully!');
+          context.pop();
         } else if (state is AdPostingError) {
-          _showError(state.message);
+          AppSnackBar.error(context, state.message);
         }
       },
       builder: (context, state) {
+        final cubit = context.read<AdPostingCubit>();
         final isLoading = state is AdPostingLoading;
 
         return Scaffold(
@@ -197,9 +132,9 @@ class _PostAdScreenState extends State<PostAdScreen> {
                   SizedBox(height: 20.h),
 
                   PhotoUploadSection(
-                    images: _selectedImages,
-                    onSelectImages: _pickImages,
-                    onRemoveImage: _onRemoveImage,
+                    images: state.images,
+                    onSelectImages: () => _pickImages(cubit),
+                    onRemoveImage: cubit.removeImage,
                   ),
                   SizedBox(height: 24.h),
 
@@ -207,23 +142,15 @@ class _PostAdScreenState extends State<PostAdScreen> {
                   PostAdTextField(
                     controller: _titleController,
                     hint: 'e.g. Professional Web Development',
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Service title is required';
-                      }
-                      if (value.trim().length < 5) {
-                        return 'Title must be at least 5 characters';
-                      }
-                      return null;
-                    },
+                    validator: AppValidator.validateService,
                   ),
                   SizedBox(height: 18.h),
 
                   const FieldLabel(label: 'Category'),
                   CategoryDropdown(
-                    selectedCategory: _selectedCategory,
+                    selectedCategory: state.selectedCategory,
                     categories: _categories,
-                    onChanged: _onCategoryChanged,
+                    onChanged: cubit.selectCategory,
                   ),
                   SizedBox(height: 18.h),
 
@@ -235,15 +162,7 @@ class _PostAdScreenState extends State<PostAdScreen> {
                         " what's included and your experience.",
                     maxLines: 5,
                     keyboardType: TextInputType.multiline,
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Description is required';
-                      }
-                      if (value.trim().length < 20) {
-                        return 'Description must be at least 20 characters';
-                      }
-                      return null;
-                    },
+                    validator: AppValidator.validateDescription,
                   ),
                   SizedBox(height: 18.h),
 
@@ -267,15 +186,7 @@ class _PostAdScreenState extends State<PostAdScreen> {
                                   RegExp(r'^\d*\.?\d{0,2}'),
                                 ),
                               ],
-                              validator: (value) {
-                                if (value == null || value.trim().isEmpty) {
-                                  return 'Price is required';
-                                }
-                                if (double.tryParse(value.trim()) == null) {
-                                  return 'Enter a valid price';
-                                }
-                                return null;
-                              },
+                              validator: AppValidator.validatePrice,
                             ),
                           ],
                         ),
@@ -288,13 +199,8 @@ class _PostAdScreenState extends State<PostAdScreen> {
                             const FieldLabel(label: 'City'),
                             PostAdTextField(
                               controller: _cityController,
-                              hint: 'e.g. New York',
-                              validator: (value) {
-                                if (value == null || value.trim().isEmpty) {
-                                  return 'City is required';
-                                }
-                                return null;
-                              },
+                              hint: 'e.g. Cairo',
+                              validator: AppValidator.validateCity,
                             ),
                           ],
                         ),
@@ -304,7 +210,10 @@ class _PostAdScreenState extends State<PostAdScreen> {
                   SizedBox(height: 18.h),
 
                   const FieldLabel(label: 'Relevant Skills'),
-                  SkillsSection(skills: _skills, onToggle: _onToggleSkill),
+                  SkillsSection(
+                    skills: state.skills,
+                    onToggle: cubit.toggleSkill,
+                  ),
                   SizedBox(height: 32.h),
 
                   isLoading
@@ -313,7 +222,10 @@ class _PostAdScreenState extends State<PostAdScreen> {
                             color: AppColors.primaryColor,
                           ),
                         )
-                      : PrimaryButton(label: 'Publish Ad', onTap: _onPublish),
+                      : PrimaryButton(
+                          label: 'Publish Ad',
+                          onTap: () => _onPublish(context, cubit),
+                        ),
 
                   SizedBox(height: 32.h),
                 ],
@@ -340,7 +252,7 @@ class _PostAdAppBar extends StatelessWidget implements PreferredSizeWidget {
       scrolledUnderElevation: 0,
       centerTitle: true,
       leading: GestureDetector(
-        onTap: () => Navigator.of(context).pop(),
+        onTap: () => context.pop(),
         child: Container(
           margin: EdgeInsets.all(10.w),
           decoration: BoxDecoration(
@@ -350,14 +262,7 @@ class _PostAdAppBar extends StatelessWidget implements PreferredSizeWidget {
           child: Icon(Icons.arrow_back, size: 18.sp, color: AppColors.textDark),
         ),
       ),
-      title: Text(
-        'Post an Ad',
-        style: TextStyle(
-          fontSize: 17.sp,
-          fontWeight: FontWeight.w700,
-          color: AppColors.textDark,
-        ),
-      ),
+      title: const Text('Post an Ad', style: AppStyles.font17Bold),
       bottom: PreferredSize(
         preferredSize: const Size.fromHeight(1),
         child: Container(height: 1, color: AppColors.border),
