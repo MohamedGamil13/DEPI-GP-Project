@@ -33,6 +33,20 @@ class AdModel {
       "adCity": adCity.name,
     };
   }
+
+  factory AdModel.fromJson(Map<String, dynamic> json) {
+    return AdModel(
+      title: json['title'],
+      description: json['description'],
+      city: json['city'],
+      photos: json['photos'],
+      price: json['price'],
+      category: json['category'],
+      relevantSkills: json['relevantSkills'],
+      adCity: json['adCity'],
+      adID: json['adID'],
+    );
+  }
 }
 
 enum AdCategory {

@@ -9,6 +9,7 @@ import 'package:skillbridge/features/auth/presentation/screens/sign_in_screen.da
 import 'package:skillbridge/features/auth/presentation/screens/sign_up_screen.dart';
 import 'package:skillbridge/features/auth/presentation/viewmodel/auth_cubit.dart';
 import 'package:skillbridge/features/home/home_screen.dart';
+import 'package:skillbridge/features/post_ad/presentation/screens/post_ad_screen.dart';
 import 'package:skillbridge/features/splash/splash_screen.dart';
 
 final GoRouter router = GoRouter(
@@ -68,6 +69,12 @@ final GoRouter router = GoRouter(
           create: (context) => getIt<AuthCubit>(),
           child: const ForgotPasswordScreen(),
         );
+      },
+    ),
+    GoRoute(
+      path: AppScreens.postAdScreen,
+      builder: (context, state) {
+        return const PostAdScreen();
       },
     ),
   ],

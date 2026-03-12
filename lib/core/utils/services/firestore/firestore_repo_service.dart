@@ -1,5 +1,9 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:skillbridge/core/errors/database_exception.dart';
 import 'package:skillbridge/core/models/ad_model.dart';
+import 'package:skillbridge/core/utils/constants/app_constants.dart';
 import 'package:skillbridge/core/utils/services/firestore/firestore_repo.dart';
 import 'package:skillbridge/core/utils/validator/result.dart';
 
@@ -8,25 +12,30 @@ class FirestoreService implements FirestoreRepo {
   FirestoreService({required this.db});
   @override
   Future<Result<void>> addPost(AdModel post) async {
-    // try {
-    //   db
-    //       .collection('AdPosts')
-    //       .add(post.toJson())
-    //       .then(
-    //         (DocumentReference doc) =>
-    //             print('DocumentSnapshot added with ID: ${doc.id}'),
-    //       );
-    //   return const Success(null);
-    // } on Exception catch (e) {
-    //   return Failure(e);
-    // }
-    // TODO: implement getAllPosts
-    throw UnimplementedError();
+    try {
+      db
+          .collection(AppConstants.adPostsCollection)
+          .add(post.toJson())
+          .then(
+            (DocumentReference doc) =>
+                log('DocumentSnapshot added with ID: ${doc.id}'),
+          );
+      return const Success(null);
+    } on FirebaseException catch (e) {
+      throw _mapException(e);
+    }
   }
 
   @override
-  Future<Result<List<AdModel>>> getAllPosts() {
-    // TODO: implement getAllPosts
+  Future<Result<List<AdModel>>> getAllPosts() async {
+    // List<AdModel> allPosts = [];
+    // await db.collection(AppConstants.adPostsCollection).get().then((event) {
+    //   for (var doc in event.docs) {
+    //     print("${doc.id} => ${doc.data()}");
+    //     allPosts = doc.data();
+    //   }
+    // });
+    // TODO: implement getFilteredPosts
     throw UnimplementedError();
   }
 
@@ -46,5 +55,18 @@ class FirestoreService implements FirestoreRepo {
   Future<Result<AdModel>> searchForPost(String title) {
     // TODO: implement searchForPost
     throw UnimplementedError();
+  }
+
+  DatabaseException _mapException(FirebaseException e) {
+    return switch (e.code) {
+      'not-found' => DocumentNotFoundException(),
+      'permission-denied' => PermissionDeniedException(),
+      'already-exists' => DataAlreadyExistsException(),
+      'unavailable' || 'network-request-failed' => DatabaseNetworkException(),
+      _ => UnknownDatabaseException(
+        code: e.code,
+        message: e.message ?? 'Unexpected database error.',
+      ),
+    };
   }
 }
