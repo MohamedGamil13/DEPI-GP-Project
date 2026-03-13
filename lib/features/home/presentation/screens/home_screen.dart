@@ -4,16 +4,8 @@ import 'package:skillbridge/core/theme/app_styles.dart';
 import 'package:skillbridge/features/home/presentation/screens/widgets/custom_bottom_navigation_bar.dart';
 import 'package:skillbridge/features/home/presentation/screens/widgets/home_screen_body.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  int selectedCategory = 0; // 0: Tech, 1: Local, 2: Students, 3: General
-  List<bool> favorites = [false, true, false];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

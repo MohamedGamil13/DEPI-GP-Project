@@ -7,13 +7,13 @@ part 'home_state.dart';
 
 class HomeCubit extends Cubit<HomeState> {
   HomeCubit() : super(HomeInitial());
-  void getPosts()async {
+  void getPosts() async {
     emit(HomeLoading());
-  try{
-    // final posts = await Repository.getAllPosts();
-    // emit(HomeSuccess(posts: posts));
-  }catch(e){
-    emit(HomeError('Something went wrong'));
-  }
+    try {
+      // final posts = await Repository.getAllPosts();
+      // emit(HomeSuccess(posts: posts));
+    } catch (e) {
+      emit(HomeError('Something went wrong'));
+    }
   }
 }

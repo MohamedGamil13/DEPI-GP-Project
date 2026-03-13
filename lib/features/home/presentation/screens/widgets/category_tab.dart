@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:skillbridge/core/theme/app_colors.dart';
+import 'package:skillbridge/core/theme/app_styles.dart';
 
 class CategoryTab extends StatelessWidget {
   final String label;
@@ -16,55 +18,33 @@ class CategoryTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = Theme.of(context).colorScheme.primary;
-
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 250),
         curve: Curves.easeInOut,
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+        margin: const EdgeInsets.only(right: 8),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
         decoration: BoxDecoration(
-          color: selected ? color.withOpacity(0.12) : Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
+          color: selected ? AppColors.primaryColor : AppColors.surfaceColor,
+          borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: selected ? color : Colors.grey.withOpacity(0.3),
-            width: 1.5,
+            color: selected ? AppColors.primaryColor : AppColors.border,
           ),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // أنيميشن على اللون بدل AnimatedSwitcher
-            TweenAnimationBuilder<Color?>(
-              tween: ColorTween(
-                begin: selected ? Colors.grey : color,
-                end: selected ? color : Colors.grey,
-              ),
-              duration: const Duration(milliseconds: 300),
-              builder: (context, value, _) =>
-                  Icon(icon, size: 18, color: value),
+            Icon(
+              icon,
+              color: selected ? AppColors.white : AppColors.secondaryColor,
+              size: 18,
             ),
-            // expand/collapse للـ label
-            AnimatedSize(
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
-              child: AnimatedOpacity(
-                opacity: selected ? 1.0 : 0.0,
-                duration: const Duration(milliseconds: 200),
-                child: selected
-                    ? Padding(
-                        padding: const EdgeInsets.only(left: 6),
-                        child: Text(
-                          label,
-                          style: TextStyle(
-                            color: color,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 13,
-                          ),
-                        ),
-                      )
-                    : const SizedBox.shrink(),
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: AppStyles.font14w600.copyWith(
+                color: selected ? AppColors.white : AppColors.secondaryColor,
               ),
             ),
           ],
