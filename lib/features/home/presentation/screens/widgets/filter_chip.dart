@@ -22,7 +22,7 @@ class _CustomFilterChipState extends State<CustomFilterChip> {
   Widget build(BuildContext context) {
     return Center(
       child: SizedBox(
-        width: MediaQuery.of(context).size.width * 0.5,
+        width: MediaQuery.of(context).size.width * 0.4,
         child: DropdownButtonHideUnderline(
           child: DropdownButton<String>(
             value: _selectedCategory,

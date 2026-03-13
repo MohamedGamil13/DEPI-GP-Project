@@ -54,9 +54,10 @@ class _HomeScreenBodyState extends State<HomeScreenBody> {
               children: [
                 SizedBox(height: 12),
                 Row(
+                  mainAxisAlignment: .spaceBetween,
                   children: [
                     CustomFilterChip(label: 'All Categories'),
-                    SizedBox(width: 8),
+
                     CustomFilterChip(label: 'Any City'),
                   ],
                 ),
