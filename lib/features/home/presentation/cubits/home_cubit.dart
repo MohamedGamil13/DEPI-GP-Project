@@ -1,6 +1,5 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:meta/meta.dart';
 import 'package:skillbridge/core/models/ad_model.dart';
 
 part 'home_state.dart';
