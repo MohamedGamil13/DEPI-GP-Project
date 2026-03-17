@@ -152,5 +152,31 @@ enum AdCity {
   redSea,
   northSinai,
   southSinai,
-  ismailia,
+  ismailia;
+
+  String get label => switch (this) {
+    AdCity.cairo => "Cairo",
+    AdCity.giza => "Giza",
+    AdCity.alexandria => "Alexandria",
+    AdCity.portSaid => "Port Said",
+    AdCity.suez => "Suez",
+    AdCity.damietta => "Damietta",
+    AdCity.dakahlia => "Dakahlia",
+    AdCity.sharkia => "Sharkia",
+    AdCity.ghrbia => "Gharbia",
+    AdCity.monufia => "Monufia",
+    AdCity.behira => "Beheira",
+    AdCity.fayoum => "Fayoum",
+    AdCity.beniSuef => "Beni Suef",
+    AdCity.minya => "Minya",
+    AdCity.assiut => "Assiut",
+    AdCity.sohag => "Sohag",
+    AdCity.qena => "Qena",
+    AdCity.luxor => "Luxor",
+    AdCity.matrouh => "Matrouh",
+    AdCity.redSea => "Red Sea",
+    AdCity.northSinai => "North Sinai",
+    AdCity.southSinai => "South Sinai",
+    AdCity.ismailia => "Ismailia",
+  };
 }
