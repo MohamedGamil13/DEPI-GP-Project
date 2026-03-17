@@ -21,6 +21,11 @@ abstract class AppStyles {
     fontSize: 14,
     color: AppColors.textDark,
   );
+  static const TextStyle font24w600 = TextStyle(
+    fontSize: 24,
+    color: AppColors.textDark,
+    fontWeight: FontWeight.w600,
+  );
 
   AppStyles._(); //to prevent any one  to take an instance from this class
 }

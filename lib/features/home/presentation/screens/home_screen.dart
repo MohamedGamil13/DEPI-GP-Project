@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:skillbridge/core/theme/app_colors.dart';
-import 'package:skillbridge/core/theme/app_styles.dart';
-import 'package:skillbridge/features/home/presentation/screens/widgets/custom_bottom_navigation_bar.dart';
+import 'package:skillbridge/core/widgets/app_title.dart';
+import 'package:skillbridge/core/widgets/custom_bottom_navigation_bar.dart';
 import 'package:skillbridge/features/home/presentation/screens/widgets/home_screen_body.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -11,30 +11,34 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
+        scrolledUnderElevation: 0,
         backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: Text(
-          'ServiMarket',
-          style: AppStyles.font14w600.copyWith(
-            fontSize: 24,
-            color: AppColors.primaryColor,
-          ),
-        ),
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 16),
-            child: CircleAvatar(
-              backgroundColor: AppColors.primaryLight,
-              child: Icon(
-                Icons.notifications_none,
-                color: AppColors.primaryColor,
-              ),
-            ),
-          ),
-        ],
+        title: const AppTitle(),
+        actions: const [_AppBarIcon()],
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {},
+        backgroundColor: AppColors.primaryColor,
+        child: const Icon(Icons.add, color: AppColors.white),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       body: const HomeScreenBody(),
       bottomNavigationBar: const CustomBottomNavigationBar(),
+    );
+  }
+}
+
+class _AppBarIcon extends StatelessWidget {
+  const _AppBarIcon({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Padding(
+      padding: EdgeInsets.only(right: 16),
+      child: CircleAvatar(
+        backgroundColor: AppColors.primaryLight,
+        child: Icon(Icons.notifications_none, color: AppColors.primaryColor),
+      ),
     );
   }
 }
