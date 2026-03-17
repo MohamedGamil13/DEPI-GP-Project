@@ -16,11 +16,7 @@ class HomeScreen extends StatelessWidget {
         title: const AppTitle(),
         actions: const [_AppBarIcon()],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        backgroundColor: AppColors.primaryColor,
-        child: const Icon(Icons.add, color: AppColors.white),
-      ),
+      floatingActionButton: const _CustomFloatingActionButton(),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       body: const HomeScreenBody(),
       bottomNavigationBar: const CustomBottomNavigationBar(),
@@ -29,7 +25,7 @@ class HomeScreen extends StatelessWidget {
 }
 
 class _AppBarIcon extends StatelessWidget {
-  const _AppBarIcon({super.key});
+  const _AppBarIcon();
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +35,19 @@ class _AppBarIcon extends StatelessWidget {
         backgroundColor: AppColors.primaryLight,
         child: Icon(Icons.notifications_none, color: AppColors.primaryColor),
       ),
+    );
+  }
+}
+
+class _CustomFloatingActionButton extends StatelessWidget {
+  const _CustomFloatingActionButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return FloatingActionButton(
+      onPressed: () {},
+      backgroundColor: AppColors.primaryColor,
+      child: const Icon(Icons.add, color: AppColors.white),
     );
   }
 }

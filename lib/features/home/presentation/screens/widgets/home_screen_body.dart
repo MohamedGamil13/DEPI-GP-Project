@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:skillbridge/core/theme/app_colors.dart';
 import 'package:skillbridge/core/theme/app_styles.dart';
+import 'package:skillbridge/core/widgets/search_bar.dart';
 import 'package:skillbridge/features/home/presentation/screens/widgets/categories_list_view.dart';
 import 'package:skillbridge/features/home/presentation/screens/widgets/custom_tag.dart';
 import 'package:skillbridge/features/home/presentation/screens/widgets/filter_chip.dart';
-import 'package:skillbridge/features/home/presentation/screens/widgets/search_bar.dart';
 import 'package:skillbridge/features/home/presentation/screens/widgets/service_card.dart';
 
 class HomeScreenBody extends StatefulWidget {
@@ -19,29 +19,15 @@ class _HomeScreenBodyState extends State<HomeScreenBody> {
   Widget build(BuildContext context) {
     return CustomScrollView(
       slivers: [
-        SliverToBoxAdapter(
+        const SliverToBoxAdapter(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: EdgeInsets.symmetric(horizontal: 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const CustomSearchBar(),
-                Padding(
-                  padding: const EdgeInsets.only(top: 8, bottom: 8),
-                  child: Text(
-                    'CATEGORIES',
-                    style: AppStyles.font14w600.copyWith(
-                      color: AppColors.textMedium,
-                      letterSpacing: 1.2,
-                    ),
-                  ),
-                ),
-              ],
+              children: [CustomSearchBar(), _HomePageSectionTitle()],
             ),
           ),
         ),
-
-        // Categories Horizontal ListView
         const SliverToBoxAdapter(
           child: SizedBox(height: 48, child: CategoriesListView()),
         ),
@@ -57,7 +43,6 @@ class _HomeScreenBodyState extends State<HomeScreenBody> {
                   mainAxisAlignment: .spaceBetween,
                   children: [
                     CustomFilterChip(label: 'All Categories'),
-
                     CustomFilterChip(label: 'Any City'),
                   ],
                 ),
@@ -130,6 +115,24 @@ class _HomeScreenBodyState extends State<HomeScreenBody> {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _HomePageSectionTitle extends StatelessWidget {
+  const _HomePageSectionTitle({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 8, bottom: 8),
+      child: Text(
+        'CATEGORIES',
+        style: AppStyles.font14w600.copyWith(
+          color: AppColors.textMedium,
+          letterSpacing: 1.2,
+        ),
+      ),
     );
   }
 }
