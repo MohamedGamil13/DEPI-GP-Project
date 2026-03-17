@@ -24,13 +24,23 @@ class CategoryTab extends StatelessWidget {
         duration: const Duration(milliseconds: 250),
         curve: Curves.easeInOut,
         margin: const EdgeInsets.only(right: 8),
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
+        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 14),
         decoration: BoxDecoration(
           color: selected ? AppColors.primaryColor : AppColors.surfaceColor,
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(50),
           border: Border.all(
             color: selected ? AppColors.primaryColor : AppColors.border,
+            width: 1.5,
           ),
+          boxShadow: selected
+              ? [
+                  BoxShadow(
+                    color: AppColors.primaryColor.withOpacity(0.25),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+              : [],
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -38,12 +48,12 @@ class CategoryTab extends StatelessWidget {
             Icon(
               icon,
               color: selected ? AppColors.white : AppColors.secondaryColor,
-              size: 18,
+              size: 16,
             ),
             const SizedBox(width: 6),
             Text(
               label,
-              style: AppStyles.font14w600.copyWith(
+              style: AppStyles.font13w500.copyWith(
                 color: selected ? AppColors.white : AppColors.secondaryColor,
               ),
             ),

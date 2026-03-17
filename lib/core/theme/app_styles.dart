@@ -12,6 +12,11 @@ abstract class AppStyles {
     fontWeight: FontWeight.w600,
     color: AppColors.textDark,
   );
+  static const TextStyle font13w500 = TextStyle(
+    fontSize: 13,
+    fontWeight: FontWeight.w500,
+    color: AppColors.textDark,
+  );
   static const TextStyle font14Regular = TextStyle(
     fontSize: 14,
     color: AppColors.textDark,

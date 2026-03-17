@@ -43,7 +43,7 @@ class _HomeScreenBodyState extends State<HomeScreenBody> {
 
         // Categories Horizontal ListView
         const SliverToBoxAdapter(
-          child: SizedBox(height: 80, child: CategoriesListView()),
+          child: SizedBox(height: 48, child: CategoriesListView()),
         ),
 
         const SliverToBoxAdapter(
