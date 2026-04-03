@@ -1,11 +1,7 @@
-sealed class AuthException implements Exception {
-  final String code;
-  final String message;
+import 'package:skillbridge/core/errors/app_exception.dart';
 
-  const AuthException({required this.code, required this.message});
-
-  @override
-  String toString() => '[$code] $message';
+sealed class AuthException extends AppException {
+  const AuthException({required super.code, required super.message});
 }
 
 final class WeakPasswordException extends AuthException {
