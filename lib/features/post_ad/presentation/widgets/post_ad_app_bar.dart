@@ -18,7 +18,7 @@ class PostAdAppBar extends StatelessWidget implements PreferredSizeWidget {
       scrolledUnderElevation: 0,
       centerTitle: true,
       leading: GestureDetector(
-        onTap: () => context.pop(),
+        onTap: () => context.popPage(),
         child: Container(
           margin: EdgeInsets.all(10.w),
           decoration: BoxDecoration(

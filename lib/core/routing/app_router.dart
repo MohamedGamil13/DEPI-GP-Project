@@ -81,5 +81,14 @@ final GoRouter router = GoRouter(
         );
       },
     ),
+    GoRoute(
+      path: AppScreens.homeScreen,
+      builder: (context, state) {
+        return BlocProvider(
+          create: (context) => getIt<AuthCubit>(),
+          child: const HomeScreen(),
+        );
+      },
+    ),
   ],
 );

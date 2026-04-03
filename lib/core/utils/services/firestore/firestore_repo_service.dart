@@ -26,7 +26,7 @@ class FirestoreService implements FirestoreRepo {
   }
 
   @override
-  Future<Result<List<AdModel>>> getFilteredPosts(AdCategory category) async {
+  Future<Result<List<AdModel>>> getFilteredPosts(AdCategories category) async {
     try {
       final QuerySnapshot snapshot = await db
           .collection(AppConstants.adPostsCollection)

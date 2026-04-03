@@ -214,9 +214,9 @@ class _PostAdScreenState extends State<PostAdScreen> {
       city: _cityController.text.trim(),
       photos: [],
       price: double.parse(_priceController.text.trim()),
-      category: AdCategory.values.firstWhere(
+      category: AdCategories.values.firstWhere(
         (e) => e.name.toLowerCase() == state.selectedCategory!.toLowerCase(),
-        orElse: () => AdCategory.services,
+        orElse: () => AdCategories.services,
       ),
       relevantSkills: selectedSkills,
       adCity: AdCity.values.firstWhere(
