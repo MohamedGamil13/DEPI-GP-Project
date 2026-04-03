@@ -1,7 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
-import 'package:skillbridge/core/models/auth_user_model.dart';
 import 'package:skillbridge/core/utils/validator/result.dart';
+import 'package:skillbridge/features/auth/data/models/auth_user_model.dart';
 import 'package:skillbridge/features/auth/data/repos/auth_repo.dart';
 
 part 'auth_state.dart';

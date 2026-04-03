@@ -61,3 +61,4 @@ final class UnauthenticatedException extends AuthException {
 final class UnknownAuthException extends AuthException {
   const UnknownAuthException({required super.code, required super.message});
 }
+//reviewed 

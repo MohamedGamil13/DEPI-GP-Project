@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:skillbridge/core/errors/auth_exception.dart';
-import 'package:skillbridge/core/models/auth_user_model.dart';
 import 'package:skillbridge/core/utils/services/auth/firebase_auth_service_repo.dart';
 import 'package:skillbridge/core/utils/validator/app_validator.dart';
+import 'package:skillbridge/features/auth/data/models/auth_user_model.dart';
 
 class FirebaseAuthService implements AuthService {
   final FirebaseAuth _auth;

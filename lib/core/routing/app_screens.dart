@@ -6,4 +6,5 @@ abstract class AppScreens {
   static const String forgetPasswordScreen = "/forgetPasswordScreen";
   static const String postAdScreen = "/postAdScreen";
   AppScreens._();
+  //reviewed
 }
