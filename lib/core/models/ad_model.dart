@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class AdModel {
   final int adID;
   final String title;
@@ -5,7 +7,7 @@ class AdModel {
   final String city;
   final List<String> photos;
   final double price;
-  final AdCategory category;
+  final AdCategories category;
   final List<RelevantSkills>? relevantSkills;
   final AdCity adCity;
 
@@ -20,7 +22,6 @@ class AdModel {
     required this.adCity,
     required this.adID,
   });
-
   Map<String, dynamic> toJson() {
     return {
       "adID": adID,
@@ -34,49 +35,9 @@ class AdModel {
       "adCity": adCity.name,
     };
   }
-
-  factory AdModel.fromJson(Map<String, dynamic> json) {
-    return AdModel(
-      title: json['title'],
-      description: json['description'],
-      city: json['city'],
-      photos: List<String>.from(json['photos']),
-      price: (json['price'] as num).toDouble(),
-      adID: json['adID'],
-      category: AdCategory.values.byName(json['category']),
-      relevantSkills: (json['relevantSkills'] as List?)
-          ?.map((s) => RelevantSkills.values.byName(s))
-          .toList(),
-      adCity: AdCity.values.byName(json['adCity']),
-    );
-  }
-
-  AdModel copyWith({
-    int? adID,
-    String? title,
-    String? description,
-    String? city,
-    List<String>? photos,
-    double? price,
-    AdCategory? category,
-    List<RelevantSkills>? relevantSkills,
-    AdCity? adCity,
-  }) {
-    return AdModel(
-      adID: adID ?? this.adID,
-      title: title ?? this.title,
-      description: description ?? this.description,
-      city: city ?? this.city,
-      photos: photos ?? this.photos,
-      price: price ?? this.price,
-      category: category ?? this.category,
-      relevantSkills: relevantSkills ?? this.relevantSkills,
-      adCity: adCity ?? this.adCity,
-    );
-  }
 }
 
-enum AdCategory {
+enum AdCategories {
   programming,
   vehicles,
   jobs,
@@ -96,7 +57,53 @@ enum AdCategory {
   music,
   furniture,
   photography,
-  studentSupport,
+  studentSupport;
+
+  String get label => switch (this) {
+    AdCategories.programming => 'Programming',
+    AdCategories.vehicles => 'Vehicles',
+    AdCategories.jobs => 'Jobs',
+    AdCategories.games => 'Games',
+    AdCategories.interns => 'Interns',
+    AdCategories.services => 'Services',
+    AdCategories.events => 'Events',
+    AdCategories.electronics => 'Electronics',
+    AdCategories.realEstate => 'Real Estate',
+    AdCategories.fashion => 'Fashion',
+    AdCategories.sports => 'Sports',
+    AdCategories.health => 'Health',
+    AdCategories.education => 'Education',
+    AdCategories.travel => 'Travel',
+    AdCategories.food => 'Food',
+    AdCategories.books => 'Books',
+    AdCategories.music => 'Music',
+    AdCategories.furniture => 'Furniture',
+    AdCategories.photography => 'Photography',
+    AdCategories.studentSupport => 'Student Support',
+  };
+
+  IconData get icon => switch (this) {
+    AdCategories.programming => Icons.code,
+    AdCategories.vehicles => Icons.directions_car,
+    AdCategories.jobs => Icons.work,
+    AdCategories.games => Icons.sports_esports,
+    AdCategories.interns => Icons.school,
+    AdCategories.services => Icons.miscellaneous_services,
+    AdCategories.events => Icons.event,
+    AdCategories.electronics => Icons.devices,
+    AdCategories.realEstate => Icons.home,
+    AdCategories.fashion => Icons.checkroom,
+    AdCategories.sports => Icons.sports,
+    AdCategories.health => Icons.health_and_safety,
+    AdCategories.education => Icons.menu_book,
+    AdCategories.travel => Icons.flight,
+    AdCategories.food => Icons.restaurant,
+    AdCategories.books => Icons.book,
+    AdCategories.music => Icons.music_note,
+    AdCategories.furniture => Icons.chair,
+    AdCategories.photography => Icons.camera_alt,
+    AdCategories.studentSupport => Icons.support,
+  };
 }
 
 enum RelevantSkills {
@@ -145,5 +152,31 @@ enum AdCity {
   redSea,
   northSinai,
   southSinai,
-  ismailia,
+  ismailia;
+
+  String get label => switch (this) {
+    AdCity.cairo => "Cairo",
+    AdCity.giza => "Giza",
+    AdCity.alexandria => "Alexandria",
+    AdCity.portSaid => "Port Said",
+    AdCity.suez => "Suez",
+    AdCity.damietta => "Damietta",
+    AdCity.dakahlia => "Dakahlia",
+    AdCity.sharkia => "Sharkia",
+    AdCity.ghrbia => "Gharbia",
+    AdCity.monufia => "Monufia",
+    AdCity.behira => "Beheira",
+    AdCity.fayoum => "Fayoum",
+    AdCity.beniSuef => "Beni Suef",
+    AdCity.minya => "Minya",
+    AdCity.assiut => "Assiut",
+    AdCity.sohag => "Sohag",
+    AdCity.qena => "Qena",
+    AdCity.luxor => "Luxor",
+    AdCity.matrouh => "Matrouh",
+    AdCity.redSea => "Red Sea",
+    AdCity.northSinai => "North Sinai",
+    AdCity.southSinai => "South Sinai",
+    AdCity.ismailia => "Ismailia",
+  };
 }

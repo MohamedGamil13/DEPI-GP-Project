@@ -12,14 +12,28 @@ abstract class AppStyles {
     fontWeight: FontWeight.w600,
     color: AppColors.textDark,
   );
+  static const TextStyle font13w500 = TextStyle(
+    fontSize: 13,
+    fontWeight: FontWeight.w500,
+    color: AppColors.textDark,
+  );
   static const TextStyle font14Regular = TextStyle(
     fontSize: 14,
     color: AppColors.textDark,
   );
+<<<<<<< HEAD
+  static const TextStyle font24w600 = TextStyle(
+    fontSize: 24,
+    color: AppColors.textDark,
+    fontWeight: FontWeight.w600,
+  );
+
+=======
   static const TextStyle font17Bold = TextStyle(
     fontSize: 17,
     fontWeight: FontWeight.w700,
     color: AppColors.textDark,
   );
+>>>>>>> 871ed0cbef2c74d55c2633766fbc5fb8fccc10c4
   AppStyles._(); //to prevent any one  to take an instance from this class
 }
