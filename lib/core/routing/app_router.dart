@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:skillbridge/core/routing/app_screens.dart';
 import 'package:skillbridge/core/routing/routing_stream_refresh.dart';
 import 'package:skillbridge/core/utils/locator/service_locator.dart';
-import 'package:skillbridge/core/utils/services/firebase_auth_service_repo.dart';
+import 'package:skillbridge/core/utils/services/auth/firebase_auth_service_repo.dart';
 import 'package:skillbridge/features/auth/presentation/screens/forgot_password_screen.dart';
 import 'package:skillbridge/features/auth/presentation/screens/sign_in_screen.dart';
 import 'package:skillbridge/features/auth/presentation/screens/sign_up_screen.dart';
@@ -67,6 +67,24 @@ final GoRouter router = GoRouter(
         return BlocProvider(
           create: (context) => getIt<AuthCubit>(),
           child: const ForgotPasswordScreen(),
+        );
+      },
+    ),
+    GoRoute(
+      path: AppScreens.postAdScreen,
+      builder: (context, state) {
+        return BlocProvider(
+          create: (context) => getIt<AdPostingCubit>(),
+          child: const PostAdScreen(),
+        );
+      },
+    ),
+    GoRoute(
+      path: AppScreens.homeScreen,
+      builder: (context, state) {
+        return BlocProvider(
+          create: (context) => getIt<AuthCubit>(),
+          child: const HomeScreen(),
         );
       },
     ),

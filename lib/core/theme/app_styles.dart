@@ -21,11 +21,19 @@ abstract class AppStyles {
     fontSize: 14,
     color: AppColors.textDark,
   );
+<<<<<<< HEAD
   static const TextStyle font24w600 = TextStyle(
     fontSize: 24,
     color: AppColors.textDark,
     fontWeight: FontWeight.w600,
   );
 
+=======
+  static const TextStyle font17Bold = TextStyle(
+    fontSize: 17,
+    fontWeight: FontWeight.w700,
+    color: AppColors.textDark,
+  );
+>>>>>>> 871ed0cbef2c74d55c2633766fbc5fb8fccc10c4
   AppStyles._(); //to prevent any one  to take an instance from this class
 }

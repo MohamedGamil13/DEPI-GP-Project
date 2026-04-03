@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+<<<<<<< HEAD
 import 'package:skillbridge/core/theme/app_colors.dart';
 import 'package:skillbridge/core/widgets/app_title.dart';
 import 'package:skillbridge/core/widgets/custom_bottom_navigation_bar.dart';
@@ -34,10 +35,33 @@ class _AppBarIcon extends StatelessWidget {
       child: CircleAvatar(
         backgroundColor: AppColors.primaryLight,
         child: Icon(Icons.notifications_none, color: AppColors.primaryColor),
+=======
+import 'package:skillbridge/core/routing/app_navigator.dart';
+
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: .center,
+          children: [
+            TextButton(
+              onPressed: () {
+                context.goAddPost();
+              },
+              child: const Text('PressMe'),
+            ),
+          ],
+        ),
+>>>>>>> 871ed0cbef2c74d55c2633766fbc5fb8fccc10c4
       ),
     );
   }
 }
+<<<<<<< HEAD
 
 class _CustomFloatingActionButton extends StatelessWidget {
   const _CustomFloatingActionButton();
@@ -51,3 +75,5 @@ class _CustomFloatingActionButton extends StatelessWidget {
     );
   }
 }
+=======
+>>>>>>> 871ed0cbef2c74d55c2633766fbc5fb8fccc10c4

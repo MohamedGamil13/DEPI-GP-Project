@@ -126,4 +126,41 @@ class AppValidator {
     }
     return null;
   }
+
+  static String? validateDescription(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Description is required';
+    }
+    if (value.trim().length < 20) {
+      return 'Description must be at least 20 characters';
+    }
+    return null;
+  }
+
+  static String? validatePrice(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Price is required';
+    }
+    if (double.tryParse(value.trim()) == null) {
+      return 'Enter a valid price';
+    }
+    return null;
+  }
+
+  static String? validateCity(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'City is required';
+    }
+    return null;
+  }
+
+  static String? validateService(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Service title is required';
+    }
+    if (value.trim().length < 5) {
+      return 'Title must be at least 5 characters';
+    }
+    return null;
+  }
 }
