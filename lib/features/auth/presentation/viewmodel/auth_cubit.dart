@@ -46,16 +46,16 @@ class AuthCubit extends Cubit<AuthState> {
         emit(AuthFailure(errorMessage: exception.message));
     }
   }
-
-  Future<void> sendVerificationEmail() async {
-    emit(AuthLoading());
-    final result = await authRepo.sendVerificationEmail();
-
-    switch (result) {
-      case Success():
-        emit(AuthSendPasswordSuccess());
-      case Failure(:final exception):
-        emit(AuthFailure(errorMessage: exception.message));
-    }
-  }
 }
+
+  // Future<void> sendVerificationEmail() async {
+  //   emit(AuthLoading());
+  //   final result = await authRepo.sendVerificationEmail();
+
+  //   switch (result) {
+  //     case Success():
+  //       emit(AuthSendPasswordSuccess());
+  //     case Failure(:final exception):
+  //       emit(AuthFailure(errorMessage: exception.message));
+  //   }
+  // }
