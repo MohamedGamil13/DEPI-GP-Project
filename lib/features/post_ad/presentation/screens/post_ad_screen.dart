@@ -61,7 +61,7 @@ class _PostAdScreenState extends State<PostAdScreen> {
       listener: (context, state) {
         if (state is AdPostingSuccess) {
           AppSnackBar.success(context, 'Ad published successfully!');
-          context.pop();
+          context.popPage();
         } else if (state is AdPostingError) {
           AppSnackBar.error(context, state.message);
         }
