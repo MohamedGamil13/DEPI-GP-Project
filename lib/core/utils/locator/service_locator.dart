@@ -30,7 +30,7 @@ void setupLocator() {
   getIt.registerLazySingleton<AuthService>(
     () => FirebaseAuthService(getIt<FirebaseAuth>()),
   );
-  getIt.registerLazySingleton<FirestoreRepo>(
+  getIt.registerLazySingleton<FirestoreServiceRepo>(
     () => FirestoreService(db: getIt<FirebaseFirestore>()),
   );
   getIt.registerLazySingleton<StorageService>(
@@ -43,7 +43,7 @@ void setupLocator() {
   );
   getIt.registerLazySingleton<PostAdRepo>(
     () => PostAdRepoImplementation(
-      firestoreRepo: getIt<FirestoreRepo>(),
+      firestoreRepo: getIt<FirestoreServiceRepo>(),
       storageService: getIt<StorageService>(),
     ),
   );

@@ -120,7 +120,7 @@ class _HomeScreenBodyState extends State<HomeScreenBody> {
 }
 
 class _HomePageSectionTitle extends StatelessWidget {
-  const _HomePageSectionTitle({super.key});
+  const _HomePageSectionTitle();
 
   @override
   Widget build(BuildContext context) {

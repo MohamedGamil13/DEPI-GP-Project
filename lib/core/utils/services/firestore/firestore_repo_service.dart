@@ -5,7 +5,7 @@ import 'package:skillbridge/core/utils/constants/app_constants.dart';
 import 'package:skillbridge/core/utils/services/firestore/firestore_repo.dart';
 import 'package:skillbridge/core/utils/validator/result.dart';
 
-class FirestoreService implements FirestoreRepo {
+class FirestoreService implements FirestoreServiceRepo {
   final FirebaseFirestore db;
   FirestoreService({required this.db});
   @override
@@ -85,6 +85,16 @@ class FirestoreService implements FirestoreRepo {
     }
   }
 
+  @override
+  Future<Result<void>> addPost(AdModel post) async {
+    try {
+      await db.collection(AppConstants.adPostsCollection).add(post.toJson());
+      return const Success(null);
+    } on FirebaseException catch (e) {
+      throw _mapException(e);
+    }
+  }
+
   DatabaseException _mapException(FirebaseException e) {
     return switch (e.code) {
       'not-found' => DocumentNotFoundException(),
@@ -96,15 +106,5 @@ class FirestoreService implements FirestoreRepo {
         message: e.message ?? 'Unexpected database error.',
       ),
     };
-  }
-
-  @override
-  Future<Result<void>> addPost(AdModel post) async {
-    try {
-      await db.collection(AppConstants.adPostsCollection).add(post.toJson());
-      return const Success(null);
-    } on FirebaseException catch (e) {
-      throw _mapException(e);
-    }
   }
 }

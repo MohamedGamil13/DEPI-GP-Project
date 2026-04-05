@@ -9,11 +9,11 @@ import 'package:skillbridge/core/utils/validator/result.dart';
 import 'package:skillbridge/features/post_ad/data/repos/post_ad_repo.dart';
 
 class PostAdRepoImplementation implements PostAdRepo {
-  final FirestoreRepo _firestoreRepo;
+  final FirestoreServiceRepo _firestoreRepo;
   final StorageService _storageService;
 
   PostAdRepoImplementation({
-    required FirestoreRepo firestoreRepo,
+    required FirestoreServiceRepo firestoreRepo,
     required StorageService storageService,
   }) : _firestoreRepo = firestoreRepo,
        _storageService = storageService;
