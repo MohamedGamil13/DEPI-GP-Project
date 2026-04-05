@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:skillbridge/core/errors/auth_exception.dart';
-import 'package:skillbridge/core/models/auth_user_model.dart';
-import 'package:skillbridge/core/utils/services/auth/firebase_auth_service_repo.dart';
+import 'package:skillbridge/core/utils/services/auth/auth_service.dart';
 import 'package:skillbridge/core/utils/validator/app_validator.dart';
+import 'package:skillbridge/features/auth/data/models/auth_user_model.dart';
 
 class FirebaseAuthService implements AuthService {
   final FirebaseAuth _auth;
@@ -66,30 +66,6 @@ class FirebaseAuthService implements AuthService {
   }
 
   @override
-  Future<void> signOut() async {
-    try {
-      await _auth.signOut();
-    } on FirebaseAuthException catch (e) {
-      throw _mapException(e);
-    }
-  }
-
-  @override
-  Future<void> sendVerificationEmail() async {
-    final user = _auth.currentUser;
-
-    if (user == null) {
-      throw const UnauthenticatedException();
-    }
-
-    try {
-      await user.sendEmailVerification();
-    } on FirebaseAuthException catch (e) {
-      throw _mapException(e);
-    }
-  }
-
-  @override
   Future<void> sendPasswordResetEmail(String email) async {
     if (email.trim().isEmpty) {
       throw const InvalidEmailException();
@@ -97,21 +73,6 @@ class FirebaseAuthService implements AuthService {
 
     try {
       await _auth.sendPasswordResetEmail(email: email.trim());
-    } on FirebaseAuthException catch (e) {
-      throw _mapException(e);
-    }
-  }
-
-  @override
-  Future<void> deleteAccount() async {
-    final user = _auth.currentUser;
-
-    if (user == null) {
-      throw const UnauthenticatedException();
-    }
-
-    try {
-      await user.delete();
     } on FirebaseAuthException catch (e) {
       throw _mapException(e);
     }
@@ -153,3 +114,45 @@ class FirebaseAuthService implements AuthService {
     };
   }
 }
+
+  // @override
+  // Future<void> sendVerificationEmail() async {
+  //   final user = _auth.currentUser;
+
+  //   if (user == null) {
+  //     throw const UnauthenticatedException();
+  //   }
+
+  //   try {
+  //     await user.sendEmailVerification();
+  //   } on FirebaseAuthException catch (e) {
+  //     throw _mapException(e);
+  //   }
+  // }
+
+
+  // @override
+  // Future<void> deleteAccount() async {
+  //   final user = _auth.currentUser;
+
+  //   if (user == null) {
+  //     throw const UnauthenticatedException();
+  //   }
+
+  //   try {
+  //     await user.delete();
+  //   } on FirebaseAuthException catch (e) {
+  //     throw _mapException(e);
+  //   }
+  // }
+  // @override
+  // Future<void> signOut() async {
+  //   try {
+  //     await _auth.signOut();
+  //   } on FirebaseAuthException catch (e) {
+  //     throw _mapException(e);
+  //   }
+  // }
+
+
+  //reviewed

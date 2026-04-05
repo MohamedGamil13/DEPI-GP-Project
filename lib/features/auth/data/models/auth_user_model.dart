@@ -3,9 +3,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 class AuthUser {
   final String uid;
+  final String? displayName;
   final String? email;
   final bool isEmailVerified;
-  final String? displayName;
   final String? photoUrl;
 
   const AuthUser({
@@ -23,18 +23,20 @@ class AuthUser {
     displayName: user.displayName,
     photoUrl: user.photoURL,
   );
-
-  AuthUser copyWith({
-    String? uid,
-    String? email,
-    bool? isEmailVerified,
-    String? displayName,
-    String? photoUrl,
-  }) => AuthUser(
-    uid: uid ?? this.uid,
-    email: email ?? this.email,
-    isEmailVerified: isEmailVerified ?? this.isEmailVerified,
-    displayName: displayName ?? this.displayName,
-    photoUrl: photoUrl ?? this.photoUrl,
-  );
+  //reviewed
 }
+
+  // AuthUser copyWith({
+  //   String? uid,
+  //   String? email,
+  //   bool? isEmailVerified,
+  //   String? displayName,
+  //   String? photoUrl,
+  // }) => AuthUser(
+  //   uid: uid ?? this.uid,
+  //   email: email ?? this.email,
+  //   isEmailVerified: isEmailVerified ?? this.isEmailVerified,
+  //   displayName: displayName ?? this.displayName,
+  //   photoUrl: photoUrl ?? this.photoUrl,
+  // );
+  // i commented it because it's unused code 

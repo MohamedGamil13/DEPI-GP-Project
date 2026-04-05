@@ -47,3 +47,5 @@ class AppSnackBar {
     show(context, message, type: SnackBarType.info);
   }
 }
+
+//reviewed

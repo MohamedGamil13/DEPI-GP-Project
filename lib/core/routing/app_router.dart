@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:skillbridge/core/routing/app_screens.dart';
 import 'package:skillbridge/core/routing/routing_stream_refresh.dart';
 import 'package:skillbridge/core/utils/locator/service_locator.dart';
-import 'package:skillbridge/core/utils/services/auth/firebase_auth_service_repo.dart';
+import 'package:skillbridge/core/utils/services/auth/auth_service.dart';
 import 'package:skillbridge/features/auth/presentation/screens/forgot_password_screen.dart';
 import 'package:skillbridge/features/auth/presentation/screens/sign_in_screen.dart';
 import 'package:skillbridge/features/auth/presentation/screens/sign_up_screen.dart';
@@ -33,18 +33,14 @@ final GoRouter router = GoRouter(
     getIt<AuthService>().authStateChanges,
   ),
   routes: <RouteBase>[
-    GoRoute(
-      path: AppScreens.homeScreen,
-      builder: (context, state) {
-        return const HomeScreen();
-      },
-    ),
+    // == splash Route == //
     GoRoute(
       path: AppScreens.splashScreen,
       builder: (context, state) {
         return const SplashScreen();
       },
     ),
+    // == Auth Routes == //
     GoRoute(
       path: AppScreens.signinScreen,
       builder: (context, state) {
@@ -72,15 +68,8 @@ final GoRouter router = GoRouter(
         );
       },
     ),
-    GoRoute(
-      path: AppScreens.postAdScreen,
-      builder: (context, state) {
-        return BlocProvider(
-          create: (context) => getIt<AdPostingCubit>(),
-          child: const PostAdScreen(),
-        );
-      },
-    ),
+
+    // == Home Routes == //
     GoRoute(
       path: AppScreens.homeScreen,
       builder: (context, state) {
@@ -90,5 +79,17 @@ final GoRouter router = GoRouter(
         );
       },
     ),
+
+    // == Post Ad Routes == //
+    GoRoute(
+      path: AppScreens.postAdScreen,
+      builder: (context, state) {
+        return BlocProvider(
+          create: (context) => getIt<AdPostingCubit>(),
+          child: const PostAdScreen(),
+        );
+      },
+    ),
   ],
 );
+//reviewed
