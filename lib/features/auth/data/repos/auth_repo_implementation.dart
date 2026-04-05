@@ -1,6 +1,6 @@
 import 'package:skillbridge/core/errors/auth_exception.dart';
-import 'package:skillbridge/core/models/auth_user_model.dart';
 import 'package:skillbridge/core/utils/validator/result.dart';
+import 'package:skillbridge/features/auth/data/models/auth_user_model.dart';
 import 'package:skillbridge/features/auth/data/repos/auth_repo.dart';
 
 class AuthRepoImplementation extends AuthRepo {
@@ -36,13 +36,13 @@ class AuthRepoImplementation extends AuthRepo {
     }
   }
 
-  @override
-  Future<Result<void>> sendVerificationEmail() async {
-    try {
-      await authService.sendVerificationEmail();
-      return const Success(null);
-    } on AuthException catch (e) {
-      return Failure(e);
-    }
-  }
+  // @override
+  // Future<Result<void>> sendVerificationEmail() async {
+  //   try {
+  //     await authService.sendVerificationEmail();
+  //     return const Success(null);
+  //   } on AuthException catch (e) {
+  //     return Failure(e);
+  //   }
+  // }
 }

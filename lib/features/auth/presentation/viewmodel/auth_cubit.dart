@@ -1,7 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
-import 'package:skillbridge/core/models/auth_user_model.dart';
 import 'package:skillbridge/core/utils/validator/result.dart';
+import 'package:skillbridge/features/auth/data/models/auth_user_model.dart';
 import 'package:skillbridge/features/auth/data/repos/auth_repo.dart';
 
 part 'auth_state.dart';
@@ -46,16 +46,16 @@ class AuthCubit extends Cubit<AuthState> {
         emit(AuthFailure(errorMessage: exception.message));
     }
   }
-
-  Future<void> sendVerificationEmail() async {
-    emit(AuthLoading());
-    final result = await authRepo.sendVerificationEmail();
-
-    switch (result) {
-      case Success():
-        emit(AuthSendPasswordSuccess());
-      case Failure(:final exception):
-        emit(AuthFailure(errorMessage: exception.message));
-    }
-  }
 }
+
+  // Future<void> sendVerificationEmail() async {
+  //   emit(AuthLoading());
+  //   final result = await authRepo.sendVerificationEmail();
+
+  //   switch (result) {
+  //     case Success():
+  //       emit(AuthSendPasswordSuccess());
+  //     case Failure(:final exception):
+  //       emit(AuthFailure(errorMessage: exception.message));
+  //   }
+  // }

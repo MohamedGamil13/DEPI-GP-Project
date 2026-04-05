@@ -39,3 +39,4 @@ final class DatabaseNetworkException extends DatabaseException {
 final class UnknownDatabaseException extends DatabaseException {
   UnknownDatabaseException({required super.code, required super.message});
 }
+//reviewed 
