@@ -1,85 +1,121 @@
 import 'package:flutter/material.dart';
-import 'package:skillbridge/core/models/ad_model.dart';
 import 'package:skillbridge/core/theme/app_colors.dart';
 import 'package:skillbridge/core/theme/app_styles.dart';
-import 'package:skillbridge/features/home/presentation/screens/widgets/category_combo_box_item.dart';
 
-class CustomFilterChip extends StatefulWidget {
+class CustomFilterChip<T> extends StatefulWidget {
+  const CustomFilterChip({
+    super.key,
+    required this.label,
+    required this.items,
+    required this.getLabel,
+    this.getIcon,
+    this.leadingIcon,
+    this.onChanged,
+  });
+
   final String label;
-  final IconData? icon;
-  final List<AdCategories> categories = AdCategories.values;
+  final List<T> items;
 
-  const CustomFilterChip({super.key, required this.label, this.icon});
+  /// how to display text
+  final String Function(T) getLabel;
+
+  /// optional icon per item
+  final IconData Function(T)? getIcon;
+
+  /// icon before selected value (like location icon)
+  final IconData? leadingIcon;
+
+  final Function(T?)? onChanged;
 
   @override
-  State<CustomFilterChip> createState() => _CustomFilterChipState();
+  State<CustomFilterChip<T>> createState() => _CustomFilterChipState<T>();
 }
 
-class _CustomFilterChipState extends State<CustomFilterChip> {
-  String? _selectedCategory;
+class _CustomFilterChipState<T> extends State<CustomFilterChip<T>> {
+  T? selectedItem;
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: SizedBox(
-        width: MediaQuery.of(context).size.width * 0.4,
-        child: DropdownButtonHideUnderline(
-          child: DropdownButton<String>(
-            value: _selectedCategory,
-            hint: Row(
-              children: [
-                if (widget.icon != null) ...[
-                  Icon(widget.icon, color: AppColors.primaryColor, size: 18),
-                  const SizedBox(width: 4),
-                ],
-                Text(
-                  widget.label,
-                  style: AppStyles.font14Regular.copyWith(
-                    color: AppColors.textMedium,
-                  ),
+    return SizedBox(
+      width: MediaQuery.of(context).size.width * 0.4,
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<T>(
+          value: selectedItem,
+          isExpanded: true,
+          icon: const Icon(Icons.keyboard_arrow_down),
+          iconEnabledColor: AppColors.primaryColor,
+          dropdownColor: AppColors.surfaceColor,
+          borderRadius: BorderRadius.circular(16),
+
+          /// Hint (before selection)
+          hint: Row(
+            children: [
+              if (widget.leadingIcon != null) ...[
+                Icon(
+                  widget.leadingIcon,
+                  color: AppColors.primaryColor,
+                  size: 18,
                 ),
+                const SizedBox(width: 4),
               ],
-            ),
-            icon: const Icon(Icons.keyboard_arrow_down),
-            iconEnabledColor: AppColors.primaryColor,
-            isExpanded: true,
-            dropdownColor: AppColors.surfaceColor,
-            borderRadius: BorderRadius.circular(16),
-            items: widget.categories.map((category) {
-              return DropdownMenuItem<String>(
-                value: category.label,
-                child: CategoryComboBoxItem(adCategories: category),
-              );
-            }).toList(),
-            onChanged: (value) {
-              setState(() {
-                _selectedCategory = value;
-              });
-            },
-            // Styling the button itself
-            selectedItemBuilder: (context) {
-              return widget.categories.map((category) {
-                return Row(
-                  children: [
-                    if (widget.icon != null) ...[
-                      Icon(
-                        widget.icon,
-                        color: AppColors.primaryColor,
-                        size: 18,
-                      ),
-                      const SizedBox(width: 4),
-                    ],
-                    Text(
-                      category.label,
-                      style: AppStyles.font14Regular.copyWith(
-                        color: AppColors.textMedium,
-                      ),
-                    ),
-                  ],
-                );
-              }).toList();
-            },
+              Text(
+                widget.label,
+                style: AppStyles.font14Regular.copyWith(
+                  color: AppColors.textMedium,
+                ),
+              ),
+            ],
           ),
+
+          /// Dropdown items
+          items: widget.items.map((item) {
+            return DropdownMenuItem<T>(
+              value: item,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    widget.getLabel(item),
+                    style: AppStyles.font14Regular.copyWith(
+                      color: AppColors.textMedium,
+                    ),
+                  ),
+                  if (widget.getIcon != null)
+                    Icon(widget.getIcon!(item), color: AppColors.primaryColor),
+                ],
+              ),
+            );
+          }).toList(),
+
+          /// On change
+          onChanged: (value) {
+            setState(() => selectedItem = value);
+            widget.onChanged?.call(value);
+          },
+
+          /// Selected item UI
+          selectedItemBuilder: (context) {
+            return widget.items.map((item) {
+              return Row(
+                children: [
+                  if (widget.leadingIcon != null) ...[
+                    Icon(
+                      widget.leadingIcon,
+                      color: AppColors.primaryColor,
+                      size: 18,
+                    ),
+                    const SizedBox(width: 4),
+                  ],
+                  Text(
+                    widget.getLabel(item),
+                    style: AppStyles.font14Regular.copyWith(
+                      color: AppColors.textMedium,
+                    ),
+                  ),
+                ],
+              );
+            }).toList();
+          },
         ),
       ),
     );

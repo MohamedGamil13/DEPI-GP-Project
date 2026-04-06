@@ -1,21 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:skillbridge/core/models/ad_model.dart';
 import 'package:skillbridge/core/theme/app_colors.dart';
 import 'package:skillbridge/core/theme/app_styles.dart';
 
 class CategoryComboBoxItem extends StatelessWidget {
-  const CategoryComboBoxItem({super.key, required this.adCategories});
-  final AdCategories adCategories;
+  const CategoryComboBoxItem({
+    super.key,
+    required this.label,
+    required this.icon,
+    this.iconColor,
+  });
+
+  final String label;
+  final IconData icon;
+  final Color? iconColor;
+
   @override
   Widget build(BuildContext context) {
     return Row(
-      mainAxisAlignment: .spaceBetween,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
-          adCategories.label,
+          label,
           style: AppStyles.font14Regular.copyWith(color: AppColors.textMedium),
         ),
-        Icon(adCategories.icon, color: AppColors.primaryColor),
+        Icon(icon, color: iconColor ?? AppColors.primaryColor),
       ],
     );
   }
