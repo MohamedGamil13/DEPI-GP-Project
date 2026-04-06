@@ -21,6 +21,7 @@ class FiltersSection extends StatelessWidget {
               children: [
                 /// Categories
                 CustomFilterChip<AdCategories>(
+                  key: const ValueKey('categories'),
                   label: 'All Categories',
                   items: AdCategories.values,
                   getLabel: (category) => category.label,
@@ -32,6 +33,7 @@ class FiltersSection extends StatelessWidget {
 
                 /// Cities
                 CustomFilterChip<AdCity>(
+                  key: const ValueKey('cities'),
                   label: 'Any City',
                   items: AdCity.values,
                   getLabel: (city) => city.label,
@@ -46,14 +48,17 @@ class FiltersSection extends StatelessWidget {
             const SizedBox(height: 8),
 
             /// My City Only (optional logic)
-            CustomFilterChip<AdCity>(
-              label: 'My City Only',
-              items: AdCity.values,
-              getLabel: (city) => city.label,
-              leadingIcon: Icons.my_location,
-              onChanged: (value) {
-                // ممكن هنا تجيب current location وتفلتر
-              },
+            Center(
+              child: CustomFilterChip<AdCity>(
+                key: const ValueKey('my_city'),
+                label: 'My City Only',
+                items: AdCity.values,
+                getLabel: (city) => city.label,
+                leadingIcon: Icons.my_location,
+                onChanged: (value) {
+                  // ممكن هنا تجيب current location وتفلتر
+                },
+              ),
             ),
 
             const SizedBox(height: 16),
