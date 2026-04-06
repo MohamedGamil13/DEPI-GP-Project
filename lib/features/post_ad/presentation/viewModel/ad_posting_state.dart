@@ -1,58 +1,43 @@
-// ad_posting_state.dart
-part of 'ad_posting_cubit.dart';
+import 'dart:io';
 
-@immutable
-sealed class AdPostingState {
+class PostState {
   final List<File> images;
   final String? selectedCategory;
-  final List<SkillTag> skills;
+  final List<SkillItem> skills;
+  final bool isLoading;
+  final String? error;
 
-  const AdPostingState({
+  const PostState({
     this.images = const [],
     this.selectedCategory,
-    this.skills = const [
-      SkillTag(label: 'React', isSelected: true),
-      SkillTag(label: 'Python', isSelected: true),
-      SkillTag(label: 'Cleaning'),
-      SkillTag(label: 'JavaScript'),
-      SkillTag(label: 'Gardening'),
-      SkillTag(label: 'Design'),
-      SkillTag(label: 'Marketing'),
-      SkillTag(label: 'Education'),
-    ],
+    this.skills = const [],
+    this.isLoading = false,
+    this.error,
   });
+
+  PostState copyWith({
+    List<File>? images,
+    String? selectedCategory,
+    List<SkillItem>? skills,
+    bool? isLoading,
+    String? error,
+  }) {
+    return PostState(
+      images: images ?? this.images,
+      selectedCategory: selectedCategory ?? this.selectedCategory,
+      skills: skills ?? this.skills,
+      isLoading: isLoading ?? this.isLoading,
+      error: error,
+    );
+  }
 }
 
-final class AdPostingInitial extends AdPostingState {
-  const AdPostingInitial() : super();
-}
+class SkillItem {
+  final String label;
+  final bool isSelected;
+  const SkillItem({required this.label, this.isSelected = false});
 
-final class AdPostingUpdated extends AdPostingState {
-  const AdPostingUpdated({
-    required super.images,
-    required super.selectedCategory,
-    required super.skills,
-  });
-}
-
-final class AdPostingLoading extends AdPostingState {
-  const AdPostingLoading({
-    required super.images,
-    required super.selectedCategory,
-    required super.skills,
-  });
-}
-
-final class AdPostingSuccess extends AdPostingState {
-  const AdPostingSuccess() : super();
-}
-
-final class AdPostingError extends AdPostingState {
-  final String message;
-  const AdPostingError(
-    this.message, {
-    required super.images,
-    required super.selectedCategory,
-    required super.skills,
-  });
+  SkillItem copyWith({bool? isSelected}) {
+    return SkillItem(label: label, isSelected: isSelected ?? this.isSelected);
+  }
 }

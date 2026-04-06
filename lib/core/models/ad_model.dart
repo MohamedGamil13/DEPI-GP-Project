@@ -10,8 +10,10 @@ class AdModel {
   final AdCategories category;
   final List<RelevantSkills>? relevantSkills;
   final AdCity adCity;
+  final List<String>? images;
 
   AdModel({
+    required this.adID,
     required this.title,
     required this.description,
     required this.city,
@@ -20,7 +22,7 @@ class AdModel {
     required this.category,
     required this.relevantSkills,
     required this.adCity,
-    required this.adID,
+    required this.images,
   });
   Map<String, dynamic> toJson() {
     return {
@@ -33,6 +35,7 @@ class AdModel {
       "category": category.name,
       "relevantSkills": relevantSkills?.map((skill) => skill.name).toList(),
       "adCity": adCity.name,
+      "images": images,
     };
   }
 
@@ -46,6 +49,7 @@ class AdModel {
     AdCategories? category,
     List<RelevantSkills>? relevantSkills,
     AdCity? adCity,
+    List<String>? images, // 🔥 ADD THIS
   }) {
     return AdModel(
       adID: adID ?? this.adID,
@@ -57,6 +61,7 @@ class AdModel {
       category: category ?? this.category,
       relevantSkills: relevantSkills ?? this.relevantSkills,
       adCity: adCity ?? this.adCity,
+      images: images ?? this.images, // 🔥 FIX
     );
   }
 
@@ -84,6 +89,7 @@ class AdModel {
         (e) => e.name == json['adCity'],
         orElse: () => AdCity.cairo,
       ),
+      images: List<String>.from(json['images'] ?? []),
     );
   }
 }

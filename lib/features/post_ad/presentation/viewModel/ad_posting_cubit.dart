@@ -1,86 +1,51 @@
-// ad_posting_cubit.dart
 import 'dart:io';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:meta/meta.dart';
 import 'package:skillbridge/core/models/ad_model.dart';
 import 'package:skillbridge/core/utils/validator/result.dart';
-import 'package:skillbridge/features/post_ad/data/models/skill_tag.dart';
+import 'package:skillbridge/features/post_ad/data/repos/post_ad_repo.dart';
+import 'package:skillbridge/features/post_ad/presentation/viewModel/ad_posting_state.dart';
 
-import '../../data/repos/post_ad_repo.dart';
+class PostCubit extends Cubit<PostState> {
+  final PostAdRepo repo;
 
-part 'ad_posting_state.dart';
-
-class AdPostingCubit extends Cubit<AdPostingState> {
-  final PostAdRepo _postAdRepo;
-  static const int _maxImages = 3;
-
-  AdPostingCubit(this._postAdRepo) : super(const AdPostingInitial());
-
-  List<File> get _images => state.images;
-  String? get _selectedCategory => state.selectedCategory;
-  List<SkillTag> get _skills => state.skills;
-
-  void _emitUpdated({
-    List<File>? images,
-    String? selectedCategory,
-    List<SkillTag>? skills,
-  }) {
-    emit(
-      AdPostingUpdated(
-        images: images ?? _images,
-        selectedCategory: selectedCategory ?? _selectedCategory,
-        skills: skills ?? _skills,
-      ),
-    );
-  }
+  PostCubit({required this.repo}) : super(const PostState());
 
   void addImages(List<File> files) {
-    final remaining = _maxImages - _images.length;
-    if (remaining <= 0) return;
-    _emitUpdated(images: [..._images, ...files.take(remaining)]);
+    emit(state.copyWith(images: [...state.images, ...files]));
   }
 
-  void removeImage(int index) {
-    final updated = List<File>.from(_images)..removeAt(index);
-    _emitUpdated(images: updated);
+  void removeImage(File file) {
+    emit(state.copyWith(images: state.images..remove(file)));
   }
 
-  void selectCategory(String? category) {
-    _emitUpdated(selectedCategory: category);
+  void selectCategory(String category) {
+    emit(state.copyWith(selectedCategory: category));
   }
 
-  void toggleSkill(int index) {
-    final updated = List<SkillTag>.from(_skills)
-      ..[index] = _skills[index].copyWith(
-        isSelected: !_skills[index].isSelected,
-      );
-    _emitUpdated(skills: updated);
+  void toggleSkill(String label) {
+    final updatedSkills = state.skills.map((s) {
+      if (s.label == label) return s.copyWith(isSelected: !s.isSelected);
+      return s;
+    }).toList();
+    emit(state.copyWith(skills: updatedSkills));
   }
 
   Future<void> publishNewAd({required AdModel adModel}) async {
-    emit(
-      AdPostingLoading(
-        images: _images,
-        selectedCategory: _selectedCategory,
-        skills: _skills,
-      ),
-    );
+    emit(state.copyWith(isLoading: true, error: null));
 
-    final result = await _postAdRepo.publishAd(adModel, _images);
+    try {
+      final result = await repo.publishAd(adModel, state.images);
 
-    switch (result) {
-      case Success(data: _):
-        emit(const AdPostingSuccess());
-      case Failure(exception: var e):
-        emit(
-          AdPostingError(
-            e.message,
-            images: _images,
-            selectedCategory: _selectedCategory,
-            skills: _skills,
-          ),
-        );
+      switch (result) {
+        case Success():
+          emit(state.copyWith(isLoading: false));
+          break;
+        case Failure(exception: final e):
+          emit(state.copyWith(isLoading: false, error: e.message));
+      }
+    } catch (e) {
+      emit(state.copyWith(isLoading: false, error: e.toString()));
     }
   }
 }

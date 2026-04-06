@@ -13,6 +13,7 @@ import 'package:skillbridge/core/utils/validator/app_validator.dart';
 import 'package:skillbridge/features/auth/presentation/screens/widgets/field_label.dart';
 import 'package:skillbridge/features/auth/presentation/screens/widgets/primary_button.dart';
 import 'package:skillbridge/features/post_ad/presentation/viewModel/ad_posting_cubit.dart';
+import 'package:skillbridge/features/post_ad/presentation/viewModel/ad_posting_state.dart';
 import 'package:skillbridge/features/post_ad/presentation/widgets/category_dropdown.dart';
 import 'package:skillbridge/features/post_ad/presentation/widgets/photo_upload_section.dart';
 import 'package:skillbridge/features/post_ad/presentation/widgets/post_ad_app_bar.dart';
@@ -57,18 +58,17 @@ class _PostAdScreenState extends State<PostAdScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<AdPostingCubit, AdPostingState>(
+    return BlocConsumer<PostCubit, PostState>(
       listener: (context, state) {
-        if (state is AdPostingSuccess) {
+        if (state.error != null) {
+          AppSnackBar.error(context, state.error!);
+        } else if (!state.isLoading && state.error == null) {
           AppSnackBar.success(context, 'Ad published successfully!');
           context.popPage();
-        } else if (state is AdPostingError) {
-          AppSnackBar.error(context, state.message);
         }
       },
       builder: (context, state) {
-        final cubit = context.read<AdPostingCubit>();
-        final isLoading = state is AdPostingLoading;
+        final cubit = context.read<PostCubit>();
 
         return Scaffold(
           backgroundColor: AppColors.white,
@@ -82,6 +82,7 @@ class _PostAdScreenState extends State<PostAdScreen> {
                 children: [
                   SizedBox(height: 20.h),
 
+                  // Photo upload section
                   PhotoUploadSection(
                     images: state.images,
                     onSelectImages: () => _pickImages(cubit),
@@ -109,8 +110,7 @@ class _PostAdScreenState extends State<PostAdScreen> {
                   PostAdTextField(
                     controller: _descriptionController,
                     hint:
-                        'Describe your service in detail, including'
-                        " what's included and your experience.",
+                        'Describe your service in detail, including what\'s included and your experience.',
                     maxLines: 5,
                     keyboardType: TextInputType.multiline,
                     validator: AppValidator.validateDescription,
@@ -167,7 +167,7 @@ class _PostAdScreenState extends State<PostAdScreen> {
                   ),
                   SizedBox(height: 32.h),
 
-                  isLoading
+                  state.isLoading
                       ? const Center(
                           child: CircularProgressIndicator(
                             color: AppColors.primaryColor,
@@ -177,7 +177,6 @@ class _PostAdScreenState extends State<PostAdScreen> {
                           label: 'Publish Ad',
                           onTap: () => _onPublish(context, cubit),
                         ),
-
                   SizedBox(height: 32.h),
                 ],
               ),
@@ -188,9 +187,10 @@ class _PostAdScreenState extends State<PostAdScreen> {
     );
   }
 
-  Future<void> _onPublish(BuildContext context, AdPostingCubit cubit) async {
-    final state = cubit.state;
+  Future<void> _onPublish(BuildContext context, PostCubit cubit) async {
     if (!_formKey.currentState!.validate()) return;
+
+    final state = cubit.state;
 
     if (state.selectedCategory == null) {
       AppSnackBar.error(context, 'Please select a category');
@@ -224,12 +224,13 @@ class _PostAdScreenState extends State<PostAdScreen> {
             e.name.toLowerCase() == _cityController.text.trim().toLowerCase(),
         orElse: () => AdCity.cairo,
       ),
+      images: state.images,
     );
 
     await cubit.publishNewAd(adModel: ad);
   }
 
-  Future<void> _pickImages(AdPostingCubit cubit) async {
+  Future<void> _pickImages(PostCubit cubit) async {
     final picker = ImagePicker();
     final picked = await picker.pickMultiImage();
     if (picked.isNotEmpty) {
