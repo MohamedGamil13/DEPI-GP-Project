@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:skillbridge/core/theme/app_colors.dart';
-import 'package:skillbridge/core/theme/app_styles.dart';
-import 'package:skillbridge/core/widgets/search_bar.dart';
-import 'package:skillbridge/features/home/presentation/screens/widgets/categories_list_view.dart';
-import 'package:skillbridge/features/home/presentation/screens/widgets/custom_tag.dart';
-import 'package:skillbridge/features/home/presentation/screens/widgets/filter_chip.dart';
-import 'package:skillbridge/features/home/presentation/screens/widgets/service_card.dart';
+import 'package:skillbridge/core/models/ad_model.dart';
+import 'package:skillbridge/features/home/presentation/screens/widgets/ad_list_section.dart';
+import 'package:skillbridge/features/home/presentation/screens/widgets/categories_section.dart';
+import 'package:skillbridge/features/home/presentation/screens/widgets/filter_section.dart';
+import 'package:skillbridge/features/home/presentation/screens/widgets/home_header.dart';
 
 class HomeScreenBody extends StatefulWidget {
   const HomeScreenBody({super.key});
@@ -15,124 +13,51 @@ class HomeScreenBody extends StatefulWidget {
 }
 
 class _HomeScreenBodyState extends State<HomeScreenBody> {
+  final List<AdModel> _ads = [
+    AdModel(
+      adID: 1,
+      title: 'Laptop Repair & Setup',
+      description: 'Expert hardware diagnostics and software installation',
+      city: 'Cairo',
+      photos: ['assets/images/labtop.jpg'],
+      price: 50,
+      category: AdCategories.services,
+      relevantSkills: [RelevantSkills.mobile, RelevantSkills.ai],
+      adCity: AdCity.cairo,
+    ),
+    AdModel(
+      adID: 2,
+      title: 'Deep Home Cleaning',
+      description: 'Professional eco-friendly cleaning service',
+      city: 'Giza',
+      photos: ['assets/images/labtop.jpg'],
+      price: 85,
+      category: AdCategories.services,
+      relevantSkills: [RelevantSkills.projectManagement],
+      adCity: AdCity.giza,
+    ),
+    AdModel(
+      adID: 3,
+      title: 'Math Tutoring (K-12)',
+      description: 'Personalized algebra and calculus tutoring',
+      city: 'Alexandria',
+      photos: ['assets/images/labtop.jpg'],
+      price: 35,
+      category: AdCategories.education,
+      relevantSkills: [RelevantSkills.teaching],
+      adCity: AdCity.alexandria,
+    ),
+  ];
+
   @override
   Widget build(BuildContext context) {
     return CustomScrollView(
       slivers: [
-        const SliverToBoxAdapter(
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [CustomSearchBar(), _HomePageSectionTitle()],
-            ),
-          ),
-        ),
-        const SliverToBoxAdapter(
-          child: SizedBox(height: 48, child: CategoriesListView()),
-        ),
-
-        const SliverToBoxAdapter(
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(height: 12),
-                Row(
-                  mainAxisAlignment: .spaceBetween,
-                  children: [
-                    CustomFilterChip(label: 'All Categories'),
-                    CustomFilterChip(label: 'Any City'),
-                  ],
-                ),
-                SizedBox(height: 8),
-                CustomFilterChip(
-                  label: 'My City Only',
-                  icon: Icons.location_on_outlined,
-                ),
-                SizedBox(height: 16),
-              ],
-            ),
-          ),
-        ),
-
-        // Service Cards Vertical ListView
-        SliverPadding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          sliver: SliverList(
-            delegate: SliverChildListDelegate([
-              ServiceCard(
-                image: 'assets/images/labtop.jpg',
-                tags: const [
-                  CustomTag(label: 'TECH', color: AppColors.primaryColor),
-                  CustomTag(label: 'NEW YORK', color: AppColors.textMedium),
-                ],
-                title: 'Laptop Repair & Setup',
-                price: 'EGP 50',
-                description: 'Expert hardware diagnostics and software...',
-                user: 'Alex Chen',
-                rating: 4.9,
-                reviews: 24,
-                isFavorite: true,
-                onFavoriteTap: () {},
-              ),
-              const SizedBox(height: 16),
-              ServiceCard(
-                image: 'assets/images/labtop.jpg',
-                tags: const [
-                  CustomTag(label: 'LOCAL', color: AppColors.secondaryColor),
-                  CustomTag(label: 'BROOKLYN', color: AppColors.textMedium),
-                ],
-                title: 'Deep Home Cleaning',
-                price: 'EGP 85',
-                description:
-                    'Professional eco-friendly cleaning service for...',
-                user: 'Sarah Miller',
-                rating: 5.0,
-                reviews: 52,
-                isFavorite: true,
-                onFavoriteTap: () {},
-              ),
-              const SizedBox(height: 16),
-              ServiceCard(
-                image: 'assets/images/labtop.jpg',
-                tags: const [
-                  CustomTag(label: 'STUDENTS', color: AppColors.primaryColor),
-                  CustomTag(label: 'MANHATTAN', color: AppColors.textMedium),
-                ],
-                title: 'Math Tutoring (K-12)',
-                price: 'EGP 35',
-                description: 'Personalized algebra and calculus tutoring by...',
-                user: 'David Park',
-                rating: 4.8,
-                reviews: 12,
-                isFavorite: true,
-                onFavoriteTap: () {},
-              ),
-              const SizedBox(height: 24),
-            ]),
-          ),
-        ),
+        const HomeHeader(),
+        const CategoriesSection(),
+        const FiltersSection(),
+        AdListSection(ads: _ads),
       ],
-    );
-  }
-}
-
-class _HomePageSectionTitle extends StatelessWidget {
-  const _HomePageSectionTitle();
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 8, bottom: 8),
-      child: Text(
-        'CATEGORIES',
-        style: AppStyles.font14w600.copyWith(
-          color: AppColors.textMedium,
-          letterSpacing: 1.2,
-        ),
-      ),
     );
   }
 }
