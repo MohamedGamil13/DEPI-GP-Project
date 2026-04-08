@@ -15,7 +15,7 @@ class HomeScreen extends StatelessWidget {
         scrolledUnderElevation: 0,
         backgroundColor: Colors.transparent,
         title: const AppTitle(),
-        actions: const [_AppBarIcon()],
+        actions: const [_NotificationIcon()],
       ),
       floatingActionButton: const _CustomFloatingActionButton(),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
@@ -25,8 +25,8 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-class _AppBarIcon extends StatelessWidget {
-  const _AppBarIcon();
+class _NotificationIcon extends StatelessWidget {
+  const _NotificationIcon();
 
   @override
   Widget build(BuildContext context) {
