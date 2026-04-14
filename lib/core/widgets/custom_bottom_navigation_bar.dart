@@ -2,16 +2,16 @@ import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.da
 import 'package:flutter/material.dart';
 import 'package:skillbridge/core/theme/app_colors.dart';
 
-class CustomBottomNavigationBar extends StatefulWidget {
-  const CustomBottomNavigationBar({super.key});
+class CustomBottomNavigationBar extends StatelessWidget {
+  const CustomBottomNavigationBar({
+    super.key,
+    required this.activeIndex,
+    this.onTap,
+  });
 
-  @override
-  State<CustomBottomNavigationBar> createState() =>
-      _CustomBottomNavigationBarState();
-}
+  final int activeIndex;
+  final ValueChanged<int>? onTap;
 
-class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
-  int _bottomNavIndex = 0;
   @override
   Widget build(BuildContext context) {
     return AnimatedBottomNavigationBar(
@@ -23,12 +23,12 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
         Icons.chat_bubble_outline,
         Icons.person_outline,
       ],
-      activeIndex: _bottomNavIndex,
+      activeIndex: activeIndex,
       gapLocation: GapLocation.center,
       notchSmoothness: NotchSmoothness.verySmoothEdge,
       leftCornerRadius: 32,
       rightCornerRadius: 32,
-      onTap: (index) => setState(() => _bottomNavIndex = index),
+      onTap: onTap ?? (_) {},
     );
   }
 }
