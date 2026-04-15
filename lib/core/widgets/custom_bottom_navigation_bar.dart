@@ -34,6 +34,10 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
           context.goMessages();
           return;
         }
+        else if (index == 1) {
+          context.goFavourites();
+          return;
+        }
 
         setState(() => _bottomNavIndex = index);
       },

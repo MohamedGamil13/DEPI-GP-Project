@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:skillbridge/core/routing/app_router.dart';
 import 'package:skillbridge/core/utils/locator/service_locator.dart';
 import 'package:skillbridge/core/utils/observers/bloc_observer.dart';
+import 'package:skillbridge/features/saved_services/presentation/view_model/saved_services_cubit.dart';
 import 'package:skillbridge/firebase_options.dart';
 
 void main() async {
@@ -14,12 +15,15 @@ void main() async {
   Bloc.observer = AppBlocObserver();
   setupLocator();
 
-  runApp(const SkillBridge());
+  runApp(BlocProvider(
+    create: (context) => SavedServicesCubit()..fetchSavedServices(),
+    child:const SkillBridge()
+  ),
+      );
 }
 
 class SkillBridge extends StatelessWidget {
   const SkillBridge({super.key});
-
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(

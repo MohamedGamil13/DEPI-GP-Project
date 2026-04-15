@@ -17,6 +17,16 @@ abstract class AppStyles {
     fontWeight: FontWeight.w500,
     color: AppColors.textDark,
   );
+  static const TextStyle font15BoldTextLight = TextStyle(
+    fontSize: 15,
+    fontWeight: FontWeight.bold,
+    color: AppColors.textLight,
+  );
+  static const TextStyle font13w500Primary = TextStyle(
+    fontSize: 13,
+    fontWeight: FontWeight.w500,
+    color: AppColors.primaryColor,
+  );
   static const TextStyle font14Regular = TextStyle(
     fontSize: 14,
     color: AppColors.textDark,

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skillbridge/core/routing/app_screens.dart';
 import 'package:skillbridge/features/messages/data/models/service_conversation.dart';
+import 'package:skillbridge/features/saved_services/presentation/screens/saved_services_screen.dart';
 
 extension AppNavigator on BuildContext {
   void goHome() => go(AppScreens.homeScreen);
@@ -10,6 +11,7 @@ extension AppNavigator on BuildContext {
   void gosignUp() => go(AppScreens.signupScreen);
   void goForgetPassword() => go(AppScreens.forgetPasswordScreen);
   void goAddPost() => push(AppScreens.postAdScreen);
+  void goFavourites() => push(AppScreens.SavedServicesScreen);
   void goMessages() => push(AppScreens.messagesScreen);
   void goChatDetail(ServiceConversation conversation) =>
       push(AppScreens.chatDetailScreen, extra: conversation);
