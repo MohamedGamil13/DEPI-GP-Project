@@ -108,8 +108,3 @@ Posts with score > 0 appear in the Matched Feed, sorted by best match first.
 4. Live counter updates in real time: `3 / 5 joined`
 5. Campaign auto-closes when target is reached and notifies all participants
 
----
-
-## License
-
-This project was developed as part of the DEPI (Digital Egypt Pioneers Initiative) program.
