@@ -16,6 +16,7 @@ import 'package:skillbridge/features/messages/presentation/screens/messages_scre
 import 'package:skillbridge/features/messages/presentation/viewmodel/messages_cubit.dart';
 import 'package:skillbridge/features/post_ad/presentation/screens/post_ad_screen.dart';
 import 'package:skillbridge/features/post_ad/presentation/viewModel/ad_posting_cubit.dart';
+import 'package:skillbridge/features/product_screen/presentaion/screens/widgets/service_detail_screen.dart';
 import 'package:skillbridge/features/splash/splash_screen.dart';
 
 final GoRouter router = GoRouter(
@@ -121,6 +122,14 @@ final GoRouter router = GoRouter(
         );
       },
     ),
+    GoRoute(
+      path: AppScreens.ServiceDetailScreen,
+      builder: (context, state) {
+        return BlocProvider(
+          create: (context) => getIt<AuthCubit>(),
+          child: const ServiceDetailScreen(),
+        );
+      },
+    ),
   ],
 );
-//reviewed

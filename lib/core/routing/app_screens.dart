@@ -7,6 +7,9 @@ abstract class AppScreens {
   static const String postAdScreen = "/postAdScreen";
   static const String messagesScreen = "/messagesScreen";
   static const String chatDetailScreen = "/messagesScreen/chatDetailScreen";
+  static const String ServiceDetailScreen =
+      "/messagesScreen/ServiceDetailScreen";
+
   AppScreens._();
   //reviewed
 }
