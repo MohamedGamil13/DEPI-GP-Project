@@ -1,4 +1,4 @@
-# ServiMarket 🛍️
+# ServiMarket 
 
 A full-stack cross-platform service marketplace built with Flutter and Firebase, developed as a DEPI Final Project. ServiMarket connects service providers with buyers through smart matching, collaborative booking, and local discovery.
 
@@ -6,20 +6,20 @@ A full-stack cross-platform service marketplace built with Flutter and Firebase,
 
 ## Features
 
-### 🔴 Core
+###  Core
 - **Authentication** — Email/password login & registration via Firebase Auth, with persistent session and role-based profiles (Student / Provider / Regular)
 - **Service Posting** — Create, edit, and delete service ads with title, description, category, price, city tag, and up to 3 images
 - **Home Feed + Search + Filters** — Real-time stream of posts with keyword search, category/city filters, and paginated loading (20 posts/batch)
 - **Service Detail Screen** — Full post view with swipeable image gallery, seller info, Call & WhatsApp contact buttons, and a comments section
 - **Favorites / Wishlist** — Save and unsave posts with real-time heart icon state updates
 
-### 🟡 Recommended
+###  Recommended
 - **CV / Skill Matcher** — Tag-based scoring system that matches users to relevant tech/student posts based on their skill profile. Posts are scored and labeled as *Great Match*, *Stretch*, or *Overqualified*
 - **Group Campaign** — Collaborative booking feature where multiple users join a service at a lower per-person price, powered by atomic Firestore transactions with a live countdown timer
 - **Student Services Section** — Dedicated tab for student-to-student academic help, filterable by subject, area, and free/paid status
 - **Local Services Filter** — Toggle to show only posts matching the user's saved city, with a planned GPS radius upgrade
 
-### ⚪ Nice to Have
+###  Nice to Have
 - Dark Mode with system-aware theming
 - Google Sign-In
 - Push Notifications via FCM
