@@ -12,7 +12,20 @@
           "package_name": "com.example.skillbridge"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "649211504330-pm0qctvvrdj9ilbngop83hdu7e62pcdr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.skillbridge",
+            "certificate_hash": "23d748a7510d0b0e7ad04204ad7157a442beaa3b"
+          }
+        },
+        {
+          "client_id": "649211504330-32sov62vjb951km2tqcehukqmnf57ba1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAIvy223ubdd6lX_LCBaSAQKwzgfsiyMXk"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "649211504330-32sov62vjb951km2tqcehukqmnf57ba1.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "649211504330-4fptbg4bk5k6k30nbmig99a3t5qbpavl.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.skillbridge"
+              }
+            }
+          ]
         }
       }
     }

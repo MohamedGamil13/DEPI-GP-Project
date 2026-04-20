@@ -43,6 +43,7 @@ dependencies:
   go_router: ^17.1.0
   animated_bottom_navigation_bar: ^1.4.0
   image_picker: ^1.2.1
+  google_sign_in: ^6.0.2
 
 dev_dependencies:
   # The "flutter_lints" package below contains a set of recommended lints to
