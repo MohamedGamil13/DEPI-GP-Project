@@ -68,11 +68,16 @@ class FirebaseAuthService implements AuthService {
   }
 
   @override
-  Future<AuthUser?> signInWithGoogle() async {
+  Future<AuthUser> signInWithGoogle() async {
     try {
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
 
-      if (googleUser == null) return null;
+      if (googleUser == null) {
+        throw const UnknownAuthException(
+          code: 'sign-in-cancelled',
+          message: 'Sign in was cancelled by the user.',
+        );
+      }
 
       final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;
@@ -88,10 +93,19 @@ class FirebaseAuthService implements AuthService {
 
       final user = userCredential.user;
 
-      return user == null ? null : _mapUser(user);
+      if (user == null) {
+        throw const UnknownAuthException(
+          code: 'user-not-found',
+          message: 'Failed to retrieve user information from Firebase.',
+        );
+      }
+
+      return _mapUser(user);
     } on FirebaseAuthException catch (e) {
       throw _mapException(e);
     } catch (e) {
+      if (e is AuthException) rethrow;
+
       throw UnknownAuthException(
         code: 'google-sign-in-error',
         message: e.toString(),

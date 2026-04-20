@@ -1,3 +1,4 @@
+import 'package:skillbridge/core/errors/app_exception.dart';
 import 'package:skillbridge/core/errors/auth_exception.dart';
 import 'package:skillbridge/core/utils/validator/result.dart';
 import 'package:skillbridge/features/auth/data/models/auth_user_model.dart';
@@ -32,6 +33,16 @@ class AuthRepoImplementation extends AuthRepo {
       await authService.sendPasswordResetEmail(email);
       return const Success(null);
     } on AuthException catch (e) {
+      return Failure(e);
+    }
+  }
+
+  @override
+  Future<Result<AuthUser>> signInWithGoogle() async {
+    try {
+      final user = await authService.signInWithGoogle();
+      return Success(user);
+    } on AppException catch (e) {
       return Failure(e);
     }
   }

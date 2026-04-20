@@ -9,6 +9,5 @@ abstract class AuthRepo {
   Future<Result<AuthUser>> signIn(String email, String password);
   Future<Result<AuthUser>> signUp(String email, String password);
   Future<Result<void>> sendPasswordResetEmail(String email);
+  Future<Result<AuthUser>> signInWithGoogle();
 }
-
-// Future<Result<void>> sendVerificationEmail();

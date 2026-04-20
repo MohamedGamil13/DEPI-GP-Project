@@ -6,6 +6,6 @@ abstract class AuthService {
   Future<AuthUser> register(String email, String password);
   Future<AuthUser> signIn(String email, String password);
   Future<void> sendPasswordResetEmail(String email);
-  Future<AuthUser?> signInWithGoogle();
+  Future<AuthUser> signInWithGoogle();
   Future<void> signOut();
 }
