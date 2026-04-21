@@ -43,7 +43,7 @@ class ProfileCubit extends Cubit<ProfileState> {
         break;
     }
 
-    final profile = (profileResult as Success<UserProfileModel>).data;
+    final profile = (profileResult).data;
     final myPosts = myPostsResult is Success<List<AdPostModel>>
         ? (myPostsResult).data
         : <AdPostModel>[];
@@ -51,11 +51,13 @@ class ProfileCubit extends Cubit<ProfileState> {
         ? (activityResult).data
         : <AdPostModel>[];
 
-    emit(ProfileSuccess(
-      userProfile: profile,
-      myPosts: myPosts,
-      activityPosts: activity,
-    ));
+    emit(
+      ProfileSuccess(
+        userProfile: profile,
+        myPosts: myPosts,
+        activityPosts: activity,
+      ),
+    );
   }
 
   // ─────────────────────────────────────────────
