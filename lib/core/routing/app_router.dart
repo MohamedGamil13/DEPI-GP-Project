@@ -17,6 +17,9 @@ import 'package:skillbridge/features/messages/presentation/viewmodel/messages_cu
 import 'package:skillbridge/features/post_ad/presentation/screens/post_ad_screen.dart';
 import 'package:skillbridge/features/post_ad/presentation/viewModel/ad_posting_cubit.dart';
 import 'package:skillbridge/features/splash/splash_screen.dart';
+import 'package:skillbridge/features/profile/presentation/screens/profile_screen.dart';
+import 'package:skillbridge/features/profile/presentation/viewmodel/profile_cubit.dart';
+import 'package:skillbridge/features/profile/data/repos/profile_repo_implementation.dart';
 
 final GoRouter router = GoRouter(
   initialLocation: AppScreens.splashScreen,
@@ -96,6 +99,11 @@ final GoRouter router = GoRouter(
       },
     ),
     GoRoute(
+      path: AppScreens.profileScreen,
+      builder: (context, state) {
+        return BlocProvider(
+          create: (context) => ProfileCubit(ProfileRepoImplementation()),
+          child: const ProfileScreen(),
       path: AppScreens.messagesScreen,
       builder: (context, state) {
         return BlocProvider(
@@ -118,6 +126,7 @@ final GoRouter router = GoRouter(
           create: (context) =>
               getIt<MessagesCubit>()..loadConversation(conversation),
           child: const ChatDetailScreen(),
+
         );
       },
     ),
