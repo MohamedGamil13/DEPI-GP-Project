@@ -1,5 +1,6 @@
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:skillbridge/core/routing/app_navigator.dart';
 import 'package:skillbridge/core/theme/app_colors.dart';
 
 class CustomBottomNavigationBar extends StatefulWidget {
@@ -29,7 +30,14 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
       notchSmoothness: NotchSmoothness.verySmoothEdge,
       leftCornerRadius: 32,
       rightCornerRadius: 32,
-      onTap: (index) => setState(() => _bottomNavIndex = index),
+      onTap: (index) {
+        if (index == 2) {
+          context.goMessages();
+          return;
+        }
+
+        setState(() => _bottomNavIndex = index);
+      },
     );
   }
 }
