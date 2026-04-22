@@ -12,7 +12,6 @@ class CustomBottomNavigationBar extends StatefulWidget {
 }
 
 class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
-  final List<Widget> _pages = [];
   int _bottomNavIndex = 0;
   @override
   Widget build(BuildContext context) {
@@ -35,13 +34,13 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
           context.goMessages();
           return;
         }
+        if (index == 3) {
+          context.goProfile();
+          return;
+        }
 
         setState(() => _bottomNavIndex = index);
       },
     );
   }
-}
-
-Widget _navbarPage(int index) {
-  return const Center();
 }

@@ -4,11 +4,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:skillbridge/core/theme/app_colors.dart';
 import 'package:skillbridge/core/utils/helpers/snackbar_manger.dart';
 import 'package:skillbridge/features/profile/data/models/ad_post_model.dart';
+import 'package:skillbridge/features/profile/presentation/viewmodel/profile_cubit.dart';
 import 'package:skillbridge/features/profile/presentation/widgets/post_card_widget.dart';
 import 'package:skillbridge/features/profile/presentation/widgets/profile_header_widget.dart';
 import 'package:skillbridge/features/profile/presentation/widgets/profile_skills_widget.dart';
 import 'package:skillbridge/features/profile/presentation/widgets/profile_stats_widget.dart';
-import 'package:skillbridge/features/profile/presentation/viewmodel/profile_cubit.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -50,9 +50,7 @@ class _ProfileScreenState extends State<ProfileScreen>
           builder: (context, state) {
             if (state is ProfileLoading || state is ProfileInitial) {
               return const Center(
-                child: CircularProgressIndicator(
-                  color: AppColors.primaryColor,
-                ),
+                child: CircularProgressIndicator(color: AppColors.primaryColor),
               );
             }
 
@@ -217,10 +215,7 @@ class _ProfileScreenState extends State<ProfileScreen>
       return Center(
         child: Text(
           'No posts yet.',
-          style: TextStyle(
-            color: AppColors.secondaryColor,
-            fontSize: 14.sp,
-          ),
+          style: TextStyle(color: AppColors.secondaryColor, fontSize: 14.sp),
         ),
       );
     }
@@ -249,18 +244,11 @@ class _ProfileScreenState extends State<ProfileScreen>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.error_outline,
-            size: 54.sp,
-            color: AppColors.errorColor,
-          ),
+          Icon(Icons.error_outline, size: 54.sp, color: AppColors.errorColor),
           SizedBox(height: 12.h),
           Text(
             'Failed to load profile.',
-            style: TextStyle(
-              fontSize: 15.sp,
-              color: AppColors.secondaryColor,
-            ),
+            style: TextStyle(fontSize: 15.sp, color: AppColors.secondaryColor),
           ),
           SizedBox(height: 16.h),
           ElevatedButton(
@@ -270,10 +258,7 @@ class _ProfileScreenState extends State<ProfileScreen>
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10.r),
               ),
-              padding: EdgeInsets.symmetric(
-                horizontal: 32.w,
-                vertical: 12.h,
-              ),
+              padding: EdgeInsets.symmetric(horizontal: 32.w, vertical: 12.h),
             ),
             child: Text(
               'Retry',
@@ -300,11 +285,12 @@ class _StickyTabBarDelegate extends SliverPersistentHeaderDelegate {
   const _StickyTabBarDelegate(this.tabBar);
 
   @override
-  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return Container(
-      color: AppColors.backgroundColor,
-      child: tabBar,
-    );
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
+    return Container(color: AppColors.backgroundColor, child: tabBar);
   }
 
   @override

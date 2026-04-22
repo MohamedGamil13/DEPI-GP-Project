@@ -16,17 +16,19 @@ import 'package:skillbridge/features/messages/presentation/screens/messages_scre
 import 'package:skillbridge/features/messages/presentation/viewmodel/messages_cubit.dart';
 import 'package:skillbridge/features/post_ad/presentation/screens/post_ad_screen.dart';
 import 'package:skillbridge/features/post_ad/presentation/viewModel/ad_posting_cubit.dart';
-import 'package:skillbridge/features/splash/splash_screen.dart';
+import 'package:skillbridge/features/profile/data/repos/profile_repo_implementation.dart';
 import 'package:skillbridge/features/profile/presentation/screens/profile_screen.dart';
 import 'package:skillbridge/features/profile/presentation/viewmodel/profile_cubit.dart';
-import 'package:skillbridge/features/profile/data/repos/profile_repo_implementation.dart';
+import 'package:skillbridge/features/splash/splash_screen.dart';
 
 final GoRouter router = GoRouter(
   initialLocation: AppScreens.splashScreen,
   redirect: (context, state) {
     final bool isLoggedIn = getIt<AuthService>().currentUser != null;
     final bool isSplash = state.matchedLocation == AppScreens.splashScreen;
-    if (isSplash) return null; //to start with splash
+
+    if (isSplash) return null;
+
     final bool isOnAuthRoute = [
       AppScreens.signinScreen,
       AppScreens.signupScreen,
@@ -35,20 +37,22 @@ final GoRouter router = GoRouter(
 
     if (!isLoggedIn && !isOnAuthRoute) return AppScreens.signinScreen;
     if (isLoggedIn && isOnAuthRoute) return AppScreens.homeScreen;
+
     return null;
   },
   refreshListenable: GoRouterRefreshStream(
     getIt<AuthService>().authStateChanges,
   ),
   routes: <RouteBase>[
-    // == splash Route == //
+    // == Splash ==
     GoRoute(
       path: AppScreens.splashScreen,
       builder: (context, state) {
         return const SplashScreen();
       },
     ),
-    // == Auth Routes == //
+
+    // == Auth ==
     GoRoute(
       path: AppScreens.signinScreen,
       builder: (context, state) {
@@ -77,7 +81,7 @@ final GoRouter router = GoRouter(
       },
     ),
 
-    // == Home Routes == //
+    // == Home ==
     GoRoute(
       path: AppScreens.homeScreen,
       builder: (context, state) {
@@ -88,7 +92,7 @@ final GoRouter router = GoRouter(
       },
     ),
 
-    // == Post Ad Routes == //
+    // == Post Ad ==
     GoRoute(
       path: AppScreens.postAdScreen,
       builder: (context, state) {
@@ -98,12 +102,20 @@ final GoRouter router = GoRouter(
         );
       },
     ),
+
+    // == Profile ==
     GoRoute(
       path: AppScreens.profileScreen,
       builder: (context, state) {
         return BlocProvider(
           create: (context) => ProfileCubit(ProfileRepoImplementation()),
           child: const ProfileScreen(),
+        );
+      },
+    ),
+
+    // == Messages ==
+    GoRoute(
       path: AppScreens.messagesScreen,
       builder: (context, state) {
         return BlocProvider(
@@ -112,10 +124,13 @@ final GoRouter router = GoRouter(
         );
       },
     ),
+
+    // == Chat Detail ==
     GoRoute(
       path: AppScreens.chatDetailScreen,
       builder: (context, state) {
         final conversation = state.extra;
+
         if (conversation is! ServiceConversation) {
           return const Scaffold(
             body: Center(child: Text('Conversation unavailable')),
@@ -126,10 +141,8 @@ final GoRouter router = GoRouter(
           create: (context) =>
               getIt<MessagesCubit>()..loadConversation(conversation),
           child: const ChatDetailScreen(),
-
         );
       },
     ),
   ],
 );
-//reviewed
