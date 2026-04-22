@@ -114,45 +114,4 @@ class FirebaseAuthService implements AuthService {
     };
   }
 }
-
-  // @override
-  // Future<void> sendVerificationEmail() async {
-  //   final user = _auth.currentUser;
-
-  //   if (user == null) {
-  //     throw const UnauthenticatedException();
-  //   }
-
-  //   try {
-  //     await user.sendEmailVerification();
-  //   } on FirebaseAuthException catch (e) {
-  //     throw _mapException(e);
-  //   }
-  // }
-
-
-  // @override
-  // Future<void> deleteAccount() async {
-  //   final user = _auth.currentUser;
-
-  //   if (user == null) {
-  //     throw const UnauthenticatedException();
-  //   }
-
-  //   try {
-  //     await user.delete();
-  //   } on FirebaseAuthException catch (e) {
-  //     throw _mapException(e);
-  //   }
-  // }
-  // @override
-  // Future<void> signOut() async {
-  //   try {
-  //     await _auth.signOut();
-  //   } on FirebaseAuthException catch (e) {
-  //     throw _mapException(e);
-  //   }
-  // }
-
-
   //reviewed
