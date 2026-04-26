@@ -23,23 +23,7 @@ import 'package:skillbridge/features/splash/splash_screen.dart';
 
 final GoRouter router = GoRouter(
   initialLocation: AppScreens.splashScreen,
-  redirect: (context, state) {
-    final bool isLoggedIn = getIt<AuthService>().currentUser != null;
-    final bool isSplash = state.matchedLocation == AppScreens.splashScreen;
-
-    if (isSplash) return null;
-
-    final bool isOnAuthRoute = [
-      AppScreens.signinScreen,
-      AppScreens.signupScreen,
-      AppScreens.forgetPasswordScreen,
-    ].contains(state.matchedLocation);
-
-    if (!isLoggedIn && !isOnAuthRoute) return AppScreens.signinScreen;
-    if (isLoggedIn && isOnAuthRoute) return AppScreens.homeScreen;
-
-    return null;
-  },
+  redirect: _redirect,
   refreshListenable: GoRouterRefreshStream(
     getIt<AuthService>().authStateChanges,
   ),
@@ -51,7 +35,6 @@ final GoRouter router = GoRouter(
         return const SplashScreen();
       },
     ),
-
     // == Auth ==
     GoRoute(
       path: AppScreens.signinScreen,
@@ -146,3 +129,28 @@ final GoRouter router = GoRouter(
     ),
   ],
 );
+
+String? _redirect(BuildContext context, GoRouterState state) {
+  final bool isLoggedIn = getIt<AuthService>().currentUser != null;
+  final bool isSplash = state.matchedLocation == AppScreens.splashScreen;
+
+  if (isSplash) return null;
+
+  final bool isOnAuthRoute = [
+    AppScreens.signinScreen,
+    AppScreens.signupScreen,
+    AppScreens.forgetPasswordScreen,
+  ].contains(state.matchedLocation);
+
+  // If user is NOT logged in and trying to access a protected route
+  if (!isLoggedIn && !isOnAuthRoute) {
+    return AppScreens.signinScreen;
+  }
+
+  // If user IS logged in and trying to access auth pages (sign in/up)
+  if (isLoggedIn && isOnAuthRoute) {
+    return AppScreens.homeScreen;
+  }
+
+  return null;
+}
