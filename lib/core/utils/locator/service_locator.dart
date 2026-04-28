@@ -6,6 +6,7 @@ import 'package:skillbridge/core/utils/services/auth/auth_service.dart';
 import 'package:skillbridge/core/utils/services/auth/firebase_auth_service.dart';
 import 'package:skillbridge/core/utils/services/firestore/firestore_repo.dart';
 import 'package:skillbridge/core/utils/services/firestore/firestore_repo_service.dart';
+import 'package:skillbridge/core/utils/services/notifications/push_notifications_service.dart';
 import 'package:skillbridge/core/utils/services/storage/firebase_storage_service.dart';
 import 'package:skillbridge/core/utils/services/storage/storage_service.dart';
 import 'package:skillbridge/features/auth/data/repos/auth_repo.dart';
@@ -55,6 +56,9 @@ void setupLocator() {
     () => AdPostingCubit(getIt<PostAdRepo>()),
   );
   getIt.registerFactory<MessagesCubit>(() => MessagesCubit());
+
+  //messageing Service
+  getIt.registerSingleton<PushNotificationsService>(PushNotificationsService());
 }
 
 //our flow => auth methods(firebase or something else) >  AuthService(deal with any authsevice from any source) => Auth repo(deal with authService only) => Auth cubit(deal with repo only) => UI
