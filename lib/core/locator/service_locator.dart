@@ -11,6 +11,7 @@ import 'package:skillbridge/core/services/storage/storage_service.dart';
 import 'package:skillbridge/features/auth/data/repos/auth_repo.dart';
 import 'package:skillbridge/features/auth/data/repos/auth_repo_implementation.dart';
 import 'package:skillbridge/features/auth/presentation/viewmodel/auth_cubit.dart';
+import 'package:skillbridge/features/home/presentation/cubits/home_cubit.dart';
 import 'package:skillbridge/features/messages/presentation/viewmodel/messages_cubit.dart';
 import 'package:skillbridge/features/post_ad/data/repos/post_ad_repo.dart';
 import 'package:skillbridge/features/post_ad/data/repos/post_ad_repo_impl.dart';
@@ -31,7 +32,7 @@ void setupLocator() {
   getIt.registerLazySingleton<AuthService>(
     () => FirebaseAuthService(getIt<FirebaseAuth>()),
   );
-  getIt.registerLazySingleton<FirestoreServiceRepo>(
+  getIt.registerLazySingleton<StoreService>(
     () => FirestoreService(db: getIt<FirebaseFirestore>()),
   );
   getIt.registerLazySingleton<StorageService>(
@@ -44,7 +45,7 @@ void setupLocator() {
   );
   getIt.registerLazySingleton<PostAdRepo>(
     () => PostAdRepoImplementation(
-      firestoreRepo: getIt<FirestoreServiceRepo>(),
+      firestoreRepo: getIt<StoreService>(),
       storageService: getIt<StorageService>(),
     ),
   );
@@ -55,6 +56,11 @@ void setupLocator() {
     () => AdPostingCubit(getIt<PostAdRepo>()),
   );
   getIt.registerFactory<MessagesCubit>(() => MessagesCubit());
+  getIt.registerFactory<HomeCubit>(
+    () => HomeCubit(
+      firestoreService: getIt<StoreService>(),
+    ), // review this line — use StoreService not FirestoreService
+  );
 }
 
 //our flow => auth methods(firebase or something else) >  AuthService(deal with any authsevice from any source) => Auth repo(deal with authService only) => Auth cubit(deal with repo only) => UI

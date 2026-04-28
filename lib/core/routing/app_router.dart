@@ -9,6 +9,7 @@ import 'package:skillbridge/features/auth/presentation/screens/forgot_password_s
 import 'package:skillbridge/features/auth/presentation/screens/sign_in_screen.dart';
 import 'package:skillbridge/features/auth/presentation/screens/sign_up_screen.dart';
 import 'package:skillbridge/features/auth/presentation/viewmodel/auth_cubit.dart';
+import 'package:skillbridge/features/home/presentation/cubits/home_cubit.dart';
 import 'package:skillbridge/features/home/presentation/screens/home_screen.dart';
 import 'package:skillbridge/features/messages/data/models/service_conversation.dart';
 import 'package:skillbridge/features/messages/presentation/screens/chat_detail_screen.dart';
@@ -69,7 +70,7 @@ final GoRouter router = GoRouter(
       path: AppScreens.homeScreen,
       builder: (context, state) {
         return BlocProvider(
-          create: (context) => getIt<AuthCubit>(),
+          create: (context) => getIt<HomeCubit>()..getPosts(),
           child: const HomeScreen(),
         );
       },

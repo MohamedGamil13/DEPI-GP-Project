@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:skillbridge/core/models/ad_model.dart';
+import 'package:skillbridge/features/home/presentation/cubits/home_cubit.dart';
 import 'package:skillbridge/features/home/presentation/screens/widgets/category_tab.dart';
 
 class CategoriesSection extends StatelessWidget {
@@ -27,7 +29,7 @@ class __CategoriesListViewState extends State<_CategoriesListView> {
   Widget build(BuildContext context) {
     const List<AdCategories> categories = AdCategories.values;
     return ListView.builder(
-      scrollDirection: .horizontal,
+      scrollDirection: Axis.horizontal,
       itemCount: categories.length,
       itemBuilder: (BuildContext context, int index) {
         final category = categories[index];
@@ -37,7 +39,10 @@ class __CategoriesListViewState extends State<_CategoriesListView> {
             label: category.label,
             icon: category.icon,
             selected: index == _currentIndex,
-            onTap: () => setState(() => _currentIndex = index),
+            onTap: () {
+              setState(() => _currentIndex = index);
+              context.read<HomeCubit>().getFilteredPosts(category);
+            },
           ),
         );
       },

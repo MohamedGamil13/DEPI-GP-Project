@@ -1,7 +1,7 @@
 import 'package:skillbridge/core/models/ad_model.dart';
 import 'package:skillbridge/core/utils/validator/result.dart';
 
-abstract interface class FirestoreServiceRepo {
+abstract interface class StoreService {
   Future<Result<List<AdModel>>> getAllPosts();
   Future<Result<List<AdModel>>> getFilteredPosts(AdCategories category);
   Future<Result<AdModel>> getPost(int postID);

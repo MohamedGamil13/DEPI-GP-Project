@@ -5,7 +5,7 @@ import 'package:skillbridge/core/services/firestore/firestore_repo.dart';
 import 'package:skillbridge/core/utils/constants/app_constants.dart';
 import 'package:skillbridge/core/utils/validator/result.dart';
 
-class FirestoreService implements FirestoreServiceRepo {
+class FirestoreService implements StoreService {
   final FirebaseFirestore db;
   FirestoreService({required this.db});
   @override
