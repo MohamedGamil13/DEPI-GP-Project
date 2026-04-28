@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:skillbridge/core/errors/app_exception.dart';
 import 'package:skillbridge/core/errors/database_exception.dart';
 import 'package:skillbridge/core/models/ad_model.dart';
-import 'package:skillbridge/core/utils/services/firestore/firestore_repo.dart';
-import 'package:skillbridge/core/utils/services/storage/storage_service.dart';
+import 'package:skillbridge/core/services/firestore/firestore_repo.dart';
+import 'package:skillbridge/core/services/storage/storage_service.dart';
 import 'package:skillbridge/core/utils/validator/result.dart';
 import 'package:skillbridge/features/post_ad/data/repos/post_ad_repo.dart';
 

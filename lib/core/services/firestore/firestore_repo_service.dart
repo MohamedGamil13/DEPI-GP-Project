@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:skillbridge/core/errors/database_exception.dart';
 import 'package:skillbridge/core/models/ad_model.dart';
+import 'package:skillbridge/core/services/firestore/firestore_repo.dart';
 import 'package:skillbridge/core/utils/constants/app_constants.dart';
-import 'package:skillbridge/core/utils/services/firestore/firestore_repo.dart';
 import 'package:skillbridge/core/utils/validator/result.dart';
 
 class FirestoreService implements FirestoreServiceRepo {
