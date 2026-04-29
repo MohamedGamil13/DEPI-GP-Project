@@ -5,13 +5,13 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:skillbridge/core/models/ad_model.dart';
 import 'package:skillbridge/core/routing/app_navigator.dart';
 import 'package:skillbridge/core/theme/app_colors.dart';
 import 'package:skillbridge/core/utils/helpers/snackbar_manger.dart';
 import 'package:skillbridge/core/utils/validator/app_validator.dart';
 import 'package:skillbridge/features/auth/presentation/screens/widgets/field_label.dart';
 import 'package:skillbridge/features/auth/presentation/screens/widgets/primary_button.dart';
+import 'package:skillbridge/features/home/data/ad_model.dart';
 import 'package:skillbridge/features/post_ad/presentation/viewModel/ad_posting_cubit.dart';
 import 'package:skillbridge/features/post_ad/presentation/widgets/category_dropdown.dart';
 import 'package:skillbridge/features/post_ad/presentation/widgets/photo_upload_section.dart';
@@ -31,27 +31,20 @@ class _PostAdScreenState extends State<PostAdScreen> {
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _priceController = TextEditingController();
-  final _cityController = TextEditingController();
 
-  static const List<String> _categories = [
-    'Technology',
-    'Design',
-    'Marketing',
-    'Cleaning',
-    'Gardening',
-    'Education',
-    'Health & Fitness',
-    'Photography',
-    'Writing',
-    'Other',
-  ];
+  // FIX 1: Drive category list directly from the enum
+  static final List<String> _categories = AdCategories.values
+      .map((e) => e.label)
+      .toList();
+
+  // FIX 2: City is now a dropdown, not free text
+  AdCity _selectedCity = AdCity.cairo;
 
   @override
   void dispose() {
     _titleController.dispose();
     _descriptionController.dispose();
     _priceController.dispose();
-    _cityController.dispose();
     super.dispose();
   }
 
@@ -97,6 +90,7 @@ class _PostAdScreenState extends State<PostAdScreen> {
                   ),
                   SizedBox(height: 18.h),
 
+                  // FIX 1: CategoryDropdown now uses enum-derived labels
                   const FieldLabel(label: 'Category'),
                   CategoryDropdown(
                     selectedCategory: state.selectedCategory,
@@ -109,7 +103,7 @@ class _PostAdScreenState extends State<PostAdScreen> {
                   PostAdTextField(
                     controller: _descriptionController,
                     hint:
-                        'Describe your service in detail, including'
+                        "Describe your service in detail, including"
                         " what's included and your experience.",
                     maxLines: 5,
                     keyboardType: TextInputType.multiline,
@@ -143,15 +137,20 @@ class _PostAdScreenState extends State<PostAdScreen> {
                         ),
                       ),
                       SizedBox(width: 14.w),
+
+                      // FIX 2: City is now a proper enum-driven dropdown
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const FieldLabel(label: 'City'),
-                            PostAdTextField(
-                              controller: _cityController,
-                              hint: 'e.g. Cairo',
-                              validator: AppValidator.validateCity,
+                            _CityDropdown(
+                              value: _selectedCity,
+                              onChanged: (city) {
+                                if (city != null) {
+                                  setState(() => _selectedCity = city);
+                                }
+                              },
                             ),
                           ],
                         ),
@@ -160,6 +159,7 @@ class _PostAdScreenState extends State<PostAdScreen> {
                   ),
                   SizedBox(height: 18.h),
 
+                  // FIX 3: SkillsSection now uses enum-backed tags (see cubit fix below)
                   const FieldLabel(label: 'Relevant Skills'),
                   SkillsSection(
                     skills: state.skills,
@@ -197,11 +197,18 @@ class _PostAdScreenState extends State<PostAdScreen> {
       return;
     }
 
+    // FIX 1: Match by label, not by name
+    final AdCategories category = AdCategories.values.firstWhere(
+      (e) => e.label == state.selectedCategory,
+      orElse: () => AdCategories.services,
+    );
+
+    // FIX 3: SkillTag.label now stores the enum name, so matching is exact
     final selectedSkills = state.skills
         .where((s) => s.isSelected)
         .map(
           (s) => RelevantSkills.values.firstWhere(
-            (e) => e.name.toLowerCase() == s.label.toLowerCase(),
+            (e) => e.name == s.label,
             orElse: () => RelevantSkills.web,
           ),
         )
@@ -211,19 +218,12 @@ class _PostAdScreenState extends State<PostAdScreen> {
       adID: DateTime.now().millisecondsSinceEpoch,
       title: _titleController.text.trim(),
       description: _descriptionController.text.trim(),
-      city: _cityController.text.trim(),
-      photos: [],
+      city: _selectedCity.label, // human-readable string for display
+      photos: [], // will be replaced by repo after upload
       price: double.parse(_priceController.text.trim()),
-      category: AdCategories.values.firstWhere(
-        (e) => e.name.toLowerCase() == state.selectedCategory!.toLowerCase(),
-        orElse: () => AdCategories.services,
-      ),
+      category: category,
       relevantSkills: selectedSkills,
-      adCity: AdCity.values.firstWhere(
-        (e) =>
-            e.name.toLowerCase() == _cityController.text.trim().toLowerCase(),
-        orElse: () => AdCity.cairo,
-      ),
+      adCity: _selectedCity, // FIX 2: comes directly from dropdown
     );
 
     await cubit.publishNewAd(adModel: ad);
@@ -235,5 +235,42 @@ class _PostAdScreenState extends State<PostAdScreen> {
     if (picked.isNotEmpty) {
       cubit.addImages(picked.map((xf) => File(xf.path)).toList());
     }
+  }
+}
+
+// ─── City Dropdown Widget ────────────────────────────────────────────────────
+
+class _CityDropdown extends StatelessWidget {
+  final AdCity value;
+  final ValueChanged<AdCity?> onChanged;
+
+  const _CityDropdown({required this.value, required this.onChanged});
+
+  @override
+  Widget build(BuildContext context) {
+    return DropdownButtonFormField<AdCity>(
+      initialValue: value,
+      isExpanded: true,
+      decoration: InputDecoration(
+        contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 14.h),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8.r),
+          borderSide: BorderSide(color: Colors.grey.shade300),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8.r),
+          borderSide: BorderSide(color: Colors.grey.shade300),
+        ),
+      ),
+      items: AdCity.values
+          .map(
+            (city) => DropdownMenuItem(
+              value: city,
+              child: Text(city.label, overflow: TextOverflow.ellipsis),
+            ),
+          )
+          .toList(),
+      onChanged: onChanged,
+    );
   }
 }

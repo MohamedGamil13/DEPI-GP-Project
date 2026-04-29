@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:skillbridge/core/models/ad_model.dart';
 import 'package:skillbridge/core/theme/app_colors.dart';
+import 'package:skillbridge/features/home/data/ad_model.dart';
 import 'package:skillbridge/features/home/presentation/screens/widgets/custom_tag.dart';
 import 'package:skillbridge/features/home/presentation/screens/widgets/service_card.dart';
 
@@ -18,7 +18,9 @@ class AdListSection extends StatelessWidget {
           return Padding(
             padding: const EdgeInsets.only(bottom: 16),
             child: ServiceCard(
-              image: ad.photos.first,
+              image:
+                  'https://images.unsplash.com/photo-1527555197883-98e27ca0c1ea?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80',
+
               tags: ad.relevantSkills != null
                   ? ad.relevantSkills!
                         .map(

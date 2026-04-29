@@ -3,7 +3,7 @@ import 'package:skillbridge/core/theme/app_colors.dart';
 import 'package:skillbridge/core/theme/app_styles.dart';
 
 class ServiceCard extends StatelessWidget {
-  final String image;
+  final String? image;
   final List<Widget> tags;
   final String title;
   final String price;
@@ -15,7 +15,7 @@ class ServiceCard extends StatelessWidget {
   final VoidCallback onFavoriteTap;
   const ServiceCard({
     super.key,
-    required this.image,
+    this.image,
     required this.tags,
     required this.title,
     required this.price,
@@ -50,7 +50,8 @@ class ServiceCard extends StatelessWidget {
                   top: Radius.circular(20),
                 ),
                 child: Image.asset(
-                  image,
+                  image ??
+                      "https://images.unsplash.com/photo-1527555197883-98e27ca0c1ea?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80",
                   height: 140,
                   width: double.infinity,
                   fit: BoxFit.cover,

@@ -3,8 +3,8 @@ import 'dart:io';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meta/meta.dart';
-import 'package:skillbridge/core/models/ad_model.dart';
 import 'package:skillbridge/core/utils/validator/result.dart';
+import 'package:skillbridge/features/home/data/ad_model.dart';
 import 'package:skillbridge/features/post_ad/data/models/skill_tag.dart';
 
 import '../../data/repos/post_ad_repo.dart';

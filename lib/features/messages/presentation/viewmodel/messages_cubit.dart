@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:skillbridge/core/models/ad_model.dart';
+import 'package:skillbridge/features/home/data/ad_model.dart';
 import 'package:skillbridge/features/messages/data/models/chat_message.dart';
 import 'package:skillbridge/features/messages/data/models/service_conversation.dart';
 

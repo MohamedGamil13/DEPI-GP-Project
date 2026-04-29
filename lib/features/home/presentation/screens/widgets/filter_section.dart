@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:skillbridge/core/models/ad_model.dart';
+import 'package:skillbridge/features/home/data/ad_model.dart';
 
 import 'filter_chip.dart';
 
