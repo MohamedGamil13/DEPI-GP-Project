@@ -1,11 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:skillbridge/core/errors/database_exception.dart';
-import 'package:skillbridge/core/models/ad_model.dart';
+import 'package:skillbridge/core/services/firestore/firestore_repo.dart';
 import 'package:skillbridge/core/utils/constants/app_constants.dart';
-import 'package:skillbridge/core/utils/services/firestore/firestore_repo.dart';
 import 'package:skillbridge/core/utils/validator/result.dart';
+import 'package:skillbridge/features/home/data/ad_model.dart';
 
-class FirestoreService implements FirestoreServiceRepo {
+class FirestoreService implements StoreService {
   final FirebaseFirestore db;
   FirestoreService({required this.db});
   @override
@@ -28,16 +28,19 @@ class FirestoreService implements FirestoreServiceRepo {
   @override
   Future<Result<List<AdModel>>> getFilteredPosts(AdCategories category) async {
     try {
-      final QuerySnapshot snapshot = await db
-          .collection(AppConstants.adPostsCollection)
-          .where('category', isEqualTo: category.name)
-          .get();
+      Query query = db.collection(AppConstants.adPostsCollection);
 
-      final List<AdModel> filteredPosts = snapshot.docs
+      if (category != AdCategories.all) {
+        query = query.where('category', isEqualTo: category.name);
+      }
+
+      final QuerySnapshot snapshot = await query.get();
+
+      final List<AdModel> posts = snapshot.docs
           .map((doc) => AdModel.fromJson(doc.data() as Map<String, dynamic>))
           .toList();
 
-      return Success(filteredPosts);
+      return Success(posts);
     } on FirebaseException catch (e) {
       throw _mapException(e);
     }

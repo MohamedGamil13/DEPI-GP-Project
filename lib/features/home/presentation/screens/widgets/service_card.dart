@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:skillbridge/core/theme/app_colors.dart';
 import 'package:skillbridge/core/theme/app_styles.dart';
+import 'package:skillbridge/core/utils/constants/app_images.dart';
 
 class ServiceCard extends StatelessWidget {
-  final String image;
+  final String? image;
   final List<Widget> tags;
   final String title;
   final String price;
@@ -15,7 +16,7 @@ class ServiceCard extends StatelessWidget {
   final VoidCallback onFavoriteTap;
   const ServiceCard({
     super.key,
-    required this.image,
+    this.image,
     required this.tags,
     required this.title,
     required this.price,
@@ -49,12 +50,41 @@ class ServiceCard extends StatelessWidget {
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(20),
                 ),
-                child: Image.asset(
-                  image,
-                  height: 140,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                ),
+                child: (image != null && image!.startsWith('http'))
+                    ? Image.network(
+                        image!,
+                        height: 140,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+
+                        errorBuilder: (context, error, stackTrace) =>
+                            Image.asset(
+                              AppImages.defalutPostImage,
+                              height: 140,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                            ),
+
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Container(
+                            height: 140,
+                            width: double.infinity,
+                            color: AppColors.backgroundColor,
+                            child: const Center(
+                              child: CircularProgressIndicator(
+                                color: AppColors.primaryColor,
+                              ),
+                            ),
+                          );
+                        },
+                      )
+                    : Image.asset(
+                        AppImages.defalutPostImage,
+                        height: 140,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      ),
               ),
               Positioned(
                 top: 12,

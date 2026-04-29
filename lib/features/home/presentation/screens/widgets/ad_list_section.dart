@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:skillbridge/core/models/ad_model.dart';
 import 'package:skillbridge/core/theme/app_colors.dart';
+import 'package:skillbridge/core/utils/constants/app_images.dart';
+import 'package:skillbridge/features/home/data/ad_model.dart';
 import 'package:skillbridge/features/home/presentation/screens/widgets/custom_tag.dart';
 import 'package:skillbridge/features/home/presentation/screens/widgets/service_card.dart';
 
 class AdListSection extends StatelessWidget {
   final List<AdModel> ads;
   const AdListSection({super.key, required this.ads});
+
+  static const String _fallbackImage = AppImages.defalutPostImage;
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +21,7 @@ class AdListSection extends StatelessWidget {
           return Padding(
             padding: const EdgeInsets.only(bottom: 16),
             child: ServiceCard(
-              image: ad.photos.first,
+              image: ad.photos.isNotEmpty ? ad.photos.first : _fallbackImage,
               tags: ad.relevantSkills != null
                   ? ad.relevantSkills!
                         .map(

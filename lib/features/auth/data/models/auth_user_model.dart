@@ -25,18 +25,3 @@ class AuthUser {
   );
   //reviewed
 }
-
-  // AuthUser copyWith({
-  //   String? uid,
-  //   String? email,
-  //   bool? isEmailVerified,
-  //   String? displayName,
-  //   String? photoUrl,
-  // }) => AuthUser(
-  //   uid: uid ?? this.uid,
-  //   email: email ?? this.email,
-  //   isEmailVerified: isEmailVerified ?? this.isEmailVerified,
-  //   displayName: displayName ?? this.displayName,
-  //   photoUrl: photoUrl ?? this.photoUrl,
-  // );
-  // i commented it because it's unused code 

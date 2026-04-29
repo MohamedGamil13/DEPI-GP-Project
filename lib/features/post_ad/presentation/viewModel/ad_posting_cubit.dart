@@ -1,10 +1,9 @@
-// ad_posting_cubit.dart
 import 'dart:io';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meta/meta.dart';
-import 'package:skillbridge/core/models/ad_model.dart';
 import 'package:skillbridge/core/utils/validator/result.dart';
+import 'package:skillbridge/features/home/data/ad_model.dart';
 import 'package:skillbridge/features/post_ad/data/models/skill_tag.dart';
 
 import '../../data/repos/post_ad_repo.dart';
@@ -59,15 +58,20 @@ class AdPostingCubit extends Cubit<AdPostingState> {
   }
 
   Future<void> publishNewAd({required AdModel adModel}) async {
+    // ✅ احفظ القيم قبل ما تغير الـ state
+    final images = _images;
+    final selectedCategory = _selectedCategory;
+    final skills = _skills;
+
     emit(
       AdPostingLoading(
-        images: _images,
-        selectedCategory: _selectedCategory,
-        skills: _skills,
+        images: images,
+        selectedCategory: selectedCategory,
+        skills: skills,
       ),
     );
 
-    final result = await _postAdRepo.publishAd(adModel, _images);
+    final result = await _postAdRepo.publishAd(adModel, images);
 
     switch (result) {
       case Success(data: _):
@@ -76,9 +80,9 @@ class AdPostingCubit extends Cubit<AdPostingState> {
         emit(
           AdPostingError(
             e.message,
-            images: _images,
-            selectedCategory: _selectedCategory,
-            skills: _skills,
+            images: images,
+            selectedCategory: selectedCategory,
+            skills: skills,
           ),
         );
     }
