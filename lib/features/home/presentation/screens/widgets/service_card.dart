@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:skillbridge/core/theme/app_colors.dart';
 import 'package:skillbridge/core/theme/app_styles.dart';
+import 'package:skillbridge/core/utils/constants/app_images.dart';
 
 class ServiceCard extends StatelessWidget {
   final String? image;
@@ -49,13 +50,41 @@ class ServiceCard extends StatelessWidget {
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(20),
                 ),
-                child: Image.network(
-                  image ??
-                      "https://images.unsplash.com/photo-1527555197883-98e27ca0c1ea?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80",
-                  height: 140,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                ),
+                child: (image != null && image!.startsWith('http'))
+                    ? Image.network(
+                        image!,
+                        height: 140,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+
+                        errorBuilder: (context, error, stackTrace) =>
+                            Image.asset(
+                              AppImages.defalutPostImage,
+                              height: 140,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                            ),
+
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Container(
+                            height: 140,
+                            width: double.infinity,
+                            color: AppColors.backgroundColor,
+                            child: const Center(
+                              child: CircularProgressIndicator(
+                                color: AppColors.primaryColor,
+                              ),
+                            ),
+                          );
+                        },
+                      )
+                    : Image.asset(
+                        AppImages.defalutPostImage,
+                        height: 140,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      ),
               ),
               Positioned(
                 top: 12,

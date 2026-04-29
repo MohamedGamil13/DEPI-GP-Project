@@ -10,7 +10,6 @@ sealed class AdPostingState {
   const AdPostingState({
     this.images = const [],
     this.selectedCategory,
-    // FIX 3: labels now match RelevantSkills enum names exactly
     this.skills = const [
       SkillTag(label: 'mobile'),
       SkillTag(label: 'web'),

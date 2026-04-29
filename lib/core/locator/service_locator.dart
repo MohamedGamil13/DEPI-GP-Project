@@ -1,12 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:get_it/get_it.dart';
 import 'package:skillbridge/core/services/auth/auth_service.dart';
 import 'package:skillbridge/core/services/auth/firebase_auth_service.dart';
 import 'package:skillbridge/core/services/firestore/firestore_repo.dart';
 import 'package:skillbridge/core/services/firestore/firestore_repo_service.dart';
-import 'package:skillbridge/core/services/storage/firebase_storage_service.dart';
+import 'package:skillbridge/core/services/storage/cloudinary_sotrage_service.dart';
 import 'package:skillbridge/core/services/storage/storage_service.dart';
 import 'package:skillbridge/features/auth/data/repos/auth_repo.dart';
 import 'package:skillbridge/features/auth/data/repos/auth_repo_implementation.dart';
@@ -26,7 +26,6 @@ void setupLocator() {
   getIt.registerLazySingleton<FirebaseFirestore>(
     () => FirebaseFirestore.instance,
   );
-  getIt.registerLazySingleton<FirebaseStorage>(() => FirebaseStorage.instance);
 
   // Services
   getIt.registerLazySingleton<AuthService>(
@@ -35,8 +34,15 @@ void setupLocator() {
   getIt.registerLazySingleton<StoreService>(
     () => FirestoreService(db: getIt<FirebaseFirestore>()),
   );
+
+  //dio
+  getIt.registerLazySingleton<Dio>(() => Dio());
+  //cloudinary
   getIt.registerLazySingleton<StorageService>(
-    () => FirebaseStorageService(storage: getIt<FirebaseStorage>()),
+    () => CloudinaryStorageService(
+      cloudName: 'dfgogg7jk',
+      uploadPreset: 'ml_default',
+    ),
   );
 
   // Repos
