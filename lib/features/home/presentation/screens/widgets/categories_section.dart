@@ -10,7 +10,10 @@ class CategoriesSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const SliverToBoxAdapter(
-      child: SizedBox(height: 48, child: _CategoriesListView()),
+      child: Padding(
+        padding: EdgeInsets.only(bottom: 16.0),
+        child: SizedBox(height: 48, child: _CategoriesListView()),
+      ),
     );
   }
 }
@@ -32,12 +35,11 @@ class __CategoriesListViewState extends State<_CategoriesListView> {
       scrollDirection: Axis.horizontal,
       itemCount: categories.length,
       itemBuilder: (BuildContext context, int index) {
-        final category = categories[index];
+        final AdCategories category = categories[index];
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           child: CategoryTab(
-            label: category.label,
-            icon: category.icon,
+            adCategories: category,
             selected: index == _currentIndex,
             onTap: () {
               setState(() => _currentIndex = index);

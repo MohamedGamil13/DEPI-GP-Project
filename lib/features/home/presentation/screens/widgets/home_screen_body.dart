@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:skillbridge/features/home/presentation/cubits/home_cubit.dart';
 import 'package:skillbridge/features/home/presentation/screens/widgets/ad_list_section.dart';
 import 'package:skillbridge/features/home/presentation/screens/widgets/categories_section.dart';
-import 'package:skillbridge/features/home/presentation/screens/widgets/filter_section.dart';
 import 'package:skillbridge/features/home/presentation/screens/widgets/home_header.dart';
 
 class HomeScreenBody extends StatelessWidget {
@@ -17,51 +16,58 @@ class HomeScreenBody extends StatelessWidget {
           slivers: [
             const HomeHeader(),
             const CategoriesSection(),
-            const FiltersSection(),
-            if (state is HomeLoading)
-              const SliverFillRemaining(
-                child: Center(child: CircularProgressIndicator()),
-              )
-            else if (state is HomeError)
-              SliverFillRemaining(
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(
-                        Icons.error_outline,
-                        size: 48,
-                        color: Colors.red,
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        state.message,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: () => context.read<HomeCubit>().getPosts(),
-                        child: const Text('Retry'),
-                      ),
-                    ],
-                  ),
-                ),
-              )
-            else if (state is HomeSuccess)
-              AdListSection(ads: state.posts)
-            else
-              SliverFillRemaining(
-                child: Center(
-                  child: ElevatedButton(
-                    onPressed: () => context.read<HomeCubit>().getPosts(),
-                    child: const Text('Load Posts'),
-                  ),
-                ),
-              ),
+            _buildPostsSliver(context, state),
           ],
         );
       },
+    );
+  }
+
+  Widget _buildPostsSliver(BuildContext context, HomeState state) {
+    if (state is HomeLoading) {
+      return const SliverFillRemaining(
+        hasScrollBody: false,
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (state is HomeError) {
+      return SliverFillRemaining(
+        hasScrollBody: false,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.error_outline, size: 48, color: Colors.red),
+              const SizedBox(height: 12),
+              Text(
+                state.message,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 16),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () => context.read<HomeCubit>().getPosts(),
+                child: const Text('Retry'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (state is HomeSuccess) {
+      return AdListSection(ads: state.posts);
+    }
+
+    return SliverFillRemaining(
+      hasScrollBody: false,
+      child: Center(
+        child: ElevatedButton(
+          onPressed: () => context.read<HomeCubit>().getPosts(),
+          child: const Text('Load Posts'),
+        ),
+      ),
     );
   }
 }

@@ -28,16 +28,19 @@ class FirestoreService implements StoreService {
   @override
   Future<Result<List<AdModel>>> getFilteredPosts(AdCategories category) async {
     try {
-      final QuerySnapshot snapshot = await db
-          .collection(AppConstants.adPostsCollection)
-          .where('category', isEqualTo: category.name)
-          .get();
+      Query query = db.collection(AppConstants.adPostsCollection);
 
-      final List<AdModel> filteredPosts = snapshot.docs
+      if (category != AdCategories.all) {
+        query = query.where('category', isEqualTo: category.name);
+      }
+
+      final QuerySnapshot snapshot = await query.get();
+
+      final List<AdModel> posts = snapshot.docs
           .map((doc) => AdModel.fromJson(doc.data() as Map<String, dynamic>))
           .toList();
 
-      return Success(filteredPosts);
+      return Success(posts);
     } on FirebaseException catch (e) {
       throw _mapException(e);
     }

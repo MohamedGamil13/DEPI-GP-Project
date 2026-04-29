@@ -49,7 +49,7 @@ class ServiceCard extends StatelessWidget {
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(20),
                 ),
-                child: Image.asset(
+                child: Image.network(
                   image ??
                       "https://images.unsplash.com/photo-1527555197883-98e27ca0c1ea?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80",
                   height: 140,
