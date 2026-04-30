@@ -14,7 +14,7 @@ class AdListSection extends StatelessWidget {
           final AdModel ad = ads[index];
           return Padding(
             padding: const EdgeInsets.only(bottom: 16),
-            child: ServiceCard(ad: ad, isFavorite: false),
+            child: ServiceCard(ad: ad),
           );
         }, childCount: ads.length),
       ),

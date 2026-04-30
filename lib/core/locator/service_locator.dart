@@ -11,6 +11,8 @@ import 'package:skillbridge/core/services/storage/storage_service.dart';
 import 'package:skillbridge/features/auth/data/repos/auth_repo.dart';
 import 'package:skillbridge/features/auth/data/repos/auth_repo_implementation.dart';
 import 'package:skillbridge/features/auth/presentation/viewmodel/auth_cubit.dart';
+import 'package:skillbridge/features/favorites/data/repos/favorities_repo.dart';
+import 'package:skillbridge/features/favorites/presentation/cubits/favorites_cubit.dart';
 import 'package:skillbridge/features/home/presentation/cubits/home_cubit.dart';
 import 'package:skillbridge/features/messages/presentation/viewmodel/messages_cubit.dart';
 import 'package:skillbridge/features/post_ad/data/repos/post_ad_repo.dart';
@@ -65,6 +67,11 @@ void setupLocator() {
   getIt.registerFactory<HomeCubit>(
     () => HomeCubit(
       firestoreService: getIt<StoreService>(),
+    ), // review this line — use StoreService not FirestoreService
+  );
+  getIt.registerFactory<FavoritesCubit>(
+    () => FavoritesCubit(
+      FavoritesRepository(),
     ), // review this line — use StoreService not FirestoreService
   );
 }

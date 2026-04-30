@@ -4,5 +4,6 @@ abstract class AppConstants {
   static const String adPostsCollection = 'ADPosts';
   static const String favoritesAdBox = 'favorites';
   static const String favIdsKey = 'fav_ids';
+
   AppConstants._();
 }

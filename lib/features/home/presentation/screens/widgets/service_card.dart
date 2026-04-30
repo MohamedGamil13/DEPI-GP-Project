@@ -6,10 +6,8 @@ import 'package:skillbridge/features/home/data/ad_model.dart';
 import 'package:skillbridge/features/home/presentation/screens/widgets/custom_tag.dart';
 
 class ServiceCard extends StatelessWidget {
+  const ServiceCard({super.key, required this.ad});
   final AdModel ad;
-  final bool isFavorite;
-  const ServiceCard({super.key, required this.ad, required this.isFavorite});
-
   static const String _fallbackImage = AppImages.defalutPostImage;
 
   @override
