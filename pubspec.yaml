@@ -41,6 +41,8 @@ dependencies:
   font_awesome_flutter: ^10.12.0
   get_it: ^9.2.1
   go_router: ^17.1.0
+  hive_ce: ^2.19.3
+  hive_ce_flutter: ^2.3.4
   image_picker: ^1.2.1
 
 dev_dependencies:
