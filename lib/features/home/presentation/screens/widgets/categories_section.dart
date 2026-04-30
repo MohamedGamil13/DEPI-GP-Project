@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:skillbridge/core/models/ad_model.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:skillbridge/features/home/data/ad_model.dart';
+import 'package:skillbridge/features/home/presentation/cubits/home_cubit.dart';
 import 'package:skillbridge/features/home/presentation/screens/widgets/category_tab.dart';
 
 class CategoriesSection extends StatelessWidget {
@@ -8,7 +10,10 @@ class CategoriesSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const SliverToBoxAdapter(
-      child: SizedBox(height: 48, child: _CategoriesListView()),
+      child: Padding(
+        padding: EdgeInsets.only(bottom: 16.0),
+        child: SizedBox(height: 48, child: _CategoriesListView()),
+      ),
     );
   }
 }
@@ -27,17 +32,19 @@ class __CategoriesListViewState extends State<_CategoriesListView> {
   Widget build(BuildContext context) {
     const List<AdCategories> categories = AdCategories.values;
     return ListView.builder(
-      scrollDirection: .horizontal,
+      scrollDirection: Axis.horizontal,
       itemCount: categories.length,
       itemBuilder: (BuildContext context, int index) {
-        final category = categories[index];
+        final AdCategories category = categories[index];
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           child: CategoryTab(
-            label: category.label,
-            icon: category.icon,
+            adCategories: category,
             selected: index == _currentIndex,
-            onTap: () => setState(() => _currentIndex = index),
+            onTap: () {
+              setState(() => _currentIndex = index);
+              context.read<HomeCubit>().getFilteredPosts(category);
+            },
           ),
         );
       },

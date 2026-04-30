@@ -7,8 +7,5 @@ abstract interface class AuthService {
   Future<AuthUser> signIn(String email, String password);
   Future<void> sendPasswordResetEmail(String email);
 }
-// Future<void> signOut();
-// Future<void> deleteAccount();
-// Future<void> sendVerificationEmail();
 
 //reviewed

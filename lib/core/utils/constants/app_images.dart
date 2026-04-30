@@ -3,5 +3,6 @@ abstract class AppImages {
   static const String laptop = 'assets/images/laptop.jpg';
   static const String study = 'assets/images/study.jpg';
   static const String homeClean = 'assets/images/home clean.jpg';
+  static const String defalutPostImage = "assets/images/default_post_image.jpg";
   AppImages._();
 }

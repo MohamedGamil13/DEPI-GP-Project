@@ -89,6 +89,7 @@ class AdModel {
 }
 
 enum AdCategories {
+  all,
   programming,
   vehicles,
   jobs,
@@ -111,6 +112,7 @@ enum AdCategories {
   studentSupport;
 
   String get label => switch (this) {
+    AdCategories.all => 'All',
     AdCategories.programming => 'Programming',
     AdCategories.vehicles => 'Vehicles',
     AdCategories.jobs => 'Jobs',
@@ -134,6 +136,7 @@ enum AdCategories {
   };
 
   IconData get icon => switch (this) {
+    AdCategories.all => Icons.code,
     AdCategories.programming => Icons.code,
     AdCategories.vehicles => Icons.directions_car,
     AdCategories.jobs => Icons.work,

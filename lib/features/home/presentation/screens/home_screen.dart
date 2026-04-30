@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:skillbridge/core/routing/app_navigator.dart';
 import 'package:skillbridge/core/theme/app_colors.dart';
 import 'package:skillbridge/core/widgets/app_title.dart';
 import 'package:skillbridge/core/widgets/custom_bottom_navigation_bar.dart';
@@ -46,7 +47,9 @@ class _CustomFloatingActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FloatingActionButton(
-      onPressed: () {},
+      onPressed: () {
+        context.goAddPost();
+      },
       backgroundColor: AppColors.primaryColor,
       child: const Icon(Icons.add, color: AppColors.white),
     );

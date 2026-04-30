@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:skillbridge/core/locator/service_locator.dart';
 import 'package:skillbridge/core/routing/app_screens.dart';
 import 'package:skillbridge/core/routing/routing_stream_refresh.dart';
-import 'package:skillbridge/core/utils/locator/service_locator.dart';
-import 'package:skillbridge/core/utils/services/auth/auth_service.dart';
+import 'package:skillbridge/core/services/auth/auth_service.dart';
 import 'package:skillbridge/features/auth/presentation/screens/forgot_password_screen.dart';
 import 'package:skillbridge/features/auth/presentation/screens/sign_in_screen.dart';
 import 'package:skillbridge/features/auth/presentation/screens/sign_up_screen.dart';
 import 'package:skillbridge/features/auth/presentation/viewmodel/auth_cubit.dart';
+import 'package:skillbridge/features/home/presentation/cubits/home_cubit.dart';
 import 'package:skillbridge/features/home/presentation/screens/home_screen.dart';
 import 'package:skillbridge/features/messages/data/models/service_conversation.dart';
 import 'package:skillbridge/features/messages/presentation/screens/chat_detail_screen.dart';
@@ -23,23 +24,7 @@ import 'package:skillbridge/features/splash/splash_screen.dart';
 
 final GoRouter router = GoRouter(
   initialLocation: AppScreens.splashScreen,
-  redirect: (context, state) {
-    final bool isLoggedIn = getIt<AuthService>().currentUser != null;
-    final bool isSplash = state.matchedLocation == AppScreens.splashScreen;
-
-    if (isSplash) return null;
-
-    final bool isOnAuthRoute = [
-      AppScreens.signinScreen,
-      AppScreens.signupScreen,
-      AppScreens.forgetPasswordScreen,
-    ].contains(state.matchedLocation);
-
-    if (!isLoggedIn && !isOnAuthRoute) return AppScreens.signinScreen;
-    if (isLoggedIn && isOnAuthRoute) return AppScreens.homeScreen;
-
-    return null;
-  },
+  redirect: _redirect,
   refreshListenable: GoRouterRefreshStream(
     getIt<AuthService>().authStateChanges,
   ),
@@ -51,7 +36,6 @@ final GoRouter router = GoRouter(
         return const SplashScreen();
       },
     ),
-
     // == Auth ==
     GoRoute(
       path: AppScreens.signinScreen,
@@ -86,7 +70,7 @@ final GoRouter router = GoRouter(
       path: AppScreens.homeScreen,
       builder: (context, state) {
         return BlocProvider(
-          create: (context) => getIt<AuthCubit>(),
+          create: (context) => getIt<HomeCubit>()..getPosts(),
           child: const HomeScreen(),
         );
       },
@@ -146,3 +130,28 @@ final GoRouter router = GoRouter(
     ),
   ],
 );
+
+String? _redirect(BuildContext context, GoRouterState state) {
+  final bool isLoggedIn = getIt<AuthService>().currentUser != null;
+  final bool isSplash = state.matchedLocation == AppScreens.splashScreen;
+
+  if (isSplash) return null;
+
+  final bool isOnAuthRoute = [
+    AppScreens.signinScreen,
+    AppScreens.signupScreen,
+    AppScreens.forgetPasswordScreen,
+  ].contains(state.matchedLocation);
+
+  // If user is NOT logged in and trying to access a protected route
+  if (!isLoggedIn && !isOnAuthRoute) {
+    return AppScreens.signinScreen;
+  }
+
+  // If user IS logged in and trying to access auth pages (sign in/up)
+  if (isLoggedIn && isOnAuthRoute) {
+    return AppScreens.homeScreen;
+  }
+
+  return null;
+}
