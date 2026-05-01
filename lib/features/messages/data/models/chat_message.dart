@@ -1,5 +1,7 @@
+/// Tracks whether a message has only been sent or has also been read.
 enum MessageDeliveryStatus { sent, read }
 
+/// Represents a single message inside a service-linked conversation.
 class ChatMessage {
   final String id;
   final String text;
@@ -15,6 +17,7 @@ class ChatMessage {
     this.deliveryStatus = MessageDeliveryStatus.sent,
   });
 
+  /// Returns a copy of this message with the provided fields replaced.
   ChatMessage copyWith({
     String? id,
     String? text,

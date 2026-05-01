@@ -1,12 +1,16 @@
 part of 'messages_cubit.dart';
 
 @immutable
+/// Base state for the messaging feature.
 sealed class MessagesState {}
 
+/// Initial state before inbox data is loaded.
 final class MessagesInitial extends MessagesState {}
 
+/// State shown while inbox content is being prepared.
 final class MessagesLoading extends MessagesState {}
 
+/// State carrying the full inbox and current UI selections.
 final class MessagesLoaded extends MessagesState {
   final List<ServiceConversation> conversations;
   final MessageFilter selectedFilter;
@@ -22,6 +26,7 @@ final class MessagesLoaded extends MessagesState {
     this.isSendingMessage = false,
   });
 
+  /// Returns an updated copy of the loaded inbox state.
   MessagesLoaded copyWith({
     List<ServiceConversation>? conversations,
     MessageFilter? selectedFilter,
@@ -38,6 +43,7 @@ final class MessagesLoaded extends MessagesState {
     );
   }
 
+  /// Conversations visible after applying the active filter and search query.
   List<ServiceConversation> get visibleConversations {
     final query = searchQuery.trim().toLowerCase();
 
@@ -64,6 +70,7 @@ final class MessagesLoaded extends MessagesState {
     }).toList();
   }
 
+  /// The currently opened conversation, if any.
   ServiceConversation? get activeConversation {
     if (activeConversationId == null) return null;
     for (final conversation in conversations) {
@@ -73,6 +80,7 @@ final class MessagesLoaded extends MessagesState {
   }
 }
 
+/// State emitted when the inbox cannot be prepared.
 final class MessagesError extends MessagesState {
   final String message;
 

@@ -1,10 +1,13 @@
 import 'package:skillbridge/core/models/ad_model.dart';
 import 'package:skillbridge/features/messages/data/models/chat_message.dart';
 
+/// Describes the workflow state of a service conversation.
 enum ConversationStatus { newLead, active, waiting, archived }
 
+/// Filters available in the inbox UI.
 enum MessageFilter { all, newLeads, active, waiting, archived }
 
+/// Groups messages with the service context they belong to.
 class ServiceConversation {
   final String id;
   final String customerName;
@@ -34,6 +37,7 @@ class ServiceConversation {
     required this.messages,
   });
 
+  /// Returns an updated copy of this conversation.
   ServiceConversation copyWith({
     String? id,
     String? customerName,
@@ -64,5 +68,6 @@ class ServiceConversation {
     );
   }
 
+  /// The most recent message in the thread, if one exists.
   ChatMessage? get latestMessage => messages.isEmpty ? null : messages.last;
 }

@@ -6,6 +6,7 @@ import 'package:skillbridge/features/messages/data/models/chat_message.dart';
 import 'package:skillbridge/features/messages/data/models/service_conversation.dart';
 import 'package:skillbridge/features/messages/presentation/viewmodel/messages_cubit.dart';
 
+/// Shows one conversation together with the service it originated from.
 class ChatDetailScreen extends StatefulWidget {
   const ChatDetailScreen({super.key});
 

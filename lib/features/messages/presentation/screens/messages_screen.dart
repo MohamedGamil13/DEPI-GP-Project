@@ -6,6 +6,7 @@ import 'package:skillbridge/core/theme/app_styles.dart';
 import 'package:skillbridge/features/messages/data/models/service_conversation.dart';
 import 'package:skillbridge/features/messages/presentation/viewmodel/messages_cubit.dart';
 
+/// Displays the service-linked inbox with search and workflow filters.
 class MessagesScreen extends StatelessWidget {
   const MessagesScreen({super.key});
 

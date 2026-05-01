@@ -1,4 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:skillbridge/core/utils/locator/service_locator.dart';
+import 'package:skillbridge/core/utils/services/notifications/push_notifications_service.dart';
 import 'package:skillbridge/core/theme/app_colors.dart';
 import 'package:skillbridge/core/widgets/app_title.dart';
 import 'package:skillbridge/core/widgets/custom_bottom_navigation_bar.dart';
@@ -30,11 +33,18 @@ class _NotificationIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.only(right: 16),
-      child: CircleAvatar(
-        backgroundColor: AppColors.primaryLight,
-        child: Icon(Icons.notifications_none, color: AppColors.primaryColor),
+    return Padding(
+      padding: const EdgeInsets.only(right: 16),
+      child: GestureDetector(
+        onLongPress: kDebugMode
+            ? () {
+                getIt<PushNotificationsService>().showMockMessageNotification();
+              }
+            : null,
+        child: const CircleAvatar(
+          backgroundColor: AppColors.primaryLight,
+          child: Icon(Icons.notifications_none, color: AppColors.primaryColor),
+        ),
       ),
     );
   }

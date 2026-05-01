@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get_it/get_it.dart';
 import 'package:skillbridge/core/utils/services/auth/auth_service.dart';
 import 'package:skillbridge/core/utils/services/auth/firebase_auth_service.dart';
@@ -25,6 +27,12 @@ void setupLocator() {
   getIt.registerLazySingleton<FirebaseAuth>(() => FirebaseAuth.instance);
   getIt.registerLazySingleton<FirebaseFirestore>(
     () => FirebaseFirestore.instance,
+  );
+  getIt.registerLazySingleton<FirebaseMessaging>(
+    () => FirebaseMessaging.instance,
+  );
+  getIt.registerLazySingleton<FlutterLocalNotificationsPlugin>(
+    () => FlutterLocalNotificationsPlugin(),
   );
   getIt.registerLazySingleton<FirebaseStorage>(() => FirebaseStorage.instance);
 
@@ -57,8 +65,15 @@ void setupLocator() {
   );
   getIt.registerFactory<MessagesCubit>(() => MessagesCubit());
 
-  //messageing Service
-  getIt.registerSingleton<PushNotificationsService>(PushNotificationsService());
+  // Messaging service
+  getIt.registerLazySingleton<PushNotificationsService>(
+    () => PushNotificationsService(
+      firebaseMessaging: getIt<FirebaseMessaging>(),
+      firestore: getIt<FirebaseFirestore>(),
+      authService: getIt<AuthService>(),
+      localNotificationsPlugin: getIt<FlutterLocalNotificationsPlugin>(),
+    ),
+  );
 }
 
 //our flow => auth methods(firebase or something else) >  AuthService(deal with any authsevice from any source) => Auth repo(deal with authService only) => Auth cubit(deal with repo only) => UI

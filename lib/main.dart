@@ -14,10 +14,8 @@ void main() async {
   await ScreenUtil.ensureScreenSize();
   Bloc.observer = AppBlocObserver();
   setupLocator();
-  // getIt<PushNotificationsService>().initFCM();
-  PushNotificationsService.initFCM();
-
   runApp(const SkillBridge());
+  getIt<PushNotificationsService>().initFCM();
 }
 
 class SkillBridge extends StatelessWidget {
