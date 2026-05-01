@@ -14,6 +14,7 @@ import 'package:skillbridge/core/utils/constants/app_constants.dart';
 import 'package:skillbridge/core/utils/services/auth/auth_service.dart';
 import 'package:skillbridge/core/utils/services/notifications/notification_route_intent.dart';
 import 'package:skillbridge/features/auth/data/models/auth_user_model.dart';
+import 'package:skillbridge/features/home/data/home_mock_ads.dart';
 import 'package:skillbridge/features/messages/data/messages_mock_data.dart';
 import 'package:skillbridge/firebase_options.dart';
 
@@ -284,6 +285,39 @@ class PushNotificationsService {
     );
   }
 
+  /// Shows a local foreground banner that mirrors a recommended listing push.
+  Future<void> showMockListingNotification() async {
+    const payload = {
+      'type': 'listing',
+      'adId': '3',
+      'title': 'New listing for you',
+      'body': 'Math Tutoring (K-12) matches your interests.',
+    };
+
+    await _localNotificationsPlugin.show(
+      DateTime.now().millisecondsSinceEpoch ~/ 1000,
+      payload['title'],
+      payload['body'],
+      NotificationDetails(
+        android: AndroidNotificationDetails(
+          _foregroundChannel.id,
+          _foregroundChannel.name,
+          channelDescription: _foregroundChannel.description,
+          importance: Importance.high,
+          priority: Priority.high,
+          icon: '@mipmap/ic_launcher',
+        ),
+        iOS: const DarwinNotificationDetails(
+          presentAlert: true,
+          presentBadge: true,
+          presentSound: true,
+          threadIdentifier: 'listing-3',
+        ),
+      ),
+      payload: jsonEncode(payload),
+    );
+  }
+
   /// Routes a decoded notification payload into the correct in-app destination.
   void handleNotificationTapData(Map<String, dynamic> data) {
     final intent = NotificationRouteIntent.fromData(data);
@@ -298,6 +332,13 @@ class PushNotificationsService {
         }
       case NotificationRouteTarget.messagesInbox:
         router.push(AppScreens.messagesScreen);
+      case NotificationRouteTarget.listingDetail:
+        final ad = findSeedAdById(intent.adId);
+        if (ad != null) {
+          router.push(AppScreens.listingDetailScreen, extra: ad);
+        } else {
+          router.go(AppScreens.homeScreen);
+        }
       case NotificationRouteTarget.profile:
         router.push(AppScreens.profileScreen);
       case NotificationRouteTarget.home:

@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:skillbridge/core/utils/services/notifications/notification_route_intent.dart';
+import 'package:skillbridge/features/home/data/home_mock_ads.dart';
 import 'package:skillbridge/features/messages/data/messages_mock_data.dart';
 
 void main() {
@@ -23,6 +24,17 @@ void main() {
 
       expect(intent.target, NotificationRouteTarget.messagesInbox);
       expect(intent.conversationId, isNull);
+    });
+
+    test('routes a listing payload with ad id to listing detail', () {
+      final intent = NotificationRouteIntent.fromData({
+        'type': 'listing',
+        'adId': '3',
+      });
+
+      expect(intent.target, NotificationRouteTarget.listingDetail);
+      expect(intent.adId, 3);
+      expect(findSeedAdById(intent.adId)?.title, 'Math Tutoring (K-12)');
     });
 
     test('falls back to home for unknown notification types', () {

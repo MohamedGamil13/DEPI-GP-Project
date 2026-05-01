@@ -36,6 +36,11 @@ class _NotificationIcon extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(right: 16),
       child: GestureDetector(
+        onTap: kDebugMode
+            ? () {
+                getIt<PushNotificationsService>().showMockListingNotification();
+              }
+            : null,
         onLongPress: kDebugMode
             ? () {
                 getIt<PushNotificationsService>().showMockMessageNotification();

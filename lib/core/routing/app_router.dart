@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:skillbridge/core/models/ad_model.dart';
 import 'package:skillbridge/core/routing/app_screens.dart';
 import 'package:skillbridge/core/routing/routing_stream_refresh.dart';
 import 'package:skillbridge/core/utils/locator/service_locator.dart';
@@ -9,6 +10,7 @@ import 'package:skillbridge/features/auth/presentation/screens/forgot_password_s
 import 'package:skillbridge/features/auth/presentation/screens/sign_in_screen.dart';
 import 'package:skillbridge/features/auth/presentation/screens/sign_up_screen.dart';
 import 'package:skillbridge/features/auth/presentation/viewmodel/auth_cubit.dart';
+import 'package:skillbridge/features/home/presentation/screens/ad_detail_screen.dart';
 import 'package:skillbridge/features/home/presentation/screens/home_screen.dart';
 import 'package:skillbridge/features/messages/data/models/service_conversation.dart';
 import 'package:skillbridge/features/messages/presentation/screens/chat_detail_screen.dart';
@@ -142,6 +144,22 @@ final GoRouter router = GoRouter(
               getIt<MessagesCubit>()..loadConversation(conversation),
           child: const ChatDetailScreen(),
         );
+      },
+    ),
+
+    // == Listing Detail ==
+    GoRoute(
+      path: AppScreens.listingDetailScreen,
+      builder: (context, state) {
+        final ad = state.extra;
+
+        if (ad is! AdModel) {
+          return const Scaffold(
+            body: Center(child: Text('Listing unavailable')),
+          );
+        }
+
+        return AdDetailScreen(ad: ad);
       },
     ),
   ],
