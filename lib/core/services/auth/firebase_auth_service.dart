@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:skillbridge/core/errors/auth_exception.dart';
 import 'package:skillbridge/core/services/auth/auth_service.dart';
 import 'package:skillbridge/core/utils/validator/app_validator.dart';
@@ -6,6 +7,7 @@ import 'package:skillbridge/features/auth/data/models/auth_user_model.dart';
 
 class FirebaseAuthService implements AuthService {
   final FirebaseAuth _auth;
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   FirebaseAuthService(this._auth);
 
@@ -60,6 +62,61 @@ class FirebaseAuthService implements AuthService {
       }
 
       return _mapUser(user);
+    } on FirebaseAuthException catch (e) {
+      throw _mapException(e);
+    }
+  }
+
+  @override
+  Future<AuthUser> signInWithGoogle() async {
+    try {
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+
+      if (googleUser == null) {
+        throw const UnknownAuthException(
+          code: 'sign-in-cancelled',
+          message: 'Sign in was cancelled by the user.',
+        );
+      }
+
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+
+      final OAuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      final UserCredential userCredential = await _auth.signInWithCredential(
+        credential,
+      );
+
+      final user = userCredential.user;
+
+      if (user == null) {
+        throw const UnknownAuthException(
+          code: 'user-not-found',
+          message: 'Failed to retrieve user information from Firebase.',
+        );
+      }
+
+      return _mapUser(user);
+    } on FirebaseAuthException catch (e) {
+      throw _mapException(e);
+    } catch (e) {
+      if (e is AuthException) rethrow;
+
+      throw UnknownAuthException(
+        code: 'google-sign-in-error',
+        message: e.toString(),
+      );
+    }
+  }
+
+  @override
+  Future<void> signOut() async {
+    try {
+      await Future.wait([_auth.signOut(), _googleSignIn.signOut()]);
     } on FirebaseAuthException catch (e) {
       throw _mapException(e);
     }
