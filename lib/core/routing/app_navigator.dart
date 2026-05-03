@@ -14,5 +14,6 @@ extension AppNavigator on BuildContext {
   void goMessages() => push(AppScreens.messagesScreen);
   void goChatDetail(ServiceConversation conversation) =>
       push(AppScreens.chatDetailScreen, extra: conversation);
+  void goAdDetails() => push(AppScreens.adDetailsScreen);
   void popPage() => pop();
 }
