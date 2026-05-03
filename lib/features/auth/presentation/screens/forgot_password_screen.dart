@@ -9,6 +9,7 @@ import 'package:skillbridge/features/auth/presentation/screens/widgets/auth_text
 import 'package:skillbridge/features/auth/presentation/screens/widgets/field_label.dart';
 import 'package:skillbridge/features/auth/presentation/screens/widgets/primary_button.dart';
 import 'package:skillbridge/features/auth/presentation/viewmodel/auth_cubit.dart';
+import 'package:skillbridge/generated/l10n.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -39,7 +40,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             }
 
             if (state is AuthSendPasswordSuccess) {
-              AppSnackBar.success(context, "Reset link sent to your email");
+              AppSnackBar.success(context, S.of(context).resetLinkSentMessage);
               context.gosignIn();
             }
           },
@@ -95,10 +96,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   SizedBox(height: 24.h),
 
                   // ── Title ──
-                  const Center(
+                  Center(
                     child: Text(
-                      'Forgot Password',
-                      style: TextStyle(
+                      S.of(context).forgotPasswordTitle,
+                      style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.w800,
                         color: AppColors.textDark,
@@ -108,11 +109,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   SizedBox(height: 12.h),
 
                   // ── Description ──
-                  const Center(
+                  Center(
                     child: Text(
-                      "Enter your email address and we'll send you a link to reset your password and get back to ServiMarket.",
+                      S.of(context).forgotPasswordDescription,
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 13,
                         color: AppColors.textMedium,
                         height: 1.6,
@@ -122,10 +123,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   SizedBox(height: 36.h),
 
                   // ── Email Field ──
-                  const FieldLabel(label: 'Email Address'),
+                  FieldLabel(label: S.of(context).emailAddressLabel),
                   AuthTextField(
                     controller: _emailController,
-                    hint: 'name@company.com',
+                    hint: S.of(context).emailHint,
                     prefixIcon: Icons.mail_outline,
                     validator: AppValidator.validateEmail,
                   ),
@@ -142,7 +143,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         );
                       }
                       return PrimaryButton(
-                        label: 'Send Reset Link',
+                        label: S.of(context).sendResetLinkButton,
                         trailingIcon: Icons.send_outlined,
                         onTap: () {
                           if (_formKey.currentState!.validate()) {
@@ -160,24 +161,26 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   Center(
                     child: RichText(
                       textAlign: TextAlign.center,
-                      text: const TextSpan(
-                        style: TextStyle(
+                      text: TextSpan(
+                        style: const TextStyle(
                           fontSize: 13,
                           color: AppColors.textMedium,
                         ),
                         children: [
-                          TextSpan(text: "Didn't receive the email? "),
+                          TextSpan(text: S.of(context).didNotReceiveEmail),
                           TextSpan(
-                            text: 'Check your spam',
-                            style: TextStyle(
+                            text: S.of(context).checkSpamText,
+                            style: const TextStyle(
                               color: AppColors.primaryColor,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
-                          TextSpan(text: ' or '),
+                          const TextSpan(text: ' '), // spacing
+                          TextSpan(text: S.of(context).orText),
+                          const TextSpan(text: ' '), // spacing
                           TextSpan(
-                            text: 'Try again',
-                            style: TextStyle(
+                            text: S.of(context).tryAgainText,
+                            style: const TextStyle(
                               color: AppColors.primaryColor,
                               fontWeight: FontWeight.w600,
                             ),
@@ -189,11 +192,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   SizedBox(height: 60.h),
 
                   // ── Watermark ──
-                  const Align(
+                  Align(
                     alignment: Alignment.centerRight,
                     child: Text(
-                      'ServiMarket',
-                      style: TextStyle(
+                      S.of(context).watermarkText,
+                      style: const TextStyle(
                         fontSize: 25,
                         fontWeight: FontWeight.w800,
                         color: AppColors.watermark,

@@ -11,6 +11,7 @@ import 'package:skillbridge/features/auth/presentation/screens/widgets/field_lab
 import 'package:skillbridge/features/auth/presentation/screens/widgets/or_divider.dart';
 import 'package:skillbridge/features/auth/presentation/screens/widgets/primary_button.dart';
 import 'package:skillbridge/features/auth/presentation/viewmodel/auth_cubit.dart';
+import 'package:skillbridge/generated/l10n.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -54,18 +55,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   SizedBox(height: 40.h),
 
                   // ── Title ──
-                  const Text(
-                    'Create Account',
-                    style: TextStyle(
+                  Text(
+                    S.of(context).createAccountTitle,
+                    style: const TextStyle(
                       fontSize: 30,
                       fontWeight: FontWeight.w800,
                       color: AppColors.textDark,
                     ),
                   ),
                   SizedBox(height: 8.h),
-                  const Text(
-                    'Join ServiMarket today and find the best local services.',
-                    style: TextStyle(
+                  Text(
+                    S.of(context).createAccountSubtitle,
+                    style: const TextStyle(
                       fontSize: 14,
                       color: AppColors.textMedium,
                       height: 1.5,
@@ -74,39 +75,39 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   SizedBox(height: 32.h),
 
                   // ── Full Name ──
-                  const FieldLabel(label: 'Full Name'),
+                  FieldLabel(label: S.of(context).fullNameLabel),
                   AuthTextField(
                     controller: _nameController,
-                    hint: 'John Doe',
+                    hint: S.of(context).fullNameHint,
                     prefixIcon: Icons.person_outline,
                     validator: (value) =>
-                        value!.isEmpty ? "Name is required" : null,
+                        value!.isEmpty ? S.of(context).nameRequiredError : null,
                   ),
                   SizedBox(height: 18.h),
 
                   // ── Email Address ──
-                  const FieldLabel(label: 'Email Address'),
+                  FieldLabel(label: S.of(context).emailAddressLabel),
                   AuthTextField(
                     controller: _emailController,
                     validator: AppValidator.validateEmail,
-                    hint: 'john@example.com',
+                    hint: S.of(context).emailHint,
                     prefixIcon: Icons.mail_outline,
                   ),
                   SizedBox(height: 18.h),
 
                   // ── Password ──
-                  const FieldLabel(label: 'Password'),
+                  FieldLabel(label: S.of(context).passwordLabel),
                   AuthTextField(
                     controller: _passwordController,
                     validator: AppValidator.validatePassword,
-                    hint: 'Create a password',
+                    hint: S.of(context).createPasswordHint,
                     prefixIcon: Icons.lock_outline,
                     obscure: true,
                     showToggle: true,
                   ),
                   SizedBox(height: 32.h),
 
-                  // ── Sign Up Button (With BlocBuilder) ──
+                  // ── Sign Up Button ──
                   BlocBuilder<AuthCubit, AuthState>(
                     builder: (context, state) {
                       if (state is AuthLoading) {
@@ -117,7 +118,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         );
                       }
                       return PrimaryButton(
-                        label: 'Sign Up',
+                        label: S.of(context).signUpText,
                         onTap: () {
                           if (_formKey.currentState!.validate()) {
                             context.read<AuthCubit>().signUp(
@@ -136,18 +137,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Text(
-                          'Already have an account? ',
-                          style: TextStyle(
+                        Text(
+                          S.of(context).alreadyHaveAccountText,
+                          style: const TextStyle(
                             fontSize: 13,
                             color: AppColors.textMedium,
                           ),
                         ),
                         GestureDetector(
                           onTap: () => context.gosignIn(),
-                          child: const Text(
-                            'Login',
-                            style: TextStyle(
+                          child: Text(
+                            S.of(context).loginText,
+                            style: const TextStyle(
                               fontSize: 13,
                               color: AppColors.primaryColor,
                               fontWeight: FontWeight.w700,
@@ -160,7 +161,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   SizedBox(height: 28.h),
 
                   // ── Divider ──
-                  const OrDivider(label: 'OR CONTINUE WITH'),
+                  OrDivider(label: S.of(context).orContinueWithText),
                   SizedBox(height: 18.h),
 
                   // ── Google Button ──
@@ -175,18 +176,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(color: AppColors.border),
                       ),
-                      child: const Row(
+                      child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          FaIcon(
+                          const FaIcon(
                             FontAwesomeIcons.google,
                             size: 20,
                             color: Color(0xFFDB4437),
                           ),
-                          SizedBox(width: 10),
+                          const SizedBox(width: 10),
                           Text(
-                            'Google',
-                            style: TextStyle(
+                            S.of(context).googleText,
+                            style: const TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
                               color: Color(0xFFDB4437),
@@ -202,29 +203,29 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   Center(
                     child: RichText(
                       textAlign: TextAlign.center,
-                      text: const TextSpan(
-                        style: TextStyle(
+                      text: TextSpan(
+                        style: const TextStyle(
                           fontSize: 11,
                           color: AppColors.textLight,
                         ),
                         children: [
-                          TextSpan(text: 'By signing up, you agree to our '),
+                          TextSpan(text: S.of(context).termsAgreementText),
                           TextSpan(
-                            text: 'Terms of Service',
-                            style: TextStyle(
+                            text: S.of(context).termsOfServiceText,
+                            style: const TextStyle(
                               color: AppColors.primaryColor,
                               decoration: TextDecoration.underline,
                             ),
                           ),
-                          TextSpan(text: ' and '),
+                          TextSpan(text: S.of(context).andText),
                           TextSpan(
-                            text: 'Privacy Policy',
-                            style: TextStyle(
+                            text: S.of(context).privacyPolicyText,
+                            style: const TextStyle(
                               color: AppColors.primaryColor,
                               decoration: TextDecoration.underline,
                             ),
                           ),
-                          TextSpan(text: '.'),
+                          const TextSpan(text: '.'),
                         ],
                       ),
                     ),
