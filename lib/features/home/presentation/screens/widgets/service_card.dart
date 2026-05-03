@@ -80,7 +80,6 @@ class ServiceCard extends StatelessWidget {
                             .toList()
                       : [],
                 ),
-
                 const SizedBox(height: 8),
 
                 /// Title + Price

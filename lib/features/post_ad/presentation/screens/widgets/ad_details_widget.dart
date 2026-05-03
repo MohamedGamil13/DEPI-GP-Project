@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:skillbridge/core/routing/app_navigator.dart';
 
-// 1. صورة الإعلان مع أزرار الرجوع والتفاعل
 class AdImageHeader extends StatelessWidget {
-  final String imageUrl;
   const AdImageHeader({super.key, required this.imageUrl});
+  final String imageUrl;
 
   @override
   Widget build(BuildContext context) {
