@@ -1,55 +1,48 @@
+// lib/features/home/presentation/screens/widgets/ad_hero_image.dart
 import 'package:flutter/material.dart';
 import 'package:skillbridge/core/utils/constants/app_images.dart';
 
-class AdImageWidget extends StatelessWidget {
-  final String imageUrl;
-  final double height;
-  final BorderRadius? borderRadius;
-  final int heroTag;
-  final Widget? overlay;
-
-  const AdImageWidget({
+class AdHeroImage extends StatelessWidget {
+  const AdHeroImage({
     super.key,
+    required this.adId,
     required this.imageUrl,
     required this.height,
-    required this.heroTag,
-    this.borderRadius,
-    this.overlay,
+    this.borderRadius = BorderRadius.zero,
   });
+
+  final int adId;
+  final String imageUrl;
+  final double height;
+  final BorderRadius borderRadius;
+
+  static const String _fallback = AppImages.defalutPostImage;
 
   @override
   Widget build(BuildContext context) {
-    final isNetwork = imageUrl.startsWith('http');
-
     return Hero(
-      tag: heroTag,
-      child: Stack(
-        children: [
-          ClipRRect(
-            borderRadius: borderRadius ?? BorderRadius.zero,
-            child: isNetwork
-                ? Image.network(
-                    imageUrl,
-                    height: height,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => Image.asset(
-                      AppImages.defalutPostImage,
-                      height: height,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                    ),
-                  )
-                : Image.asset(
-                    AppImages.defalutPostImage,
-                    height: height,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                  ),
-          ),
-
-          if (overlay != null) Positioned.fill(child: overlay!),
-        ],
+      tag: 'ad-image-$adId',
+      child: ClipRRect(
+        borderRadius: borderRadius,
+        child: imageUrl.startsWith('http')
+            ? Image.network(
+                imageUrl,
+                height: height,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => Image.asset(
+                  _fallback,
+                  height: height,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
+              )
+            : Image.asset(
+                _fallback,
+                height: height,
+                width: double.infinity,
+                fit: BoxFit.cover,
+              ),
       ),
     );
   }

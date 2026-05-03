@@ -1,19 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:skillbridge/core/routing/app_navigator.dart';
+import 'package:skillbridge/core/widgets/ad_image_widget.dart';
 
 class AdImageHeader extends StatelessWidget {
-  const AdImageHeader({super.key, required this.imageUrl});
+  const AdImageHeader({
+    super.key,
+    required this.adId, // ← add this
+    required this.imageUrl,
+  });
+
+  final int adId;
   final String imageUrl;
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        Image.network(
-          imageUrl,
+        AdHeroImage(
+          adId: adId,
+          imageUrl: imageUrl,
           height: 300,
-          width: double.infinity,
-          fit: BoxFit.cover,
+          borderRadius: BorderRadius.zero,
         ),
         Positioned(
           top: 40,

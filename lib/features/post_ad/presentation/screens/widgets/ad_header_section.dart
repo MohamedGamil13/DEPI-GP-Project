@@ -10,6 +10,7 @@ class HeaderSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AdImageHeader(
+      adId: ad.adID,
       imageUrl: ad.photos.isNotEmpty
           ? ad.photos[0]
           : AppImages.defalutPostImage,
