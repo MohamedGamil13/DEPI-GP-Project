@@ -9,6 +9,7 @@ import 'package:skillbridge/features/auth/presentation/screens/forgot_password_s
 import 'package:skillbridge/features/auth/presentation/screens/sign_in_screen.dart';
 import 'package:skillbridge/features/auth/presentation/screens/sign_up_screen.dart';
 import 'package:skillbridge/features/auth/presentation/viewmodel/auth_cubit.dart';
+import 'package:skillbridge/features/home/data/ad_model.dart';
 import 'package:skillbridge/features/home/presentation/cubits/home_cubit.dart';
 import 'package:skillbridge/features/home/presentation/screens/home_screen.dart';
 import 'package:skillbridge/features/messages/data/models/service_conversation.dart';
@@ -132,7 +133,7 @@ final GoRouter router = GoRouter(
     GoRoute(
       path: AppScreens.adDetailsScreen,
       builder: (context, state) {
-        return const AdDetailsScreen();
+        return AdDetailsScreen(ad: state.extra as AdModel);
       },
     ),
   ],

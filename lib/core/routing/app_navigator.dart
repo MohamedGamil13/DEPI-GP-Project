@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skillbridge/core/routing/app_screens.dart';
+import 'package:skillbridge/features/home/data/ad_model.dart';
 import 'package:skillbridge/features/messages/data/models/service_conversation.dart';
 
 extension AppNavigator on BuildContext {
@@ -14,6 +15,6 @@ extension AppNavigator on BuildContext {
   void goMessages() => push(AppScreens.messagesScreen);
   void goChatDetail(ServiceConversation conversation) =>
       push(AppScreens.chatDetailScreen, extra: conversation);
-  void goAdDetails() => push(AppScreens.adDetailsScreen);
+  void goAdDetails(AdModel ad) => push(AppScreens.adDetailsScreen, extra: ad);
   void popPage() => pop();
 }
