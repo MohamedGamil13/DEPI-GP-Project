@@ -147,10 +147,10 @@ class _IsFavWidgetState extends State<_IsFavWidget> {
         isFavorite = !isFavorite;
       }),
       child: CircleAvatar(
-        backgroundColor: AppColors.surfaceColor,
+        backgroundColor: Colors.black26,
         child: Icon(
           isFavorite ? Icons.favorite : Icons.favorite_border,
-          color: isFavorite ? AppColors.errorColor : AppColors.textLight,
+          color: isFavorite ? AppColors.errorColor : AppColors.white,
         ),
       ),
     );

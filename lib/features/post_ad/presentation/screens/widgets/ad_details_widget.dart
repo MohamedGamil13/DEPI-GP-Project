@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:skillbridge/core/routing/app_navigator.dart';
+import 'package:skillbridge/core/theme/app_colors.dart';
+import 'package:skillbridge/core/utils/helpers/snackbar_manger.dart';
 import 'package:skillbridge/core/widgets/ad_image_widget.dart';
+import 'package:skillbridge/features/post_ad/presentation/viewModel/call_cubit/call_cubit.dart';
 
 class AdImageHeader extends StatelessWidget {
   const AdImageHeader({
@@ -82,7 +86,9 @@ class SellerCard extends StatelessWidget {
         children: [
           const CircleAvatar(
             radius: 25,
-            backgroundImage: NetworkImage('https://via.placeholder.com/150'),
+            backgroundImage: NetworkImage(
+              'https://tse4.mm.bing.net/th/id/OIP.FkQDxKdriMvRdcRm9X7ZFAHaHX?rs=1&pid=ImgDetMain&o=7&rm=3',
+            ),
           ),
           const SizedBox(width: 12),
           const Expanded(
@@ -125,18 +131,35 @@ class ContactButtons extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Expanded(
-            child: OutlinedButton.icon(
-              onPressed: () {},
-              icon: const Icon(Icons.call),
-              label: const Text("Call"),
-              style: OutlinedButton.styleFrom(
-                minimumSize: const Size(0, 50),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+          BlocConsumer<CallCubit, CallState>(
+            builder: (context, state) {
+              if (state is CallLoading) {
+                return const CircularProgressIndicator(
+                  color: AppColors.primaryColor,
+                );
+              }
+
+              return Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () {
+                    context.read<CallCubit>().call('01102535450');
+                  },
+                  icon: const Icon(Icons.call),
+                  label: const Text("Call"),
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size(0, 50),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
                 ),
-              ),
-            ),
+              );
+            },
+            listener: (context, state) {
+              if (state is CallFailure) {
+                AppSnackBar.error(context, state.errMessage);
+              }
+            },
           ),
           const SizedBox(width: 12),
           Expanded(

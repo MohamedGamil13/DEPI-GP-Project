@@ -18,7 +18,8 @@ import 'package:skillbridge/features/messages/presentation/screens/messages_scre
 import 'package:skillbridge/features/messages/presentation/viewmodel/messages_cubit.dart';
 import 'package:skillbridge/features/post_ad/presentation/screens/ad_details_screen.dart';
 import 'package:skillbridge/features/post_ad/presentation/screens/post_ad_screen.dart';
-import 'package:skillbridge/features/post_ad/presentation/viewModel/ad_posting_cubit.dart';
+import 'package:skillbridge/features/post_ad/presentation/viewModel/ad_posting_cubit/ad_posting_cubit.dart';
+import 'package:skillbridge/features/post_ad/presentation/viewModel/call_cubit/call_cubit.dart';
 import 'package:skillbridge/features/profile/data/repos/profile_repo_implementation.dart';
 import 'package:skillbridge/features/profile/presentation/screens/profile_screen.dart';
 import 'package:skillbridge/features/profile/presentation/viewmodel/profile_cubit.dart';
@@ -133,7 +134,10 @@ final GoRouter router = GoRouter(
     GoRoute(
       path: AppScreens.adDetailsScreen,
       builder: (context, state) {
-        return AdDetailsScreen(ad: state.extra as AdModel);
+        return BlocProvider(
+          create: (context) => CallCubit(),
+          child: AdDetailsScreen(ad: state.extra as AdModel),
+        );
       },
     ),
   ],
