@@ -318,6 +318,26 @@ class S {
       args: [],
     );
   }
+
+  /// `CATEGORIES`
+  String get categories {
+    return Intl.message('CATEGORIES', name: 'categories', desc: '', args: []);
+  }
+
+  /// `Retry`
+  String get retryButton {
+    return Intl.message('Retry', name: 'retryButton', desc: '', args: []);
+  }
+
+  /// `Load Posts`
+  String get loadPostsButton {
+    return Intl.message(
+      'Load Posts',
+      name: 'loadPostsButton',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

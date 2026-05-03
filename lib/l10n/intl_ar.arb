@@ -4,7 +4,7 @@
   "forgotPasswordDescription": "أدخل بريدك الإلكتروني وسنرسل لك رابطاً لإعادة تعيين كلمة المرور والعودة إلى ServiMarket.",
   "sendResetLinkButton": "إرسال رابط إعادة التعيين",
   "didNotReceiveEmail": "لم يصلك البريد الإلكتروني؟",
-  "checkSpamText": "تحقق من الرسائل غير المرغوب فيها (Spam)",
+  "checkSpamText": "تحقق من الرسائل غير المرغوب فيها",
   "tryAgainText": "أعد المحاولة",
   "watermarkText": "ServiMarket",
   "appName": "ServiMarket",
@@ -30,5 +30,8 @@
   "termsAgreementText": "بتسجيلك، أنت توافق على ",
   "termsOfServiceText": "شروط الخدمة",
   "andText": " و ",
-  "privacyPolicyText": "سياسة الخصوصية"
+  "privacyPolicyText": "سياسة الخصوصية",
+  "categories": "الفئات",
+  "retryButton": "إعادة المحاولة",
+  "loadPostsButton": "تحميل المنشورات"
 }

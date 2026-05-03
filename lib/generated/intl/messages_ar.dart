@@ -27,8 +27,9 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "andText": MessageLookupByLibrary.simpleMessage(" و "),
     "appName": MessageLookupByLibrary.simpleMessage("ServiMarket"),
+    "categories": MessageLookupByLibrary.simpleMessage("الفئات"),
     "checkSpamText": MessageLookupByLibrary.simpleMessage(
-      "تحقق من الرسائل غير المرغوب فيها (Spam)",
+      "تحقق من الرسائل غير المرغوب فيها",
     ),
     "continueWithText": MessageLookupByLibrary.simpleMessage(
       "المتابعة باستخدام ",
@@ -62,6 +63,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "fullNameHint": MessageLookupByLibrary.simpleMessage("أحمد محمد"),
     "fullNameLabel": MessageLookupByLibrary.simpleMessage("الاسم الكامل"),
     "googleText": MessageLookupByLibrary.simpleMessage("جوجل"),
+    "loadPostsButton": MessageLookupByLibrary.simpleMessage("تحميل المنشورات"),
     "loginText": MessageLookupByLibrary.simpleMessage("تسجيل الدخول"),
     "nameRequiredError": MessageLookupByLibrary.simpleMessage("الاسم مطلوب"),
     "orContinueWithText": MessageLookupByLibrary.simpleMessage(
@@ -73,6 +75,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "resetLinkSentMessage": MessageLookupByLibrary.simpleMessage(
       "تم إرسال رابط إعادة التعيين إلى بريدك الإلكتروني",
     ),
+    "retryButton": MessageLookupByLibrary.simpleMessage("إعادة المحاولة"),
     "sendResetLinkButton": MessageLookupByLibrary.simpleMessage(
       "إرسال رابط إعادة التعيين",
     ),

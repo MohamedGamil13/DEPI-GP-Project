@@ -27,6 +27,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "andText": MessageLookupByLibrary.simpleMessage(" and "),
     "appName": MessageLookupByLibrary.simpleMessage("ServiMarket"),
+    "categories": MessageLookupByLibrary.simpleMessage("CATEGORIES"),
     "checkSpamText": MessageLookupByLibrary.simpleMessage("Check your spam"),
     "continueWithText": MessageLookupByLibrary.simpleMessage("Continue with "),
     "createAccountSubtitle": MessageLookupByLibrary.simpleMessage(
@@ -58,6 +59,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "fullNameHint": MessageLookupByLibrary.simpleMessage("John Doe"),
     "fullNameLabel": MessageLookupByLibrary.simpleMessage("Full Name"),
     "googleText": MessageLookupByLibrary.simpleMessage("Google"),
+    "loadPostsButton": MessageLookupByLibrary.simpleMessage("Load Posts"),
     "loginText": MessageLookupByLibrary.simpleMessage("Login"),
     "nameRequiredError": MessageLookupByLibrary.simpleMessage(
       "Name is required",
@@ -71,6 +73,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "resetLinkSentMessage": MessageLookupByLibrary.simpleMessage(
       "Reset link sent to your email",
     ),
+    "retryButton": MessageLookupByLibrary.simpleMessage("Retry"),
     "sendResetLinkButton": MessageLookupByLibrary.simpleMessage(
       "Send Reset Link",
     ),

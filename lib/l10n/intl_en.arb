@@ -30,5 +30,8 @@
   "termsAgreementText": "By signing up, you agree to our ",
   "termsOfServiceText": "Terms of Service",
   "andText": " and ",
-  "privacyPolicyText": "Privacy Policy"
+  "privacyPolicyText": "Privacy Policy",
+  "categories": "CATEGORIES",
+  "retryButton": "Retry",
+  "loadPostsButton": "Load Posts"
 }

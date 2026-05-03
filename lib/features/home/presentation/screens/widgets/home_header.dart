@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:skillbridge/core/theme/app_colors.dart';
 import 'package:skillbridge/core/theme/app_styles.dart';
 import 'package:skillbridge/core/widgets/search_bar.dart';
+import 'package:skillbridge/generated/l10n.dart';
 
 class HomeHeader extends StatelessWidget {
   const HomeHeader({super.key});
@@ -28,7 +29,7 @@ class _HomePageSectionTitle extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Text(
-        'CATEGORIES',
+        S.of(context).categories,
         style: AppStyles.font14w600.copyWith(
           color: AppColors.textMedium,
           letterSpacing: 1.2,

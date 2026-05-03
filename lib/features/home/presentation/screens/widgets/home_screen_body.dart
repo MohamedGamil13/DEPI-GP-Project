@@ -4,6 +4,7 @@ import 'package:skillbridge/features/home/presentation/cubits/home_cubit.dart';
 import 'package:skillbridge/features/home/presentation/screens/widgets/ad_list_section.dart';
 import 'package:skillbridge/features/home/presentation/screens/widgets/categories_section.dart';
 import 'package:skillbridge/features/home/presentation/screens/widgets/home_header.dart';
+import 'package:skillbridge/generated/l10n.dart';
 
 class HomeScreenBody extends StatelessWidget {
   const HomeScreenBody({super.key});
@@ -48,7 +49,7 @@ class HomeScreenBody extends StatelessWidget {
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () => context.read<HomeCubit>().getPosts(),
-                child: const Text('Retry'),
+                child: Text(S.of(context).retryButton),
               ),
             ],
           ),
@@ -65,7 +66,7 @@ class HomeScreenBody extends StatelessWidget {
       child: Center(
         child: ElevatedButton(
           onPressed: () => context.read<HomeCubit>().getPosts(),
-          child: const Text('Load Posts'),
+          child: Text(S.of(context).loadPostsButton),
         ),
       ),
     );
