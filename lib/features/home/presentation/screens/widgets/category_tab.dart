@@ -1,19 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:skillbridge/core/theme/app_colors.dart';
 import 'package:skillbridge/core/theme/app_styles.dart';
+import 'package:skillbridge/features/home/data/ad_model.dart';
 
 class CategoryTab extends StatelessWidget {
-  final String label;
-  final IconData icon;
   final bool selected;
   final VoidCallback onTap;
-
+  final AdCategories adCategories;
   const CategoryTab({
     super.key,
-    required this.label,
-    required this.icon,
     required this.selected,
     required this.onTap,
+    required this.adCategories,
   });
 
   @override
@@ -46,13 +44,13 @@ class CategoryTab extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
-              icon,
+              adCategories.icon,
               color: selected ? AppColors.white : AppColors.secondaryColor,
               size: 16,
             ),
             const SizedBox(width: 6),
             Text(
-              label,
+              adCategories.label,
               style: AppStyles.font13w500.copyWith(
                 color: selected ? AppColors.white : AppColors.secondaryColor,
               ),

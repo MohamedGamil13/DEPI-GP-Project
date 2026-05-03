@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:skillbridge/core/errors/auth_exception.dart';
-import 'package:skillbridge/core/utils/services/auth/auth_service.dart';
+import 'package:skillbridge/core/services/auth/auth_service.dart';
 import 'package:skillbridge/core/utils/validator/app_validator.dart';
 import 'package:skillbridge/features/auth/data/models/auth_user_model.dart';
 
@@ -171,5 +171,4 @@ class FirebaseAuthService implements AuthService {
     };
   }
 }
-
   //reviewed

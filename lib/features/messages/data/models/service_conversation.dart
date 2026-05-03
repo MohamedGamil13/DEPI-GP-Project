@@ -1,4 +1,4 @@
-import 'package:skillbridge/core/models/ad_model.dart';
+import 'package:skillbridge/features/home/data/ad_model.dart';
 import 'package:skillbridge/features/messages/data/models/chat_message.dart';
 
 enum ConversationStatus { newLead, active, waiting, archived }
