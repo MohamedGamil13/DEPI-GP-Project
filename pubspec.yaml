@@ -43,6 +43,7 @@ dependencies:
   go_router: ^17.1.0
   image_picker: ^1.2.1
   google_sign_in: ^6.0.2
+  url_launcher: ^6.3.2
   flutter_localizations:
     sdk: flutter
 

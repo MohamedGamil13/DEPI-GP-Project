@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:skillbridge/core/routing/app_navigator.dart';
 import 'package:skillbridge/features/home/data/ad_model.dart';
 import 'package:skillbridge/features/home/presentation/screens/widgets/service_card.dart';
 
@@ -14,7 +15,10 @@ class AdListSection extends StatelessWidget {
           final AdModel ad = ads[index];
           return Padding(
             padding: const EdgeInsets.only(bottom: 16),
-            child: ServiceCard(ad: ad, isFavorite: false),
+            child: GestureDetector(
+              onTap: () => context.goAdDetails(ad),
+              child: ServiceCard(ad: ad, isFavorite: false),
+            ),
           );
         }, childCount: ads.length),
       ),

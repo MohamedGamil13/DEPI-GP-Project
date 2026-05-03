@@ -9,14 +9,17 @@ import 'package:skillbridge/features/auth/presentation/screens/forgot_password_s
 import 'package:skillbridge/features/auth/presentation/screens/sign_in_screen.dart';
 import 'package:skillbridge/features/auth/presentation/screens/sign_up_screen.dart';
 import 'package:skillbridge/features/auth/presentation/viewmodel/auth_cubit.dart';
+import 'package:skillbridge/features/home/data/ad_model.dart';
 import 'package:skillbridge/features/home/presentation/cubits/home_cubit.dart';
 import 'package:skillbridge/features/home/presentation/screens/home_screen.dart';
 import 'package:skillbridge/features/messages/data/models/service_conversation.dart';
 import 'package:skillbridge/features/messages/presentation/screens/chat_detail_screen.dart';
 import 'package:skillbridge/features/messages/presentation/screens/messages_screen.dart';
 import 'package:skillbridge/features/messages/presentation/viewmodel/messages_cubit.dart';
+import 'package:skillbridge/features/post_ad/presentation/screens/ad_details_screen.dart';
 import 'package:skillbridge/features/post_ad/presentation/screens/post_ad_screen.dart';
-import 'package:skillbridge/features/post_ad/presentation/viewModel/ad_posting_cubit.dart';
+import 'package:skillbridge/features/post_ad/presentation/viewModel/ad_posting_cubit/ad_posting_cubit.dart';
+import 'package:skillbridge/features/post_ad/presentation/viewModel/call_cubit/call_cubit.dart';
 import 'package:skillbridge/features/profile/data/repos/profile_repo_implementation.dart';
 import 'package:skillbridge/features/profile/presentation/screens/profile_screen.dart';
 import 'package:skillbridge/features/profile/presentation/viewmodel/profile_cubit.dart';
@@ -125,6 +128,15 @@ final GoRouter router = GoRouter(
           create: (context) =>
               getIt<MessagesCubit>()..loadConversation(conversation),
           child: const ChatDetailScreen(),
+        );
+      },
+    ),
+    GoRoute(
+      path: AppScreens.adDetailsScreen,
+      builder: (context, state) {
+        return BlocProvider(
+          create: (context) => CallCubit(),
+          child: AdDetailsScreen(ad: state.extra as AdModel),
         );
       },
     ),

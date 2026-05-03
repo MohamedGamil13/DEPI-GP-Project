@@ -15,7 +15,7 @@ import 'package:skillbridge/features/home/presentation/cubits/home_cubit.dart';
 import 'package:skillbridge/features/messages/presentation/viewmodel/messages_cubit.dart';
 import 'package:skillbridge/features/post_ad/data/repos/post_ad_repo.dart';
 import 'package:skillbridge/features/post_ad/data/repos/post_ad_repo_impl.dart';
-import 'package:skillbridge/features/post_ad/presentation/viewModel/ad_posting_cubit.dart';
+import 'package:skillbridge/features/post_ad/presentation/viewModel/ad_posting_cubit/ad_posting_cubit.dart';
 
 GetIt getIt =
     GetIt.instance; //take an intance from get_it => i use this package for DI

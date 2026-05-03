@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:skillbridge/core/theme/app_colors.dart';
 import 'package:skillbridge/core/theme/app_styles.dart';
 import 'package:skillbridge/core/utils/constants/app_images.dart';
+import 'package:skillbridge/core/widgets/ad_image_widget.dart';
+import 'package:skillbridge/core/widgets/category_tag.dart';
 import 'package:skillbridge/features/home/data/ad_model.dart';
-import 'package:skillbridge/features/home/presentation/screens/widgets/custom_tag.dart';
 
 class ServiceCard extends StatelessWidget {
   final AdModel ad;
@@ -33,29 +34,13 @@ class ServiceCard extends StatelessWidget {
           /// Image + Favorite
           Stack(
             children: [
-              ClipRRect(
+              AdHeroImage(
+                adId: ad.adID, // ← Hero tag source
+                imageUrl: image,
+                height: 140,
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(20),
                 ),
-                child: (image.startsWith('http'))
-                    ? Image.network(
-                        image,
-                        height: 140,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => Image.asset(
-                          _fallbackImage,
-                          height: 140,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                        ),
-                      )
-                    : Image.asset(
-                        _fallbackImage,
-                        height: 140,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                      ),
               ),
               const Positioned(top: 12, right: 12, child: _IsFavWidget()),
             ],
@@ -68,19 +53,7 @@ class ServiceCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 /// Tags
-                Row(
-                  children: ad.relevantSkills != null
-                      ? ad.relevantSkills!
-                            .map(
-                              (skill) => CustomTag(
-                                label: skill.name.toUpperCase(),
-                                color: AppColors.primaryColor,
-                              ),
-                            )
-                            .toList()
-                      : [],
-                ),
-
+                CategoryTag(label: ad.category.label),
                 const SizedBox(height: 8),
 
                 /// Title + Price
@@ -174,10 +147,10 @@ class _IsFavWidgetState extends State<_IsFavWidget> {
         isFavorite = !isFavorite;
       }),
       child: CircleAvatar(
-        backgroundColor: AppColors.surfaceColor,
+        backgroundColor: Colors.black26,
         child: Icon(
           isFavorite ? Icons.favorite : Icons.favorite_border,
-          color: isFavorite ? AppColors.errorColor : AppColors.textLight,
+          color: isFavorite ? AppColors.errorColor : AppColors.white,
         ),
       ),
     );
