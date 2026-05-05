@@ -12,12 +12,12 @@ import 'package:skillbridge/core/utils/validator/app_validator.dart';
 import 'package:skillbridge/features/auth/presentation/screens/widgets/field_label.dart';
 import 'package:skillbridge/features/auth/presentation/screens/widgets/primary_button.dart';
 import 'package:skillbridge/features/home/data/ad_model.dart';
-import 'package:skillbridge/features/post_ad/presentation/viewModel/ad_posting_cubit/ad_posting_cubit.dart';
-import 'package:skillbridge/features/post_ad/presentation/widgets/category_dropdown.dart';
-import 'package:skillbridge/features/post_ad/presentation/widgets/photo_upload_section.dart';
-import 'package:skillbridge/features/post_ad/presentation/widgets/post_ad_app_bar.dart';
-import 'package:skillbridge/features/post_ad/presentation/widgets/post_ad_text_field.dart';
-import 'package:skillbridge/features/post_ad/presentation/widgets/skills_section.dart';
+import 'package:skillbridge/features/posts/presentation/viewModel/ad_posting_cubit/ad_posting_cubit.dart';
+import 'package:skillbridge/features/posts/presentation/widgets/category_dropdown.dart';
+import 'package:skillbridge/features/posts/presentation/widgets/photo_upload_section.dart';
+import 'package:skillbridge/features/posts/presentation/widgets/post_ad_app_bar.dart';
+import 'package:skillbridge/features/posts/presentation/widgets/post_ad_text_field.dart';
+import 'package:skillbridge/features/posts/presentation/widgets/skills_section.dart';
 
 class PostAdScreen extends StatefulWidget {
   const PostAdScreen({super.key});

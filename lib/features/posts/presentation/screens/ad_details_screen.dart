@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:skillbridge/core/theme/app_colors.dart';
 import 'package:skillbridge/features/home/data/ad_model.dart';
-import 'package:skillbridge/features/post_ad/presentation/screens/widgets/ad_content_section.dart';
-import 'package:skillbridge/features/post_ad/presentation/screens/widgets/ad_details_widget.dart';
-import 'package:skillbridge/features/post_ad/presentation/screens/widgets/ad_header_section.dart';
+import 'package:skillbridge/features/posts/presentation/screens/widgets/ad_content_section.dart';
+import 'package:skillbridge/features/posts/presentation/screens/widgets/ad_details_widget.dart';
+import 'package:skillbridge/features/posts/presentation/screens/widgets/ad_header_section.dart';
 
 class AdDetailsScreen extends StatelessWidget {
   final AdModel ad;

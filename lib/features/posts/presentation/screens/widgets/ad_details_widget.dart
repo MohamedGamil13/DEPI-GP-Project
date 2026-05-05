@@ -4,7 +4,7 @@ import 'package:skillbridge/core/routing/app_navigator.dart';
 import 'package:skillbridge/core/theme/app_colors.dart';
 import 'package:skillbridge/core/utils/helpers/snackbar_manger.dart';
 import 'package:skillbridge/core/widgets/ad_image_widget.dart';
-import 'package:skillbridge/features/post_ad/presentation/viewModel/call_cubit/call_cubit.dart';
+import 'package:skillbridge/features/posts/presentation/viewModel/call_cubit/call_cubit.dart';
 
 class AdImageHeader extends StatelessWidget {
   const AdImageHeader({
