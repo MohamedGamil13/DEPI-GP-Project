@@ -3,7 +3,6 @@ import 'package:skillbridge/core/theme/app_colors.dart';
 import 'package:skillbridge/core/theme/app_styles.dart';
 import 'package:skillbridge/features/home/data/ad_model.dart';
 import 'package:skillbridge/features/posts/presentation/screens/widgets/ad_details_widget.dart';
-import 'package:skillbridge/features/posts/presentation/screens/widgets/ad_info_section.dart';
 
 class ContentSection extends StatelessWidget {
   const ContentSection({super.key, required this.ad});
@@ -17,7 +16,7 @@ class ContentSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          InfoSection(ad: ad),
+          // InfoSection(ad: ad),
           const SizedBox(height: 20),
           const SellerCard(),
           const SizedBox(height: 24),

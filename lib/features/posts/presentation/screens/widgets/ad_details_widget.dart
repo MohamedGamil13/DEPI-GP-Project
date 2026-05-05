@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:skillbridge/core/routing/app_navigator.dart';
@@ -75,6 +76,7 @@ class SellerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser;
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -84,22 +86,27 @@ class SellerCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const CircleAvatar(
+          CircleAvatar(
             radius: 25,
-            backgroundImage: NetworkImage(
-              'https://tse4.mm.bing.net/th/id/OIP.FkQDxKdriMvRdcRm9X7ZFAHaHX?rs=1&pid=ImgDetMain&o=7&rm=3',
-            ),
+            backgroundImage: user?.photoURL != null
+                ? NetworkImage(user!.photoURL!)
+                : const NetworkImage(
+                    'https://tse4.mm.bing.net/th/id/OIP.FkQDxKdriMvRdcRm9X7ZFAHaHX?rs=1&pid=ImgDetMain&o=7&rm=3',
+                  ),
           ),
           const SizedBox(width: 12),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Elena Rodriguez",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  user?.displayName ?? 'NoUserName',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
                 ),
-                Row(
+                const Row(
                   children: [
                     Icon(Icons.star, color: Colors.orange, size: 16),
                     Text(
