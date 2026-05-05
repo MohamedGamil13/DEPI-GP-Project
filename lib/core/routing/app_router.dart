@@ -16,10 +16,10 @@ import 'package:skillbridge/features/messages/data/models/service_conversation.d
 import 'package:skillbridge/features/messages/presentation/screens/chat_detail_screen.dart';
 import 'package:skillbridge/features/messages/presentation/screens/messages_screen.dart';
 import 'package:skillbridge/features/messages/presentation/viewmodel/messages_cubit.dart';
-import 'package:skillbridge/features/post_ad/presentation/screens/ad_details_screen.dart';
-import 'package:skillbridge/features/post_ad/presentation/screens/post_ad_screen.dart';
-import 'package:skillbridge/features/post_ad/presentation/viewModel/ad_posting_cubit/ad_posting_cubit.dart';
-import 'package:skillbridge/features/post_ad/presentation/viewModel/call_cubit/call_cubit.dart';
+import 'package:skillbridge/features/posts/presentation/screens/ad_details_screen.dart';
+import 'package:skillbridge/features/posts/presentation/screens/post_ad_screen.dart';
+import 'package:skillbridge/features/posts/presentation/viewModel/ad_posting_cubit/ad_posting_cubit.dart';
+import 'package:skillbridge/features/posts/presentation/viewModel/call_cubit/call_cubit.dart';
 import 'package:skillbridge/features/profile/data/repos/profile_repo_implementation.dart';
 import 'package:skillbridge/features/profile/presentation/screens/profile_screen.dart';
 import 'package:skillbridge/features/profile/presentation/viewmodel/profile_cubit.dart';
