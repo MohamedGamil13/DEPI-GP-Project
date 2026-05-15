@@ -1,7 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
 import 'package:skillbridge/core/utils/validator/result.dart';
-import 'package:skillbridge/features/profile/data/models/ad_post_model.dart';
+import 'package:skillbridge/features/home/data/ad_model.dart';
 import 'package:skillbridge/features/profile/data/models/user_profile_model.dart';
 import 'package:skillbridge/features/profile/data/repos/profile_repo.dart';
 
@@ -31,8 +31,8 @@ class ProfileCubit extends Cubit<ProfileState> {
     ]);
 
     final profileResult = results[0] as Result<UserProfileModel>;
-    final myPostsResult = results[1] as Result<List<AdPostModel>>;
-    final activityResult = results[2] as Result<List<AdPostModel>>;
+    final myPostsResult = results[1] as Result<List<AdModel>>;
+    final activityResult = results[2] as Result<List<AdModel>>;
 
     // If profile fails, emit failure — posts failures are non-critical
     switch (profileResult) {
@@ -44,12 +44,12 @@ class ProfileCubit extends Cubit<ProfileState> {
     }
 
     final profile = (profileResult).data;
-    final myPosts = myPostsResult is Success<List<AdPostModel>>
+    final myPosts = myPostsResult is Success<List<AdModel>>
         ? (myPostsResult).data
-        : <AdPostModel>[];
-    final activity = activityResult is Success<List<AdPostModel>>
+        : <AdModel>[];
+    final activity = activityResult is Success<List<AdModel>>
         ? (activityResult).data
-        : <AdPostModel>[];
+        : <AdModel>[];
 
     emit(
       ProfileSuccess(

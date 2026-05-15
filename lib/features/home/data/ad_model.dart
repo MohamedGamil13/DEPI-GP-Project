@@ -10,6 +10,7 @@ class AdModel {
   final AdCategories category;
   final List<RelevantSkills>? relevantSkills;
   final AdCity adCity;
+  final String? badge;
 
   AdModel({
     required this.title,
@@ -21,6 +22,7 @@ class AdModel {
     required this.relevantSkills,
     required this.adCity,
     required this.adID,
+    this.badge,
   });
   Map<String, dynamic> toJson() {
     return {

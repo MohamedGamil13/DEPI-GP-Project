@@ -38,14 +38,14 @@ class UserProfileModel {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'name': name,
-        'member_since': memberSince,
-        'avatar_url': avatarUrl,
-        'is_verified': isVerified,
-        'rating': rating,
-        'reviews': reviews,
-        'posts_count': postsCount,
-        'skills': skills,
-      };
+    'id': id,
+    'name': name,
+    'member_since': memberSince,
+    'avatar_url': avatarUrl,
+    'is_verified': isVerified,
+    'rating': rating,
+    'reviews': reviews,
+    'posts_count': postsCount,
+    'skills': skills,
+  };
 }

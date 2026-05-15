@@ -1,6 +1,6 @@
 import 'package:skillbridge/core/errors/app_exception.dart';
 import 'package:skillbridge/core/utils/validator/result.dart';
-import 'package:skillbridge/features/profile/data/models/ad_post_model.dart';
+import 'package:skillbridge/features/home/data/ad_model.dart';
 import 'package:skillbridge/features/profile/data/models/user_profile_model.dart';
 import 'package:skillbridge/features/profile/data/repos/profile_repo.dart';
 
@@ -19,7 +19,9 @@ class ProfileRepoImplementation extends ProfileRepo {
       // final doc = await _firestore.collection('users').doc(uid).get();
       // return Success(UserProfileModel.fromJson(doc.data()!));
 
-      await Future.delayed(const Duration(milliseconds: 600)); // simulate network
+      await Future.delayed(
+        const Duration(milliseconds: 600),
+      ); // simulate network
       return const Success(
         UserProfileModel(
           id: '1',
@@ -30,7 +32,13 @@ class ProfileRepoImplementation extends ProfileRepo {
           rating: 4.8,
           reviews: 120,
           postsCount: 15,
-          skills: ['UI Design', 'Graphic Design', 'Branding', 'React Native', 'Figma'],
+          skills: [
+            'UI Design',
+            'Graphic Design',
+            'Branding',
+            'React Native',
+            'Figma',
+          ],
         ),
       );
     } on AppException catch (e) {
@@ -39,33 +47,33 @@ class ProfileRepoImplementation extends ProfileRepo {
   }
 
   @override
-  Future<Result<List<AdPostModel>>> getMyPosts() async {
+  Future<Result<List<AdModel>>> getMyPosts() async {
     try {
       // TODO: replace with real Firestore/API query
       await Future.delayed(const Duration(milliseconds: 300));
       return const Success([
-        AdPostModel(
-          id: '1',
-          title: 'Professional Mobile App UI Design',
-          priceRange: 'EGP 2,200 - EGP 3,900 / hr',
-          location: 'San Francisco, CA',
-          imageUrl: 'https://picsum.photos/seed/mobile/200/200',
-          badge: 'GREAT MATCH',
-        ),
-        AdPostModel(
-          id: '2',
-          title: 'Logo Branding & Style Guide',
-          priceRange: '24,000 ج.م - 58,000 ج.م / project',
-          location: 'Remote',
-          imageUrl: 'https://picsum.photos/seed/logo/200/200',
-        ),
-        AdPostModel(
-          id: '3',
-          title: 'React Component Library Development',
-          priceRange: 'EGP 2,900 / hr',
-          location: 'New York, NY',
-          imageUrl: 'https://picsum.photos/seed/react/200/200',
-        ),
+        // AdPostModel(
+        //   id: '1',
+        //   title: 'Professional Mobile App UI Design',
+        //   priceRange: 'EGP 2,200 - EGP 3,900 / hr',
+        //   location: 'San Francisco, CA',
+        //   imageUrl: 'https://picsum.photos/seed/mobile/200/200',
+        //   badge: 'GREAT MATCH',
+        // ),
+        // AdPostModel(
+        //   id: '2',
+        //   title: 'Logo Branding & Style Guide',
+        //   priceRange: '24,000 ج.م - 58,000 ج.م / project',
+        //   location: 'Remote',
+        //   imageUrl: 'https://picsum.photos/seed/logo/200/200',
+        // ),
+        // AdPostModel(
+        //   id: '3',
+        //   title: 'React Component Library Development',
+        //   priceRange: 'EGP 2,900 / hr',
+        //   location: 'New York, NY',
+        //   imageUrl: 'https://picsum.photos/seed/react/200/200',
+        // ),
       ]);
     } on AppException catch (e) {
       return Failure(e);
@@ -73,7 +81,7 @@ class ProfileRepoImplementation extends ProfileRepo {
   }
 
   @override
-  Future<Result<List<AdPostModel>>> getActivityPosts() async {
+  Future<Result<List<AdModel>>> getActivityPosts() async {
     try {
       // TODO: replace with real activity feed query
       await Future.delayed(const Duration(milliseconds: 300));

@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:skillbridge/core/theme/app_colors.dart';
 import 'package:skillbridge/core/utils/helpers/snackbar_manger.dart';
-import 'package:skillbridge/features/profile/data/models/ad_post_model.dart';
+import 'package:skillbridge/features/home/data/ad_model.dart';
 import 'package:skillbridge/features/profile/presentation/viewmodel/profile_cubit.dart';
 import 'package:skillbridge/features/profile/presentation/widgets/post_card_widget.dart';
 import 'package:skillbridge/features/profile/presentation/widgets/profile_header_widget.dart';
@@ -210,7 +210,7 @@ class _ProfileScreenState extends State<ProfileScreen>
   // Posts List
   // ─────────────────────────────────────────────
 
-  Widget _buildPostsList(List<AdPostModel> posts) {
+  Widget _buildPostsList(List<AdModel> posts) {
     if (posts.isEmpty) {
       return Center(
         child: Text(

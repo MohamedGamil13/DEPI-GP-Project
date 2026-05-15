@@ -12,8 +12,8 @@ class ProfileLoading extends ProfileState {}
 /// Emitted when profile and posts are successfully loaded.
 class ProfileSuccess extends ProfileState {
   final UserProfileModel userProfile;
-  final List<AdPostModel> myPosts;
-  final List<AdPostModel> activityPosts;
+  final List<AdModel> myPosts;
+  final List<AdModel> activityPosts;
   final int selectedTabIndex;
 
   ProfileSuccess({
@@ -27,8 +27,8 @@ class ProfileSuccess extends ProfileState {
   /// Used when switching tabs without reloading profile data.
   ProfileSuccess copyWith({
     UserProfileModel? userProfile,
-    List<AdPostModel>? myPosts,
-    List<AdPostModel>? activityPosts,
+    List<AdModel>? myPosts,
+    List<AdModel>? activityPosts,
     int? selectedTabIndex,
   }) {
     return ProfileSuccess(
