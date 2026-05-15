@@ -5,19 +5,21 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:skillbridge/core/locator/service_locator.dart';
 import 'package:skillbridge/core/routing/app_navigator.dart';
 import 'package:skillbridge/core/theme/app_colors.dart';
 import 'package:skillbridge/core/utils/helpers/snackbar_manger.dart';
 import 'package:skillbridge/core/utils/validator/app_validator.dart';
+import 'package:skillbridge/features/auth/data/models/auth_user_model.dart';
 import 'package:skillbridge/features/auth/presentation/screens/widgets/field_label.dart';
 import 'package:skillbridge/features/auth/presentation/screens/widgets/primary_button.dart';
 import 'package:skillbridge/features/home/data/ad_model.dart';
-import 'package:skillbridge/features/post_ad/presentation/viewModel/ad_posting_cubit/ad_posting_cubit.dart';
-import 'package:skillbridge/features/post_ad/presentation/widgets/category_dropdown.dart';
-import 'package:skillbridge/features/post_ad/presentation/widgets/photo_upload_section.dart';
-import 'package:skillbridge/features/post_ad/presentation/widgets/post_ad_app_bar.dart';
-import 'package:skillbridge/features/post_ad/presentation/widgets/post_ad_text_field.dart';
-import 'package:skillbridge/features/post_ad/presentation/widgets/skills_section.dart';
+import 'package:skillbridge/features/posts/presentation/viewModel/ad_posting_cubit/ad_posting_cubit.dart';
+import 'package:skillbridge/features/posts/presentation/widgets/category_dropdown.dart';
+import 'package:skillbridge/features/posts/presentation/widgets/photo_upload_section.dart';
+import 'package:skillbridge/features/posts/presentation/widgets/post_ad_app_bar.dart';
+import 'package:skillbridge/features/posts/presentation/widgets/post_ad_text_field.dart';
+import 'package:skillbridge/features/posts/presentation/widgets/skills_section.dart';
 
 class PostAdScreen extends StatefulWidget {
   const PostAdScreen({super.key});
@@ -224,6 +226,7 @@ class _PostAdScreenState extends State<PostAdScreen> {
       category: category,
       relevantSkills: selectedSkills,
       adCity: _selectedCity, // FIX 2: comes directly from dropdown
+      userId: getIt<AuthUser>().uid,
     );
 
     await cubit.publishNewAd(adModel: ad);

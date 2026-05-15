@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:skillbridge/core/theme/app_colors.dart';
 import 'package:skillbridge/core/theme/app_styles.dart';
 import 'package:skillbridge/features/home/data/ad_model.dart';
-import 'package:skillbridge/features/post_ad/presentation/screens/widgets/category_tag.dart';
+import 'package:skillbridge/features/posts/presentation/screens/widgets/category_tag.dart';
 
 class InfoSection extends StatelessWidget {
   final AdModel ad;

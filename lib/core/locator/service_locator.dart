@@ -8,14 +8,16 @@ import 'package:skillbridge/core/services/firestore/firestore_repo.dart';
 import 'package:skillbridge/core/services/firestore/firestore_repo_service.dart';
 import 'package:skillbridge/core/services/storage/cloudinary_sotrage_service.dart';
 import 'package:skillbridge/core/services/storage/storage_service.dart';
+import 'package:skillbridge/features/auth/data/models/auth_user_model.dart';
 import 'package:skillbridge/features/auth/data/repos/auth_repo.dart';
 import 'package:skillbridge/features/auth/data/repos/auth_repo_implementation.dart';
 import 'package:skillbridge/features/auth/presentation/viewmodel/auth_cubit.dart';
 import 'package:skillbridge/features/home/presentation/cubits/home_cubit.dart';
 import 'package:skillbridge/features/messages/presentation/viewmodel/messages_cubit.dart';
-import 'package:skillbridge/features/post_ad/data/repos/post_ad_repo.dart';
-import 'package:skillbridge/features/post_ad/data/repos/post_ad_repo_impl.dart';
-import 'package:skillbridge/features/post_ad/presentation/viewModel/ad_posting_cubit/ad_posting_cubit.dart';
+import 'package:skillbridge/features/posts/data/repos/post_ad_repo.dart';
+import 'package:skillbridge/features/posts/data/repos/post_ad_repo_impl.dart';
+import 'package:skillbridge/features/posts/presentation/viewModel/ad_posting_cubit/ad_posting_cubit.dart';
+import 'package:skillbridge/features/profile/data/models/user_profile_model.dart';
 
 GetIt getIt =
     GetIt.instance; //take an intance from get_it => i use this package for DI
@@ -66,6 +68,12 @@ void setupLocator() {
     () => HomeCubit(
       firestoreService: getIt<StoreService>(),
     ), // review this line — use StoreService not FirestoreService
+  );
+  getIt.registerLazySingleton<AuthUser>(
+    () => AuthUser.fromFirebaseUser(FirebaseAuth.instance.currentUser!),
+  );
+  getIt.registerLazySingleton<UserProfileModel>(
+    () => UserProfileModel.fromAuthUser(getIt<AuthUser>()),
   );
 }
 

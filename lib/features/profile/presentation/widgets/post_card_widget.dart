@@ -1,19 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:skillbridge/core/theme/app_colors.dart';
-import 'package:skillbridge/features/profile/data/models/ad_post_model.dart';
+import 'package:skillbridge/features/home/data/ad_model.dart';
 
 /// A single ad/post card used in both "My Posts" and "Activity" tabs.
 /// Tappable — passes the post up to the cubit via [onTap].
 class PostCardWidget extends StatelessWidget {
-  final AdPostModel post;
+  final AdModel post;
   final VoidCallback onTap;
 
-  const PostCardWidget({
-    super.key,
-    required this.post,
-    required this.onTap,
-  });
+  const PostCardWidget({super.key, required this.post, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +36,7 @@ class PostCardWidget extends StatelessWidget {
             ClipRRect(
               borderRadius: BorderRadius.circular(12.r),
               child: Image.network(
-                post.imageUrl,
+                post.photos[0],
                 width: 90.w,
                 height: 90.h,
                 fit: BoxFit.cover,
@@ -104,7 +100,7 @@ class PostCardWidget extends StatelessWidget {
 
                   // ── Price range ──
                   Text(
-                    post.priceRange,
+                    post.price.toString(),
                     style: TextStyle(
                       fontSize: 12.sp,
                       color: AppColors.textMedium,
@@ -124,7 +120,7 @@ class PostCardWidget extends StatelessWidget {
                       SizedBox(width: 3.w),
                       Expanded(
                         child: Text(
-                          post.location,
+                          post.title,
                           style: TextStyle(
                             fontSize: 12.sp,
                             color: AppColors.secondaryColor,

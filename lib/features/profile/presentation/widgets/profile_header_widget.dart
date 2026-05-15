@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:intl/intl.dart';
 import 'package:skillbridge/core/theme/app_colors.dart';
 import 'package:skillbridge/features/profile/data/models/user_profile_model.dart';
 
@@ -67,10 +68,8 @@ class ProfileHeaderWidget extends StatelessWidget {
         ),
 
         SizedBox(height: 4.h),
-
-        // ── Member since ──
         Text(
-          'Member since ${profile.memberSince}',
+          'Member since ${DateFormat.yMMMM().format(profile.memberSince)}',
           style: TextStyle(
             fontSize: 13.sp,
             color: AppColors.primaryColor,

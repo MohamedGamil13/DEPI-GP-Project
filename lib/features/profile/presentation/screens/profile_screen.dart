@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:skillbridge/core/theme/app_colors.dart';
 import 'package:skillbridge/core/utils/helpers/snackbar_manger.dart';
-import 'package:skillbridge/features/profile/data/models/ad_post_model.dart';
+import 'package:skillbridge/features/home/data/ad_model.dart';
 import 'package:skillbridge/features/profile/presentation/viewmodel/profile_cubit.dart';
 import 'package:skillbridge/features/profile/presentation/widgets/post_card_widget.dart';
 import 'package:skillbridge/features/profile/presentation/widgets/profile_header_widget.dart';
@@ -160,7 +160,9 @@ class _ProfileScreenState extends State<ProfileScreen>
                 // ── Skills ──
                 Align(
                   alignment: Alignment.centerLeft,
-                  child: ProfileSkillsWidget(skills: state.userProfile.skills),
+                  child: ProfileSkillsWidget(
+                    skills: state.userProfile.skills ?? [],
+                  ),
                 ),
 
                 SizedBox(height: 24.h),
@@ -175,7 +177,7 @@ class _ProfileScreenState extends State<ProfileScreen>
           delegate: _StickyTabBarDelegate(
             TabBar(
               controller: _tabController,
-              onTap: context.read<ProfileCubit>().selectTab,
+              onTap: (number) {},
               indicatorColor: AppColors.primaryColor,
               indicatorWeight: 2.5,
               labelColor: AppColors.primaryColor,
@@ -210,7 +212,7 @@ class _ProfileScreenState extends State<ProfileScreen>
   // Posts List
   // ─────────────────────────────────────────────
 
-  Widget _buildPostsList(List<AdPostModel> posts) {
+  Widget _buildPostsList(List<AdModel> posts) {
     if (posts.isEmpty) {
       return Center(
         child: Text(
@@ -252,7 +254,7 @@ class _ProfileScreenState extends State<ProfileScreen>
           ),
           SizedBox(height: 16.h),
           ElevatedButton(
-            onPressed: () => context.read<ProfileCubit>().loadProfile(),
+            onPressed: () {},
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primaryColor,
               shape: RoundedRectangleBorder(

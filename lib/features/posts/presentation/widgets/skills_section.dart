@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:skillbridge/features/post_ad/data/models/skill_tag.dart';
-import 'package:skillbridge/features/post_ad/presentation/widgets/skill_chip.dart';
+import 'package:skillbridge/features/posts/data/models/skill_tag.dart';
+import 'package:skillbridge/features/posts/presentation/widgets/skill_chip.dart';
 
 /// Wrapping row of skill chips.
 /// Receives the skill list and toggle callback from the screen.
