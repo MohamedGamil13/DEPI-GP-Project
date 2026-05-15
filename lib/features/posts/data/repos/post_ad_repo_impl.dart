@@ -8,6 +8,7 @@ import 'package:skillbridge/core/services/storage/storage_service.dart';
 import 'package:skillbridge/core/utils/validator/result.dart';
 import 'package:skillbridge/features/home/data/ad_model.dart';
 import 'package:skillbridge/features/posts/data/repos/post_ad_repo.dart';
+import 'package:skillbridge/features/profile/data/models/user_profile_model.dart';
 
 class PostAdRepoImplementation implements PostAdRepo {
   final StoreService _firestoreRepo;
@@ -49,5 +50,9 @@ class PostAdRepoImplementation implements PostAdRepo {
         ),
       );
     }
+  }
+
+  Future<Result<UserProfileModel>> getUserDataById(String id) async {
+    return await _firestoreRepo.getUserById(id);
   }
 }

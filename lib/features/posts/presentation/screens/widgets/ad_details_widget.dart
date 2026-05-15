@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:skillbridge/core/routing/app_navigator.dart';
@@ -6,6 +5,7 @@ import 'package:skillbridge/core/theme/app_colors.dart';
 import 'package:skillbridge/core/utils/helpers/snackbar_manger.dart';
 import 'package:skillbridge/core/widgets/ad_image_widget.dart';
 import 'package:skillbridge/features/posts/presentation/viewModel/call_cubit/call_cubit.dart';
+import 'package:skillbridge/features/posts/presentation/viewModel/user_data_cubit/user_data_cubit.dart';
 
 class AdImageHeader extends StatelessWidget {
   const AdImageHeader({
@@ -72,11 +72,14 @@ class AdImageHeader extends StatelessWidget {
 }
 
 class SellerCard extends StatelessWidget {
-  const SellerCard({super.key});
+  final String authorId;
+
+  const SellerCard({super.key, required this.authorId});
 
   @override
   Widget build(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser;
+    context.read<UserDataCubit>().fetchUserData(authorId);
+
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -84,42 +87,62 @@ class SellerCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.grey.shade200),
       ),
-      child: Row(
-        children: [
-          CircleAvatar(
-            radius: 25,
-            backgroundImage: user?.photoURL != null
-                ? NetworkImage(user!.photoURL!)
-                : const NetworkImage(
-                    'https://tse4.mm.bing.net/th/id/OIP.FkQDxKdriMvRdcRm9X7ZFAHaHX?rs=1&pid=ImgDetMain&o=7&rm=3',
-                  ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      child: BlocBuilder<UserDataCubit, UserDataState>(
+        builder: (context, state) {
+          if (state is UserDataLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (state is UserDataFailure) {
+            return Center(child: Text(state.errMessage));
+          }
+
+          if (state is UserDataSuccess) {
+            final user = state.user;
+            return Row(
               children: [
-                Text(
-                  user?.displayName ?? 'NoUserName',
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
+                CircleAvatar(
+                  radius: 25,
+                  backgroundImage: NetworkImage(user.avatarUrl),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        user.name,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.star,
+                            color: Colors.orange,
+                            size: 16,
+                          ),
+                          Text(
+                            " ${user.rating} (${user.reviews} reviews)",
+                            style: const TextStyle(color: Colors.grey),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
-                const Row(
-                  children: [
-                    Icon(Icons.star, color: Colors.orange, size: 16),
-                    Text(
-                      " 4.9 (124 reviews)",
-                      style: TextStyle(color: Colors.grey),
-                    ),
-                  ],
+                OutlinedButton(
+                  onPressed: () {},
+                  child: const Text("View Profile"),
                 ),
               ],
-            ),
-          ),
-          OutlinedButton(onPressed: () {}, child: const Text("View Profile")),
-        ],
+            );
+          }
+
+          return const SizedBox();
+        },
       ),
     );
   }

@@ -18,7 +18,7 @@ class ContentSection extends StatelessWidget {
         children: [
           // InfoSection(ad: ad),
           const SizedBox(height: 20),
-          const SellerCard(),
+          SellerCard(authorId: ad.userId),
           const SizedBox(height: 24),
           _DescriptionSection(description: ad.description),
           const SizedBox(height: 24),

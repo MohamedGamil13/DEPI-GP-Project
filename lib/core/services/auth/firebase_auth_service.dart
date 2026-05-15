@@ -102,7 +102,13 @@ class FirebaseAuthService implements AuthService {
         );
       }
 
-      return _mapUser(user);
+      final authUser = _mapUser(user);
+
+      if (userCredential.additionalUserInfo?.isNewUser ?? false) {
+        await service.saveUserData(UserProfileModel.fromAuthUser(authUser));
+      }
+
+      return authUser;
     } on FirebaseAuthException catch (e) {
       throw _mapException(e);
     } catch (e) {
@@ -168,3 +174,58 @@ class FirebaseAuthService implements AuthService {
   }
 }
   //reviewed
+
+  // @override
+  // Future<AuthUser> signInWithGoogle() async {
+  //   try {
+  //     final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+
+  //     if (googleUser == null) {
+  //       throw const UnknownAuthException(
+  //         code: 'sign-in-cancelled',
+  //         message: 'Sign in was cancelled by the user.',
+  //       );
+  //     }
+
+  //     final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+
+  //     final OAuthCredential credential = GoogleAuthProvider.credential(
+  //       accessToken: googleAuth.accessToken,
+  //       idToken: googleAuth.idToken,
+  //     );
+
+  //     final UserCredential userCredential = await _auth.signInWithCredential(
+  //       credential,
+  //     );
+
+  //     final user = userCredential.user;
+
+  //     if (user == null) {
+  //       throw const UnknownAuthException(
+  //         code: 'user-not-found',
+  //         message: 'Failed to retrieve user information from Firebase.',
+  //       );
+  //     }
+
+  //     // --- التعديل هنا ---
+  //     final authUser = _mapUser(user);
+
+  //     // بنشيك لو اليوزر ده لسه عامل حساب جديد حالا عن طريق جوجل
+  //     if (userCredential.additionalUserInfo?.isNewUser ?? false) {
+  //       // بنحول الـ AuthUser لـ UserProfileModel ونخزنه في Firestore
+  //       await service.saveUserData(UserProfileModel.fromAuthUser(authUser));
+  //     }
+  //     // ------------------
+
+  //     return authUser;
+  //   } on FirebaseAuthException catch (e) {
+  //     throw _mapException(e);
+  //   } catch (e) {
+  //     if (e is AuthException) rethrow;
+
+  //     throw UnknownAuthException(
+  //       code: 'google-sign-in-error',
+  //       message: e.toString(),
+  //     );
+  //   }
+  // }
