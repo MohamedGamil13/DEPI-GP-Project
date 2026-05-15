@@ -2,14 +2,17 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:skillbridge/core/errors/auth_exception.dart';
 import 'package:skillbridge/core/services/auth/auth_service.dart';
+import 'package:skillbridge/core/services/firestore/firestore_repo.dart';
 import 'package:skillbridge/core/utils/validator/app_validator.dart';
 import 'package:skillbridge/features/auth/data/models/auth_user_model.dart';
+import 'package:skillbridge/features/profile/data/models/user_profile_model.dart';
 
 class FirebaseAuthService implements AuthService {
   final FirebaseAuth _auth;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final StoreService service;
 
-  FirebaseAuthService(this._auth);
+  FirebaseAuthService(this._auth, {required this.service});
 
   @override
   Stream<AuthUser?> get authStateChanges => _auth.authStateChanges().map(
@@ -35,10 +38,10 @@ class FirebaseAuthService implements AuthService {
         email: email.trim(),
         password: password,
       );
-
       await credential.user?.sendEmailVerification();
-
-      return _mapUser(credential.user!);
+      AuthUser tempUser = _mapUser(credential.user!);
+      await service.saveUserData(UserProfileModel.fromAuthUser(tempUser));
+      return tempUser;
     } on FirebaseAuthException catch (e) {
       throw _mapException(e);
     }
@@ -60,7 +63,6 @@ class FirebaseAuthService implements AuthService {
         await _auth.signOut();
         throw const UnverifiedEmailException();
       }
-
       return _mapUser(user);
     } on FirebaseAuthException catch (e) {
       throw _mapException(e);
@@ -100,7 +102,13 @@ class FirebaseAuthService implements AuthService {
         );
       }
 
-      return _mapUser(user);
+      final authUser = _mapUser(user);
+
+      if (userCredential.additionalUserInfo?.isNewUser ?? false) {
+        await service.saveUserData(UserProfileModel.fromAuthUser(authUser));
+      }
+
+      return authUser;
     } on FirebaseAuthException catch (e) {
       throw _mapException(e);
     } catch (e) {
@@ -135,13 +143,7 @@ class FirebaseAuthService implements AuthService {
     }
   }
 
-  AuthUser _mapUser(User user) => AuthUser(
-    uid: user.uid,
-    email: user.email,
-    isEmailVerified: user.emailVerified,
-    displayName: user.displayName,
-    photoUrl: user.photoURL,
-  );
+  AuthUser _mapUser(User user) => AuthUser.fromFirebaseUser(user);
 
   void _validateInputs(String email, String password) {
     if (email.trim().isEmpty || password.isEmpty) {
@@ -172,3 +174,58 @@ class FirebaseAuthService implements AuthService {
   }
 }
   //reviewed
+
+  // @override
+  // Future<AuthUser> signInWithGoogle() async {
+  //   try {
+  //     final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+
+  //     if (googleUser == null) {
+  //       throw const UnknownAuthException(
+  //         code: 'sign-in-cancelled',
+  //         message: 'Sign in was cancelled by the user.',
+  //       );
+  //     }
+
+  //     final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+
+  //     final OAuthCredential credential = GoogleAuthProvider.credential(
+  //       accessToken: googleAuth.accessToken,
+  //       idToken: googleAuth.idToken,
+  //     );
+
+  //     final UserCredential userCredential = await _auth.signInWithCredential(
+  //       credential,
+  //     );
+
+  //     final user = userCredential.user;
+
+  //     if (user == null) {
+  //       throw const UnknownAuthException(
+  //         code: 'user-not-found',
+  //         message: 'Failed to retrieve user information from Firebase.',
+  //       );
+  //     }
+
+  //     // --- التعديل هنا ---
+  //     final authUser = _mapUser(user);
+
+  //     // بنشيك لو اليوزر ده لسه عامل حساب جديد حالا عن طريق جوجل
+  //     if (userCredential.additionalUserInfo?.isNewUser ?? false) {
+  //       // بنحول الـ AuthUser لـ UserProfileModel ونخزنه في Firestore
+  //       await service.saveUserData(UserProfileModel.fromAuthUser(authUser));
+  //     }
+  //     // ------------------
+
+  //     return authUser;
+  //   } on FirebaseAuthException catch (e) {
+  //     throw _mapException(e);
+  //   } catch (e) {
+  //     if (e is AuthException) rethrow;
+
+  //     throw UnknownAuthException(
+  //       code: 'google-sign-in-error',
+  //       message: e.toString(),
+  //     );
+  //   }
+  // }

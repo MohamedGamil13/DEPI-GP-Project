@@ -4,6 +4,7 @@ import 'package:skillbridge/core/services/firestore/firestore_repo.dart';
 import 'package:skillbridge/core/utils/constants/app_constants.dart';
 import 'package:skillbridge/core/utils/validator/result.dart';
 import 'package:skillbridge/features/home/data/ad_model.dart';
+import 'package:skillbridge/features/profile/data/models/user_profile_model.dart';
 
 class FirestoreService implements StoreService {
   final FirebaseFirestore db;
@@ -95,6 +96,45 @@ class FirestoreService implements StoreService {
       return const Success(null);
     } on FirebaseException catch (e) {
       throw _mapException(e);
+    }
+  }
+
+  @override
+  Future<Result<void>> saveUserData(UserProfileModel user) async {
+    try {
+      await db
+          .collection(AppConstants.userMetaDataCollection)
+          .doc(user.id)
+          .set(user.toJson());
+      return const Success(null);
+    } on FirebaseException catch (e) {
+      throw _mapException(e);
+    }
+  }
+
+  @override
+  Future<Result<UserProfileModel>> getUserById(String id) async {
+    try {
+      final DocumentSnapshot documentSnapshot = await db
+          .collection(AppConstants.userMetaDataCollection)
+          .doc(id)
+          .get();
+
+      if (documentSnapshot.exists && documentSnapshot.data() != null) {
+        final Map<String, dynamic> data =
+            documentSnapshot.data() as Map<String, dynamic>;
+        final UserProfileModel user = UserProfileModel.fromJson(data);
+
+        return Success(user);
+      } else {
+        throw DocumentNotFoundException();
+      }
+    } on FirebaseException catch (e) {
+      return Failure(_mapException(e));
+    } catch (e) {
+      return Failure(
+        UnknownDatabaseException(message: e.toString(), code: e.toString()),
+      );
     }
   }
 
