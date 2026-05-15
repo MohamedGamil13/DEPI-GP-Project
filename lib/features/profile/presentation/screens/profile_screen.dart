@@ -160,7 +160,9 @@ class _ProfileScreenState extends State<ProfileScreen>
                 // ── Skills ──
                 Align(
                   alignment: Alignment.centerLeft,
-                  child: ProfileSkillsWidget(skills: state.userProfile.skills),
+                  child: ProfileSkillsWidget(
+                    skills: state.userProfile.skills ?? [],
+                  ),
                 ),
 
                 SizedBox(height: 24.h),
@@ -175,7 +177,7 @@ class _ProfileScreenState extends State<ProfileScreen>
           delegate: _StickyTabBarDelegate(
             TabBar(
               controller: _tabController,
-              onTap: context.read<ProfileCubit>().selectTab,
+              onTap: (number) {},
               indicatorColor: AppColors.primaryColor,
               indicatorWeight: 2.5,
               labelColor: AppColors.primaryColor,
@@ -252,7 +254,7 @@ class _ProfileScreenState extends State<ProfileScreen>
           ),
           SizedBox(height: 16.h),
           ElevatedButton(
-            onPressed: () => context.read<ProfileCubit>().loadProfile(),
+            onPressed: () {},
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primaryColor,
               shape: RoundedRectangleBorder(

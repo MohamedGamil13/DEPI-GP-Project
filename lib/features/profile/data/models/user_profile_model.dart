@@ -1,15 +1,17 @@
-/// Represents the authenticated user's full profile data.
-/// [fromJson] maps directly to your backend API response fields.
+import 'package:skillbridge/core/utils/constants/app_images.dart';
+import 'package:skillbridge/features/auth/data/models/auth_user_model.dart';
+
 class UserProfileModel {
   final String id;
   final String name;
   final String memberSince;
   final String avatarUrl;
   final bool isVerified;
-  final double rating;
-  final int reviews;
-  final int postsCount;
-  final List<String> skills;
+  final List<String>? skills;
+  final String lastSignedIn;
+  final int? postsCount;
+  final int? reviews;
+  final double? rating;
 
   const UserProfileModel({
     required this.id,
@@ -17,35 +19,21 @@ class UserProfileModel {
     required this.memberSince,
     required this.avatarUrl,
     required this.isVerified,
-    required this.rating,
-    required this.reviews,
-    required this.postsCount,
-    required this.skills,
+    required this.lastSignedIn,
+    this.skills,
+    this.postsCount = 0,
+    this.rating = 0,
+    this.reviews = 0,
   });
 
-  factory UserProfileModel.fromJson(Map<String, dynamic> json) {
+  factory UserProfileModel.fromAuthUser(AuthUser user) {
     return UserProfileModel(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      memberSince: json['member_since'] as String,
-      avatarUrl: json['avatar_url'] as String,
-      isVerified: (json['is_verified'] as bool?) ?? false,
-      rating: (json['rating'] as num).toDouble(),
-      reviews: json['reviews'] as int,
-      postsCount: json['posts_count'] as int,
-      skills: List<String>.from(json['skills'] as List),
+      id: user.uid,
+      name: user.displayName ?? "No User Name Provided",
+      memberSince: user.creationTimestamp.toString(),
+      avatarUrl: user.photoUrl ?? AppImages.defalutPostImage,
+      isVerified: user.isEmailVerified,
+      lastSignedIn: user.lastSignedIn.toString(),
     );
   }
-
-  Map<String, dynamic> toJson() => {
-    'id': id,
-    'name': name,
-    'member_since': memberSince,
-    'avatar_url': avatarUrl,
-    'is_verified': isVerified,
-    'rating': rating,
-    'reviews': reviews,
-    'posts_count': postsCount,
-    'skills': skills,
-  };
 }
