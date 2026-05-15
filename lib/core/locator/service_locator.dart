@@ -31,7 +31,10 @@ void setupLocator() {
 
   // Services
   getIt.registerLazySingleton<AuthService>(
-    () => FirebaseAuthService(getIt<FirebaseAuth>()),
+    () => FirebaseAuthService(
+      getIt<FirebaseAuth>(),
+      service: getIt<StoreService>(),
+    ),
   );
   getIt.registerLazySingleton<StoreService>(
     () => FirestoreService(db: getIt<FirebaseFirestore>()),

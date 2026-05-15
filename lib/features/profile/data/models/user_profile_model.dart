@@ -36,4 +36,33 @@ class UserProfileModel {
       lastSignedIn: user.lastSignedIn.toString(),
     );
   }
+
+  factory UserProfileModel.fromJson(Map<String, dynamic> json) {
+    return UserProfileModel(
+      id: json['id'] ?? '',
+      name: json['name'] ?? '',
+      memberSince: DateTime.parse(json['memberSince']),
+      avatarUrl: json['avatarUrl'] ?? '',
+      isVerified: json['isVerified'] ?? false,
+      skills: json['skills'] != null ? List<String>.from(json['skills']) : null,
+      lastSignedIn: json['lastSignedIn'] ?? '',
+      postsCount: json['postsCount'] ?? 0,
+      reviews: json['reviews'] ?? 0,
+      rating: (json['rating'] ?? 0).toDouble(),
+    );
+  }
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'memberSince': memberSince.toIso8601String(),
+      'avatarUrl': avatarUrl,
+      'isVerified': isVerified,
+      'skills': skills,
+      'lastSignedIn': lastSignedIn,
+      'postsCount': postsCount,
+      'reviews': reviews,
+      'rating': rating,
+    };
+  }
 }
