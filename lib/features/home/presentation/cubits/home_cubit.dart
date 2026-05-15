@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:skillbridge/core/services/firestore/firestore_repo.dart';
 import 'package:skillbridge/core/utils/validator/result.dart';
@@ -25,8 +26,10 @@ class HomeCubit extends Cubit<HomeState> {
         case Failure<List<AdModel>>(:final exception):
           emit(HomeError(exception.message));
       }
+    } on FirebaseException catch (e) {
+      emit(HomeError('Something went wrong : ${e.toString()}'));
     } catch (e) {
-      emit(HomeError('Something went wrong: ${e.toString()}'));
+      emit(HomeError('Something went wrong : ${e.toString()}'));
     }
   }
 

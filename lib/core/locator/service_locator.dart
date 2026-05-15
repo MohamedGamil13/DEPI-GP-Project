@@ -72,8 +72,8 @@ void setupLocator() {
   getIt.registerLazySingleton<AuthUser>(
     () => AuthUser.fromFirebaseUser(FirebaseAuth.instance.currentUser!),
   );
-  getIt.registerSingleton<UserProfileModel>(
-    UserProfileModel.fromAuthUser(getIt<AuthUser>()),
+  getIt.registerLazySingleton<UserProfileModel>(
+    () => UserProfileModel.fromAuthUser(getIt<AuthUser>()),
   );
 }
 

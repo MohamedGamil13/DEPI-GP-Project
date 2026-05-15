@@ -11,6 +11,7 @@ class AdModel {
   final List<RelevantSkills>? relevantSkills;
   final AdCity adCity;
   final String? badge;
+  final String userId;
 
   AdModel({
     required this.title,
@@ -22,6 +23,7 @@ class AdModel {
     required this.relevantSkills,
     required this.adCity,
     required this.adID,
+    required this.userId,
     this.badge,
   });
   Map<String, dynamic> toJson() {
@@ -35,6 +37,7 @@ class AdModel {
       "category": category.name,
       "relevantSkills": relevantSkills?.map((skill) => skill.name).toList(),
       "adCity": adCity.name,
+      "UserId": userId,
     };
   }
 
@@ -59,6 +62,7 @@ class AdModel {
       category: category ?? this.category,
       relevantSkills: relevantSkills ?? this.relevantSkills,
       adCity: adCity ?? this.adCity,
+      userId: userId,
     );
   }
 
@@ -86,6 +90,7 @@ class AdModel {
         (e) => e.name == json['adCity'],
         orElse: () => AdCity.cairo,
       ),
+      userId: json["UserId"],
     );
   }
 }
