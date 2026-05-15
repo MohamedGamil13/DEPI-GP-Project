@@ -13,6 +13,7 @@ class ProfileRepoImplementation extends ProfileRepo {
       return Failure(e);
     }
   }
+}
 
   // @override
   // Future<Result<List<AdModel>>> getMyPosts() async {
@@ -58,4 +59,3 @@ class ProfileRepoImplementation extends ProfileRepo {
   //     return Failure(e);
   //   }
   // }
-}

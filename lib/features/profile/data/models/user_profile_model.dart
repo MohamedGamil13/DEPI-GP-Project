@@ -4,7 +4,7 @@ import 'package:skillbridge/features/auth/data/models/auth_user_model.dart';
 class UserProfileModel {
   final String id;
   final String name;
-  final String memberSince;
+  final DateTime memberSince;
   final String avatarUrl;
   final bool isVerified;
   final List<String>? skills;
@@ -30,7 +30,7 @@ class UserProfileModel {
     return UserProfileModel(
       id: user.uid,
       name: user.displayName ?? "No User Name Provided",
-      memberSince: user.creationTimestamp.toString(),
+      memberSince: user.creationTimestamp!,
       avatarUrl: user.photoUrl ?? AppImages.defalutPostImage,
       isVerified: user.isEmailVerified,
       lastSignedIn: user.lastSignedIn.toString(),

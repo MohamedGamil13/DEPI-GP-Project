@@ -48,6 +48,7 @@ dependencies:
   hive_ce_flutter: ^2.3.4
   image_picker: ^1.2.1
   url_launcher: ^6.3.2
+  intl: ^0.20.2
 
 dev_dependencies:
   build_runner: ^2.15.0
