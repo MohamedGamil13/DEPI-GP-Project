@@ -19,30 +19,29 @@ import 'package:skillbridge/features/posts/data/repos/post_ad_repo_impl.dart';
 import 'package:skillbridge/features/posts/presentation/viewModel/ad_posting_cubit/ad_posting_cubit.dart';
 import 'package:skillbridge/features/profile/data/models/user_profile_model.dart';
 
-GetIt getIt =
-    GetIt.instance; //take an intance from get_it => i use this package for DI
+GetIt getIt = GetIt.instance;
 
 void setupLocator() {
-  // Firebase instances
+  // ── Layer 1: Infrastructure ──────────────────────────────────────────────
   getIt.registerLazySingleton<FirebaseAuth>(() => FirebaseAuth.instance);
   getIt.registerLazySingleton<FirebaseFirestore>(
     () => FirebaseFirestore.instance,
   );
+  getIt.registerLazySingleton<Dio>(() => Dio());
 
-  // Services
+  // ── Layer 2: Services ────────────────────────────────────────────────────
+  // StoreService must come before AuthService (AuthService depends on it)
+  getIt.registerLazySingleton<StoreService>(
+    () => FirestoreService(db: getIt<FirebaseFirestore>()),
+  );
+
   getIt.registerLazySingleton<AuthService>(
     () => FirebaseAuthService(
       getIt<FirebaseAuth>(),
       service: getIt<StoreService>(),
     ),
   );
-  getIt.registerLazySingleton<StoreService>(
-    () => FirestoreService(db: getIt<FirebaseFirestore>()),
-  );
 
-  //dio
-  getIt.registerLazySingleton<Dio>(() => Dio());
-  //cloudinary
   getIt.registerLazySingleton<StorageService>(
     () => CloudinaryStorageService(
       cloudName: 'dfgogg7jk',
@@ -50,10 +49,11 @@ void setupLocator() {
     ),
   );
 
-  // Repos
+  // ── Layer 3: Repos ───────────────────────────────────────────────────────
   getIt.registerLazySingleton<AuthRepo>(
     () => AuthRepoImplementation(authService: getIt<AuthService>()),
   );
+
   getIt.registerLazySingleton<PostAdRepo>(
     () => PostAdRepoImplementation(
       firestoreRepo: getIt<StoreService>(),
@@ -61,24 +61,33 @@ void setupLocator() {
     ),
   );
 
-  // Cubits
+  // ── Layer 4: Cubits ──────────────────────────────────────────────────────
   getIt.registerFactory<AuthCubit>(() => AuthCubit(getIt<AuthRepo>()));
+
   getIt.registerFactory<AdPostingCubit>(
     () => AdPostingCubit(getIt<PostAdRepo>()),
   );
-  getIt.registerFactory<MessagesCubit>(() => MessagesCubit());
+
   getIt.registerFactory<HomeCubit>(
-    () => HomeCubit(
-      firestoreService: getIt<StoreService>(),
-    ), // review this line — use StoreService not FirestoreService
+    () => HomeCubit(firestoreService: getIt<StoreService>()),
   );
+
+  getIt.registerFactory<MessagesCubit>(() => MessagesCubit());
+}
+
+void registerUserAfterLogin() {
+  if (getIt.isRegistered<AuthUser>()) {
+    getIt.unregister<AuthUser>();
+  }
+  if (getIt.isRegistered<UserProfileModel>()) {
+    getIt.unregister<UserProfileModel>();
+  }
+
   getIt.registerLazySingleton<AuthUser>(
     () => AuthUser.fromFirebaseUser(FirebaseAuth.instance.currentUser!),
   );
+
   getIt.registerLazySingleton<UserProfileModel>(
     () => UserProfileModel.fromAuthUser(getIt<AuthUser>()),
   );
 }
-
-//our flow => auth methods(firebase or something else) >  AuthService(deal with any authsevice from any source) => Auth repo(deal with authService only) => Auth cubit(deal with repo only) => UI
-//and this flow will be implemented for any another service

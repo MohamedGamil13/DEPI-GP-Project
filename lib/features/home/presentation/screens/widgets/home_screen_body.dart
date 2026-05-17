@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lottie/lottie.dart';
+import 'package:skillbridge/core/utils/constants/app_images.dart';
 import 'package:skillbridge/features/home/presentation/cubits/home_cubit.dart';
 import 'package:skillbridge/features/home/presentation/screens/widgets/ad_list_section.dart';
 import 'package:skillbridge/features/home/presentation/screens/widgets/categories_section.dart';
@@ -57,7 +59,11 @@ class HomeScreenBody extends StatelessWidget {
     }
 
     if (state is HomeSuccess) {
-      return AdListSection(ads: state.posts);
+      return state.posts.isEmpty
+          ? SliverToBoxAdapter(
+              child: Lottie.asset(AppImages.noPostsFile, height: 320),
+            )
+          : AdListSection(ads: state.posts);
     }
 
     return SliverFillRemaining(

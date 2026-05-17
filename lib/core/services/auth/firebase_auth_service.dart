@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:logger/logger.dart';
 import 'package:skillbridge/core/errors/auth_exception.dart';
 import 'package:skillbridge/core/services/auth/auth_service.dart';
 import 'package:skillbridge/core/services/firestore/firestore_repo.dart';
@@ -11,6 +12,16 @@ class FirebaseAuthService implements AuthService {
   final FirebaseAuth _auth;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
   final StoreService service;
+
+  final Logger _logger = Logger(
+    printer: PrettyPrinter(
+      methodCount: 1,
+      errorMethodCount: 5,
+      lineLength: 80,
+      colors: true,
+      printEmojis: false,
+    ),
+  );
 
   FirebaseAuthService(this._auth, {required this.service});
 
@@ -30,8 +41,15 @@ class FirebaseAuthService implements AuthService {
     String? emailError = AppValidator.validateEmail(email);
 
     if (emailError != null) {
+      _logger.w("⚠️ Validation Failed: Invalid Email Format ($email)");
       throw const InvalidEmailException();
     }
+
+    _logger.i(
+      "===============  AUTH REQUEST ===============\n"
+      "ACTION: Register (Email & Password)\n"
+      "EMAIL: ${email.trim()}",
+    );
 
     try {
       final credential = await _auth.createUserWithEmailAndPassword(
@@ -41,8 +59,17 @@ class FirebaseAuthService implements AuthService {
       await credential.user?.sendEmailVerification();
       AuthUser tempUser = _mapUser(credential.user!);
       await service.saveUserData(UserProfileModel.fromAuthUser(tempUser));
+
+      _logger.i(
+        "===============  AUTH RESPONSE ===============\n"
+        "STATUS: Register Success \n"
+        "USER ID: ${tempUser.uid}\n"
+        "EMAIL: ${tempUser.email}",
+      );
+
       return tempUser;
     } on FirebaseAuthException catch (e) {
+      _logAuthError("Register Failed", e);
       throw _mapException(e);
     }
   }
@@ -50,6 +77,12 @@ class FirebaseAuthService implements AuthService {
   @override
   Future<AuthUser> signIn(String email, String password) async {
     _validateInputs(email, password);
+
+    _logger.i(
+      "===============  AUTH REQUEST ===============\n"
+      "ACTION: Sign In (Email & Password)\n"
+      "EMAIL: ${email.trim()}",
+    );
 
     try {
       final credential = await _auth.signInWithEmailAndPassword(
@@ -60,21 +93,39 @@ class FirebaseAuthService implements AuthService {
       final user = credential.user!;
 
       if (!user.emailVerified) {
+        _logger.w(" Sign In Blocked: Email not verified for ${user.email}");
         await _auth.signOut();
         throw const UnverifiedEmailException();
       }
-      return _mapUser(user);
+
+      final authUser = _mapUser(user);
+
+      _logger.i(
+        "===============  AUTH RESPONSE ===============\n"
+        "STATUS: Sign In Success \n"
+        "USER ID: ${authUser.uid}\n"
+        "EMAIL: ${authUser.email}",
+      );
+
+      return authUser;
     } on FirebaseAuthException catch (e) {
+      _logAuthError("Sign In Failed", e);
       throw _mapException(e);
     }
   }
 
   @override
   Future<AuthUser> signInWithGoogle() async {
+    _logger.i(
+      "===============  AUTH REQUEST ===============\n"
+      "ACTION: Google Sign In Initiated",
+    );
+
     try {
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
 
       if (googleUser == null) {
+        _logger.w(" Google Sign In Cancelled by user.");
         throw const UnknownAuthException(
           code: 'sign-in-cancelled',
           message: 'Sign in was cancelled by the user.',
@@ -92,10 +143,12 @@ class FirebaseAuthService implements AuthService {
       final UserCredential userCredential = await _auth.signInWithCredential(
         credential,
       );
-
       final user = userCredential.user;
 
       if (user == null) {
+        _logger.e(
+          " Google Sign In Error: Firebase User is null after credential sign in.",
+        );
         throw const UnknownAuthException(
           code: 'user-not-found',
           message: 'Failed to retrieve user information from Firebase.',
@@ -103,16 +156,33 @@ class FirebaseAuthService implements AuthService {
       }
 
       final authUser = _mapUser(user);
+      bool isNewUser = userCredential.additionalUserInfo?.isNewUser ?? false;
 
-      if (userCredential.additionalUserInfo?.isNewUser ?? false) {
+      if (isNewUser) {
+        _logger.i(" New Google User Detected! Saving profile to Firestore...");
         await service.saveUserData(UserProfileModel.fromAuthUser(authUser));
       }
 
+      _logger.i(
+        "===============  AUTH RESPONSE ===============\n"
+        "STATUS: Google Sign In Success \n"
+        "USER ID: ${authUser.uid}\n"
+        "EMAIL: ${authUser.email}\n"
+        "IS NEW USER: $isNewUser",
+      );
+
       return authUser;
     } on FirebaseAuthException catch (e) {
+      _logAuthError("Google Sign In Failed", e);
       throw _mapException(e);
     } catch (e) {
       if (e is AuthException) rethrow;
+
+      _logger.e(
+        "=============== UNKNOWN AUTH ERROR ===============\n"
+        "ACTION: Google Sign In Unexpected Crash\n"
+        "ERROR: $e",
+      );
 
       throw UnknownAuthException(
         code: 'google-sign-in-error',
@@ -123,9 +193,15 @@ class FirebaseAuthService implements AuthService {
 
   @override
   Future<void> signOut() async {
+    _logger.i(
+      "===============  AUTH REQUEST ===============\n"
+      "ACTION: Sign Out Called",
+    );
     try {
       await Future.wait([_auth.signOut(), _googleSignIn.signOut()]);
+      _logger.i(" Sign Out Success ");
     } on FirebaseAuthException catch (e) {
+      _logAuthError("Sign Out Failed", e);
       throw _mapException(e);
     }
   }
@@ -133,12 +209,21 @@ class FirebaseAuthService implements AuthService {
   @override
   Future<void> sendPasswordResetEmail(String email) async {
     if (email.trim().isEmpty) {
+      _logger.w(" Password Reset Failed: Email field is empty");
       throw const InvalidEmailException();
     }
 
+    _logger.i(
+      "===============  AUTH REQUEST ===============\n"
+      "ACTION: Send Password Reset Email\n"
+      "EMAIL: ${email.trim()}",
+    );
+
     try {
       await _auth.sendPasswordResetEmail(email: email.trim());
+      _logger.i(" Password Reset Email Sent Successfully ");
     } on FirebaseAuthException catch (e) {
+      _logAuthError("Password Reset Failed", e);
       throw _mapException(e);
     }
   }
@@ -147,8 +232,18 @@ class FirebaseAuthService implements AuthService {
 
   void _validateInputs(String email, String password) {
     if (email.trim().isEmpty || password.isEmpty) {
+      _logger.w(" Validation Failed: Email or Password field is empty");
       throw const InvalidEmailException();
     }
+  }
+
+  void _logAuthError(String action, FirebaseAuthException e) {
+    _logger.e(
+      "===============  FIREBASE AUTH ERROR ===============\n"
+      "ACTION: $action\n"
+      "CODE: ${e.code}\n"
+      "MESSAGE: ${e.message}",
+    );
   }
 
   AuthException _mapException(FirebaseAuthException e) {
@@ -161,11 +256,9 @@ class FirebaseAuthService implements AuthService {
         code: 'invalid-credential',
         message: 'Email or password is incorrect.',
       ),
-
       'invalid-email' => const InvalidEmailException(),
       'user-disabled' => const UserDisabledException(),
       'too-many-requests' => const TooManyRequestsException(),
-
       _ => UnknownAuthException(
         code: e.code,
         message: e.message ?? 'Unexpected authentication error.',
@@ -173,59 +266,3 @@ class FirebaseAuthService implements AuthService {
     };
   }
 }
-  //reviewed
-
-  // @override
-  // Future<AuthUser> signInWithGoogle() async {
-  //   try {
-  //     final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-
-  //     if (googleUser == null) {
-  //       throw const UnknownAuthException(
-  //         code: 'sign-in-cancelled',
-  //         message: 'Sign in was cancelled by the user.',
-  //       );
-  //     }
-
-  //     final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-
-  //     final OAuthCredential credential = GoogleAuthProvider.credential(
-  //       accessToken: googleAuth.accessToken,
-  //       idToken: googleAuth.idToken,
-  //     );
-
-  //     final UserCredential userCredential = await _auth.signInWithCredential(
-  //       credential,
-  //     );
-
-  //     final user = userCredential.user;
-
-  //     if (user == null) {
-  //       throw const UnknownAuthException(
-  //         code: 'user-not-found',
-  //         message: 'Failed to retrieve user information from Firebase.',
-  //       );
-  //     }
-
-  //     // --- التعديل هنا ---
-  //     final authUser = _mapUser(user);
-
-  //     // بنشيك لو اليوزر ده لسه عامل حساب جديد حالا عن طريق جوجل
-  //     if (userCredential.additionalUserInfo?.isNewUser ?? false) {
-  //       // بنحول الـ AuthUser لـ UserProfileModel ونخزنه في Firestore
-  //       await service.saveUserData(UserProfileModel.fromAuthUser(authUser));
-  //     }
-  //     // ------------------
-
-  //     return authUser;
-  //   } on FirebaseAuthException catch (e) {
-  //     throw _mapException(e);
-  //   } catch (e) {
-  //     if (e is AuthException) rethrow;
-
-  //     throw UnknownAuthException(
-  //       code: 'google-sign-in-error',
-  //       message: e.toString(),
-  //     );
-  //   }
-  // }

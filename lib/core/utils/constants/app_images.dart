@@ -5,5 +5,6 @@ abstract class AppImages {
   static const String homeClean = 'assets/images/home clean.jpg';
   static const String googleLogo = 'assets/images/google.png';
   static const String defalutPostImage = "assets/images/default_post_image.jpg";
+  static const String noPostsFile = "assets/images/Emptybox.json";
   AppImages._();
 }

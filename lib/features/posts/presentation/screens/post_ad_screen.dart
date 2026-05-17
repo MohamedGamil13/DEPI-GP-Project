@@ -34,12 +34,10 @@ class _PostAdScreenState extends State<PostAdScreen> {
   final _descriptionController = TextEditingController();
   final _priceController = TextEditingController();
 
-  // FIX 1: Drive category list directly from the enum
   static final List<String> _categories = AdCategories.values
       .map((e) => e.label)
       .toList();
 
-  // FIX 2: City is now a dropdown, not free text
   AdCity _selectedCity = AdCity.cairo;
 
   @override
@@ -92,7 +90,6 @@ class _PostAdScreenState extends State<PostAdScreen> {
                   ),
                   SizedBox(height: 18.h),
 
-                  // FIX 1: CategoryDropdown now uses enum-derived labels
                   const FieldLabel(label: 'Category'),
                   CategoryDropdown(
                     selectedCategory: state.selectedCategory,
@@ -140,7 +137,6 @@ class _PostAdScreenState extends State<PostAdScreen> {
                       ),
                       SizedBox(width: 14.w),
 
-                      // FIX 2: City is now a proper enum-driven dropdown
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -161,7 +157,6 @@ class _PostAdScreenState extends State<PostAdScreen> {
                   ),
                   SizedBox(height: 18.h),
 
-                  // FIX 3: SkillsSection now uses enum-backed tags (see cubit fix below)
                   const FieldLabel(label: 'Relevant Skills'),
                   SkillsSection(
                     skills: state.skills,
@@ -199,13 +194,11 @@ class _PostAdScreenState extends State<PostAdScreen> {
       return;
     }
 
-    // FIX 1: Match by label, not by name
     final AdCategories category = AdCategories.values.firstWhere(
       (e) => e.label == state.selectedCategory,
       orElse: () => AdCategories.services,
     );
 
-    // FIX 3: SkillTag.label now stores the enum name, so matching is exact
     final selectedSkills = state.skills
         .where((s) => s.isSelected)
         .map(
@@ -220,12 +213,12 @@ class _PostAdScreenState extends State<PostAdScreen> {
       adID: DateTime.now().millisecondsSinceEpoch,
       title: _titleController.text.trim(),
       description: _descriptionController.text.trim(),
-      city: _selectedCity.label, // human-readable string for display
-      photos: [], // will be replaced by repo after upload
+      city: _selectedCity.label,
+      photos: [],
       price: double.parse(_priceController.text.trim()),
       category: category,
       relevantSkills: selectedSkills,
-      adCity: _selectedCity, // FIX 2: comes directly from dropdown
+      adCity: _selectedCity,
       userId: getIt<AuthUser>().uid,
     );
 

@@ -14,8 +14,6 @@ class HomeCubit extends Cubit<HomeState> {
     : _firestoreService = firestoreService,
       super(HomeInitial());
 
-  //Fetch All Posts
-
   Future<void> getPosts() async {
     emit(HomeLoading());
     try {
