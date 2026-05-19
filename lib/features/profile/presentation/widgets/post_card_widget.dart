@@ -1,18 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:skillbridge/core/theme/app_colors.dart';
+import 'package:skillbridge/core/utils/constants/app_images.dart';
 import 'package:skillbridge/features/home/data/ad_model.dart';
 
 /// A single ad/post card used in both "My Posts" and "Activity" tabs.
-/// Tappable — passes the post up to the cubit via [onTap].
 class PostCardWidget extends StatelessWidget {
-  final AdModel post;
+  final AdModel? post;
   final VoidCallback onTap;
 
   const PostCardWidget({super.key, required this.post, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
+    // Resolve thumbnail: first photo if available, else default asset
+    final String thumbnail = (post?.photos.isNotEmpty == true)
+        ? post!.photos[0]
+        : AppImages.defalutPostImage;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -36,7 +41,7 @@ class PostCardWidget extends StatelessWidget {
             ClipRRect(
               borderRadius: BorderRadius.circular(12.r),
               child: Image.network(
-                post.photos[0],
+                thumbnail,
                 width: 90.w,
                 height: 90.h,
                 fit: BoxFit.cover,
@@ -61,22 +66,22 @@ class PostCardWidget extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // ── Optional badge ──
-                  if (post.badge != null) ...[
+                  if (post?.badge != null) ...[
                     Container(
                       padding: EdgeInsets.symmetric(
                         horizontal: 8.w,
                         vertical: 3.h,
                       ),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFD1FAE5), // light green
+                        color: const Color(0xFFD1FAE5),
                         borderRadius: BorderRadius.circular(6.r),
                       ),
                       child: Text(
-                        post.badge!,
+                        post!.badge!,
                         style: TextStyle(
                           fontSize: 10.sp,
                           fontWeight: FontWeight.w700,
-                          color: const Color(0xFF059669), // dark green
+                          color: const Color(0xFF059669),
                           letterSpacing: 0.5,
                         ),
                       ),
@@ -86,7 +91,7 @@ class PostCardWidget extends StatelessWidget {
 
                   // ── Title ──
                   Text(
-                    post.title,
+                    post?.title ?? 'Untitled',
                     style: TextStyle(
                       fontSize: 14.sp,
                       fontWeight: FontWeight.w700,
@@ -98,18 +103,21 @@ class PostCardWidget extends StatelessWidget {
 
                   SizedBox(height: 6.h),
 
-                  // ── Price range ──
+                  // ── Price ──
                   Text(
-                    post.price.toString(),
+                    post != null
+                        ? 'EGP ${post!.price.toStringAsFixed(0)}'
+                        : '—',
                     style: TextStyle(
                       fontSize: 12.sp,
-                      color: AppColors.textMedium,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.primaryColor,
                     ),
                   ),
 
                   SizedBox(height: 4.h),
 
-                  // ── Location ──
+                  // ── City ──
                   Row(
                     children: [
                       Icon(
@@ -120,7 +128,8 @@ class PostCardWidget extends StatelessWidget {
                       SizedBox(width: 3.w),
                       Expanded(
                         child: Text(
-                          post.title,
+                          // adCity.label gives the human-readable city name
+                          post?.adCity.label ?? 'Unknown location',
                           style: TextStyle(
                             fontSize: 12.sp,
                             color: AppColors.secondaryColor,
