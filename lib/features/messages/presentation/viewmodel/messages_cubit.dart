@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:skillbridge/features/home/data/ad_model.dart';
-import 'package:skillbridge/features/messages/data/models/chat_message.dart';
-import 'package:skillbridge/features/messages/data/models/service_conversation.dart';
+import 'package:skillbridge/features/messages/data/models/conversation_service.dart';
 
 part 'messages_state.dart';
 
@@ -13,12 +12,12 @@ class MessagesCubit extends Cubit<MessagesState> {
     emit(MessagesLoading());
     emit(
       MessagesLoaded(
-        conversations: List<ServiceConversation>.from(_seedConversations),
+        conversations: List<ConversationService>.from(_seedConversations),
       ),
     );
   }
 
-  void loadConversation(ServiceConversation conversation) {
+  void loadConversation(ConversationService conversation) {
     emit(
       MessagesLoaded(
         conversations: [conversation.copyWith(unreadCount: 0)],
@@ -70,16 +69,17 @@ class MessagesCubit extends Cubit<MessagesState> {
 
     emit(current.copyWith(isSendingMessage: true));
 
-    final message = ChatMessage(
-      id: DateTime.now().microsecondsSinceEpoch.toString(),
-      text: trimmedText,
-      sentAt: DateTime.now(),
-      isFromCurrentUser: true,
-    );
+    // final message = ChatMessage(
+    //   id: DateTime.now().microsecondsSinceEpoch.toString(),
+    //   text: trimmedText,
+    //   sentAt: DateTime.now(),
+    //   isFromCurrentUser: true,
+    // );
 
     final updatedConversation = current.activeConversation!.copyWith(
       status: ConversationStatus.active,
-      messages: [...current.activeConversation!.messages, message],
+      messages: [],
+      //  [...current.activeConversation!.messages, message]   ,
     );
 
     final updatedConversations = current.conversations
@@ -99,10 +99,10 @@ class MessagesCubit extends Cubit<MessagesState> {
     );
   }
 
-  List<ServiceConversation> _sortConversations(
-    List<ServiceConversation> conversations,
+  List<ConversationService> _sortConversations(
+    List<ConversationService> conversations,
   ) {
-    final sorted = List<ServiceConversation>.from(conversations);
+    final sorted = List<ConversationService>.from(conversations);
     sorted.sort((a, b) {
       final aTime =
           a.latestMessage?.sentAt ?? DateTime.fromMillisecondsSinceEpoch(0);
@@ -114,8 +114,8 @@ class MessagesCubit extends Cubit<MessagesState> {
   }
 }
 
-final List<ServiceConversation> _seedConversations = [
-  ServiceConversation(
+final List<ConversationService> _seedConversations = [
+  const ConversationService(
     id: 'conv-1',
     customerName: 'Lina Hassan',
     customerHandle: '@linah',
@@ -128,29 +128,29 @@ final List<ServiceConversation> _seedConversations = [
     unreadCount: 2,
     isOnline: true,
     messages: [
-      ChatMessage(
-        id: 'msg-1',
-        text: 'Hi, are you available to design a full logo package this week?',
-        sentAt: DateTime.now().subtract(const Duration(minutes: 18)),
-        isFromCurrentUser: false,
-        deliveryStatus: MessageDeliveryStatus.read,
-      ),
-      ChatMessage(
-        id: 'msg-2',
-        text: 'Yes, I can do that. Do you already have a style direction?',
-        sentAt: DateTime.now().subtract(const Duration(minutes: 12)),
-        isFromCurrentUser: true,
-        deliveryStatus: MessageDeliveryStatus.read,
-      ),
-      ChatMessage(
-        id: 'msg-3',
-        text: 'I want something clean and premium. Can I send references here?',
-        sentAt: DateTime.now().subtract(const Duration(minutes: 4)),
-        isFromCurrentUser: false,
-      ),
+      // ChatMessage(
+      //   id: 'msg-1',
+      //   text: 'Hi, are you available to design a full logo package this week?',
+      //   sentAt: DateTime.now().subtract(const Duration(minutes: 18)),
+      //   isFromCurrentUser: false,
+      //   deliveryStatus: MessageDeliveryStatus.read,
+      // ),
+      // ChatMessage(
+      //   id: 'msg-2',
+      //   text: 'Yes, I can do that. Do you already have a style direction?',
+      //   sentAt: DateTime.now().subtract(const Duration(minutes: 12)),
+      //   isFromCurrentUser: true,
+      //   deliveryStatus: MessageDeliveryStatus.read,
+      // ),
+      // ChatMessage(
+      //   id: 'msg-3',
+      //   text: 'I want something clean and premium. Can I send references here?',
+      //   sentAt: DateTime.now().subtract(const Duration(minutes: 4)),
+      //   isFromCurrentUser: false,
+      // ),
     ],
   ),
-  ServiceConversation(
+  const ConversationService(
     id: 'conv-2',
     customerName: 'Omar Nabil',
     customerHandle: '@omar_n',
@@ -162,24 +162,27 @@ final List<ServiceConversation> _seedConversations = [
     status: ConversationStatus.active,
     unreadCount: 0,
     isOnline: false,
-    messages: [
-      ChatMessage(
-        id: 'msg-4',
-        text: 'Can we lock our next session for Thursday at 7 PM?',
-        sentAt: DateTime.now().subtract(const Duration(hours: 3)),
-        isFromCurrentUser: false,
-        deliveryStatus: MessageDeliveryStatus.read,
-      ),
-      ChatMessage(
-        id: 'msg-5',
-        text: 'Thursday works. I will prepare the trigonometry worksheet.',
-        sentAt: DateTime.now().subtract(const Duration(hours: 2, minutes: 45)),
-        isFromCurrentUser: true,
-        deliveryStatus: MessageDeliveryStatus.read,
-      ),
-    ],
+    messages: [],
   ),
-  ServiceConversation(
+
+  // [
+  //   ChatMessage(
+  //     id: 'msg-4',
+  //     text: 'Can we lock our next session for Thursday at 7 PM?',
+  //     sentAt: DateTime.now().subtract(const Duration(hours: 3)),
+  //     isFromCurrentUser: false,
+  //     deliveryStatus: MessageDeliveryStatus.read,
+  //   ),
+  //   ChatMessage(
+  //     id: 'msg-5',
+  //     text: 'Thursday works. I will prepare the trigonometry worksheet.',
+  //     sentAt: DateTime.now().subtract(const Duration(hours: 2, minutes: 45)),
+  //     isFromCurrentUser: true,
+  //     deliveryStatus: MessageDeliveryStatus.read,
+  //   ),
+  // ],
+  //  ),
+  const ConversationService(
     id: 'conv-3',
     customerName: 'Mariam Adel',
     customerHandle: '@mariam.a',
@@ -192,16 +195,16 @@ final List<ServiceConversation> _seedConversations = [
     unreadCount: 1,
     isOnline: true,
     messages: [
-      ChatMessage(
-        id: 'msg-6',
-        text:
-            'I sent the building address. Waiting for your final confirmation.',
-        sentAt: DateTime.now().subtract(const Duration(days: 1, hours: 1)),
-        isFromCurrentUser: false,
-      ),
+      // ChatMessage(
+      //   id: 'msg-6',
+      //   text:
+      //       'I sent the building address. Waiting for your final confirmation.',
+      //   sentAt: DateTime.now().subtract(const Duration(days: 1, hours: 1)),
+      //   isFromCurrentUser: false,
+      // ),
     ],
   ),
-  ServiceConversation(
+  const ConversationService(
     id: 'conv-4',
     customerName: 'Youssef Samir',
     customerHandle: '@youssef',
@@ -214,13 +217,13 @@ final List<ServiceConversation> _seedConversations = [
     unreadCount: 0,
     isOnline: false,
     messages: [
-      ChatMessage(
-        id: 'msg-7',
-        text: 'Thanks again. The machine is running perfectly now.',
-        sentAt: DateTime.now().subtract(const Duration(days: 5)),
-        isFromCurrentUser: false,
-        deliveryStatus: MessageDeliveryStatus.read,
-      ),
+      // ChatMessage(
+      //   id: 'msg-7',
+      //   text: 'Thanks again. The machine is running perfectly now.',
+      //   sentAt: DateTime.now().subtract(const Duration(days: 5)),
+      //   isFromCurrentUser: false,
+      //   deliveryStatus: MessageDeliveryStatus.read,
+      // ),
     ],
   ),
 ];

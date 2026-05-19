@@ -5,7 +5,7 @@ enum ConversationStatus { newLead, active, waiting, archived }
 
 enum MessageFilter { all, newLeads, active, waiting, archived }
 
-class ServiceConversation {
+class ConversationService {
   final String id;
   final String customerName;
   final String customerHandle;
@@ -19,7 +19,7 @@ class ServiceConversation {
   final bool isOnline;
   final List<ChatMessage> messages;
 
-  const ServiceConversation({
+  const ConversationService({
     required this.id,
     required this.customerName,
     required this.customerHandle,
@@ -34,7 +34,7 @@ class ServiceConversation {
     required this.messages,
   });
 
-  ServiceConversation copyWith({
+  ConversationService copyWith({
     String? id,
     String? customerName,
     String? customerHandle,
@@ -48,7 +48,7 @@ class ServiceConversation {
     bool? isOnline,
     List<ChatMessage>? messages,
   }) {
-    return ServiceConversation(
+    return ConversationService(
       id: id ?? this.id,
       customerName: customerName ?? this.customerName,
       customerHandle: customerHandle ?? this.customerHandle,

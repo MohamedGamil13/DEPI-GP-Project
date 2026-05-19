@@ -12,8 +12,6 @@ import 'package:skillbridge/features/auth/presentation/viewmodel/auth_cubit.dart
 import 'package:skillbridge/features/home/data/ad_model.dart';
 import 'package:skillbridge/features/home/presentation/cubits/home_cubit.dart';
 import 'package:skillbridge/features/home/presentation/screens/home_screen.dart';
-import 'package:skillbridge/features/messages/data/models/service_conversation.dart';
-import 'package:skillbridge/features/messages/presentation/screens/chat_detail_screen.dart';
 import 'package:skillbridge/features/messages/presentation/screens/messages_screen.dart';
 import 'package:skillbridge/features/messages/presentation/viewmodel/messages_cubit.dart';
 import 'package:skillbridge/features/posts/data/repos/post_ad_repo.dart';
@@ -115,24 +113,24 @@ final GoRouter router = GoRouter(
     ),
 
     // == Chat Detail ==
-    GoRoute(
-      path: AppScreens.chatDetailScreen,
-      builder: (context, state) {
-        final conversation = state.extra;
+    // GoRoute(
+    //   path: AppScreens.chatDetailScreen,
+    //   builder: (context, state) {
+    //     final conversation = state.extra;
 
-        if (conversation is! ServiceConversation) {
-          return const Scaffold(
-            body: Center(child: Text('Conversation unavailable')),
-          );
-        }
+    //     if (conversation is! ServiceConversation) {
+    //       return const Scaffold(
+    //         body: Center(child: Text('Conversation unavailable')),
+    //       );
+    //     }
 
-        return BlocProvider(
-          create: (context) =>
-              getIt<MessagesCubit>()..loadConversation(conversation),
-          child: const ChatDetailScreen(),
-        );
-      },
-    ),
+    //     return BlocProvider(
+    //       create: (context) =>
+    //           getIt<MessagesCubit>()..loadConversation(conversation),
+    //       child: const ChatDetailScreen(),
+    //     );
+    //   },
+    // ),
     GoRoute(
       path: AppScreens.adDetailsScreen,
       builder: (context, state) {

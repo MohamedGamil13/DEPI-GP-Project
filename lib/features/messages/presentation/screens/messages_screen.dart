@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:skillbridge/core/routing/app_navigator.dart';
 import 'package:skillbridge/core/theme/app_colors.dart';
 import 'package:skillbridge/core/theme/app_styles.dart';
-import 'package:skillbridge/features/messages/data/models/service_conversation.dart';
+import 'package:skillbridge/features/messages/data/models/conversation_service.dart';
 import 'package:skillbridge/features/messages/presentation/viewmodel/messages_cubit.dart';
 
 class MessagesScreen extends StatelessWidget {
@@ -192,7 +192,7 @@ class _FilterChip extends StatelessWidget {
 }
 
 class _ConversationCard extends StatelessWidget {
-  final ServiceConversation conversation;
+  final ConversationService conversation;
   final VoidCallback onTap;
 
   const _ConversationCard({required this.conversation, required this.onTap});

@@ -8,7 +8,7 @@ final class MessagesInitial extends MessagesState {}
 final class MessagesLoading extends MessagesState {}
 
 final class MessagesLoaded extends MessagesState {
-  final List<ServiceConversation> conversations;
+  final List<ConversationService> conversations;
   final MessageFilter selectedFilter;
   final String searchQuery;
   final String? activeConversationId;
@@ -23,7 +23,7 @@ final class MessagesLoaded extends MessagesState {
   });
 
   MessagesLoaded copyWith({
-    List<ServiceConversation>? conversations,
+    List<ConversationService>? conversations,
     MessageFilter? selectedFilter,
     String? searchQuery,
     String? activeConversationId,
@@ -38,7 +38,7 @@ final class MessagesLoaded extends MessagesState {
     );
   }
 
-  List<ServiceConversation> get visibleConversations {
+  List<ConversationService> get visibleConversations {
     final query = searchQuery.trim().toLowerCase();
 
     return conversations.where((conversation) {
@@ -64,7 +64,7 @@ final class MessagesLoaded extends MessagesState {
     }).toList();
   }
 
-  ServiceConversation? get activeConversation {
+  ConversationService? get activeConversation {
     if (activeConversationId == null) return null;
     for (final conversation in conversations) {
       if (conversation.id == activeConversationId) return conversation;
