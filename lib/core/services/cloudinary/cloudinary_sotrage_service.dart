@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:skillbridge/core/errors/storage_exception.dart';
-import 'package:skillbridge/core/services/storage/storage_service.dart';
+import 'package:skillbridge/core/services/cloudinary/storage_service.dart';
 import 'package:skillbridge/core/utils/validator/result.dart';
 
 class CloudinaryStorageService implements StorageService {

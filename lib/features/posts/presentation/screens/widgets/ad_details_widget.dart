@@ -153,61 +153,64 @@ class ContactButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: Colors.grey.shade200)),
-      ),
-      child: Row(
-        children: [
-          BlocConsumer<CallCubit, CallState>(
-            builder: (context, state) {
-              if (state is CallLoading) {
-                return const CircularProgressIndicator(
-                  color: AppColors.primaryColor,
-                );
-              }
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 32.0),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border(top: BorderSide(color: Colors.grey.shade200)),
+        ),
+        child: Row(
+          children: [
+            BlocConsumer<CallCubit, CallState>(
+              builder: (context, state) {
+                if (state is CallLoading) {
+                  return const CircularProgressIndicator(
+                    color: AppColors.primaryColor,
+                  );
+                }
 
-              return Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: () {
-                    context.read<CallCubit>().call('01102535450');
-                  },
-                  icon: const Icon(Icons.call),
-                  label: const Text("Call"),
-                  style: OutlinedButton.styleFrom(
-                    minimumSize: const Size(0, 50),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                return Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () {
+                      context.read<CallCubit>().call('01102535450');
+                    },
+                    icon: const Icon(Icons.call),
+                    label: const Text("Call"),
+                    style: OutlinedButton.styleFrom(
+                      minimumSize: const Size(0, 50),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                   ),
-                ),
-              );
-            },
-            listener: (context, state) {
-              if (state is CallFailure) {
-                AppSnackBar.error(context, state.errMessage);
-              }
-            },
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: ElevatedButton.icon(
-              onPressed: () {},
-              icon: const Icon(Icons.chat),
-              label: const Text("WhatsApp"),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
-                foregroundColor: Colors.white,
-                minimumSize: const Size(0, 50),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                );
+              },
+              listener: (context, state) {
+                if (state is CallFailure) {
+                  AppSnackBar.error(context, state.errMessage);
+                }
+              },
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: ElevatedButton.icon(
+                onPressed: () {},
+                icon: const Icon(Icons.chat),
+                label: const Text("WhatsApp"),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
+                  minimumSize: const Size(0, 50),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

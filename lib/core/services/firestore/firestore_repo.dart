@@ -10,6 +10,7 @@ abstract interface class StoreService {
   Future<Result<AdModel>> searchForPost(String title);
   Future<Result<void>> saveUserData(UserProfileModel user);
   Future<Result<UserProfileModel>> getUserById(String id);
+  Future<Result<List<AdModel>>> getCurrentUserPosts();
 }
 
   // Future<Result<List<AdModel>>> ();

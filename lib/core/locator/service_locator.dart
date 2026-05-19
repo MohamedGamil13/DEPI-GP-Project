@@ -4,10 +4,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
 import 'package:skillbridge/core/services/auth/auth_service.dart';
 import 'package:skillbridge/core/services/auth/firebase_auth_service.dart';
+import 'package:skillbridge/core/services/cloudinary/cloudinary_sotrage_service.dart';
+import 'package:skillbridge/core/services/cloudinary/storage_service.dart';
 import 'package:skillbridge/core/services/firestore/firestore_repo.dart';
 import 'package:skillbridge/core/services/firestore/firestore_repo_service.dart';
-import 'package:skillbridge/core/services/storage/cloudinary_sotrage_service.dart';
-import 'package:skillbridge/core/services/storage/storage_service.dart';
 import 'package:skillbridge/features/auth/data/models/auth_user_model.dart';
 import 'package:skillbridge/features/auth/data/repos/auth_repo.dart';
 import 'package:skillbridge/features/auth/data/repos/auth_repo_implementation.dart';
@@ -73,16 +73,6 @@ void setupLocator() {
   );
 
   getIt.registerFactory<MessagesCubit>(() => MessagesCubit());
-}
-
-void registerUserAfterLogin() {
-  if (getIt.isRegistered<AuthUser>()) {
-    getIt.unregister<AuthUser>();
-  }
-  if (getIt.isRegistered<UserProfileModel>()) {
-    getIt.unregister<UserProfileModel>();
-  }
-
   getIt.registerLazySingleton<AuthUser>(
     () => AuthUser.fromFirebaseUser(FirebaseAuth.instance.currentUser!),
   );

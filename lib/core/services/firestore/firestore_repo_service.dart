@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:skillbridge/core/errors/database_exception.dart';
+import 'package:skillbridge/core/locator/service_locator.dart';
 import 'package:skillbridge/core/services/firestore/firestore_repo.dart';
 import 'package:skillbridge/core/utils/constants/app_constants.dart';
 import 'package:skillbridge/core/utils/validator/result.dart';
+import 'package:skillbridge/features/auth/data/models/auth_user_model.dart';
 import 'package:skillbridge/features/home/data/ad_model.dart';
 import 'package:skillbridge/features/profile/data/models/user_profile_model.dart';
 
@@ -19,8 +21,10 @@ class FirestoreService implements StoreService {
       final List<AdModel> allPosts = snapshot.docs
           .map((doc) => AdModel.fromJson(doc.data() as Map<String, dynamic>))
           .toList();
-
-      return Success(allPosts);
+      final List<AdModel> posts = allPosts
+          .where((post) => post.userId != getIt<AuthUser>().uid)
+          .toList();
+      return Success(posts);
     } on FirebaseException catch (e) {
       throw _mapException(e);
     }
@@ -135,6 +139,25 @@ class FirestoreService implements StoreService {
       return Failure(
         UnknownDatabaseException(message: e.toString(), code: e.toString()),
       );
+    }
+  }
+
+  @override
+  Future<Result<List<AdModel>>> getCurrentUserPosts() async {
+    try {
+      final QuerySnapshot snapshot = await db
+          .collection(AppConstants.adPostsCollection)
+          .get();
+
+      final List<AdModel> allPosts = snapshot.docs
+          .map((doc) => AdModel.fromJson(doc.data() as Map<String, dynamic>))
+          .toList();
+      final List<AdModel> currentUserPosts = allPosts
+          .where((post) => post.userId == getIt<AuthUser>().uid)
+          .toList();
+      return Success(currentUserPosts);
+    } on FirebaseException catch (e) {
+      throw _mapException(e);
     }
   }
 

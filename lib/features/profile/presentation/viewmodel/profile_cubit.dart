@@ -30,4 +30,16 @@ class ProfileCubit extends Cubit<ProfileState> {
         );
     }
   }
+
+  Future<void> loadCurrentUserPosts() async {
+    emit(ProfilePostsLoading());
+    final Result<List<AdModel>> result = await profileRepo
+        .getCurrentUserPosts();
+    switch (result) {
+      case Success<List<AdModel>>():
+        emit(ProfilePostsLoaded(posts: result.data));
+      case Failure<List<AdModel>>():
+        emit(ProfileError(message: result.exception.toString()));
+    }
+  }
 }
