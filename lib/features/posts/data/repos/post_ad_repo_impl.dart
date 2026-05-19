@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:skillbridge/core/errors/app_exception.dart';
 import 'package:skillbridge/core/errors/database_exception.dart';
 import 'package:skillbridge/core/errors/storage_exception.dart';
+import 'package:skillbridge/core/services/cloudinary/storage_service.dart';
 import 'package:skillbridge/core/services/firestore/firestore_repo.dart';
-import 'package:skillbridge/core/services/storage/storage_service.dart';
 import 'package:skillbridge/core/utils/validator/result.dart';
 import 'package:skillbridge/features/home/data/ad_model.dart';
 import 'package:skillbridge/features/posts/data/repos/post_ad_repo.dart';
@@ -52,6 +52,7 @@ class PostAdRepoImplementation implements PostAdRepo {
     }
   }
 
+  @override
   Future<Result<UserProfileModel>> getUserDataById(String id) async {
     return await _firestoreRepo.getUserById(id);
   }
