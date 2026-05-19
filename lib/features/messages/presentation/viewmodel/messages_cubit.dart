@@ -1,30 +1,46 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:skillbridge/features/home/data/ad_model.dart';
+import 'package:skillbridge/core/services/chat/chat_service.dart';
+import 'package:skillbridge/features/messages/data/models/chat_message.dart';
 import 'package:skillbridge/features/messages/data/models/conversation_model.dart';
 
 part 'messages_state.dart';
 
 class MessagesCubit extends Cubit<MessagesState> {
-  MessagesCubit() : super(MessagesInitial());
+  MessagesCubit({required IChatService chatService})
+    : _service = chatService,
+      super(MessagesInitial());
 
-  void loadInbox() {
+  final IChatService _service;
+
+  // Live subscriptions — cancelled on close()
+  StreamSubscription<List<ConversationModel>>? _conversationsSub;
+  StreamSubscription<List<ChatMessage>>? _messagesSub;
+
+  // ── Inbox ──────────────────────────────────────────────────────────────────
+
+  /// Subscribe to the user's inbox in real time.
+  void loadInbox(String userId) {
     emit(MessagesLoading());
-    emit(
-      MessagesLoaded(
-        conversations: List<ConversationModel>.from(_seedConversations),
-      ),
+
+    _conversationsSub?.cancel();
+    _conversationsSub = _service.watchConversations(userId).listen(
+      (conversations) {
+        final current = state;
+        if (current is MessagesLoaded) {
+          emit(current.copyWith(conversations: conversations));
+        } else {
+          emit(MessagesLoaded(conversations: conversations));
+        }
+      },
+      onError: (Object e) =>
+          emit(MessagesError('Failed to load inbox: ${e.toString()}')),
     );
   }
 
-  void loadConversation(ConversationModel conversation) {
-    emit(
-      MessagesLoaded(
-        conversations: [conversation.copyWith(unreadCount: 0)],
-        activeConversationId: conversation.id,
-      ),
-    );
-  }
+  // ── Filters & search ───────────────────────────────────────────────────────
 
   void selectFilter(MessageFilter filter) {
     final current = state;
@@ -38,16 +54,20 @@ class MessagesCubit extends Cubit<MessagesState> {
     emit(current.copyWith(searchQuery: query));
   }
 
-  void openConversation(String conversationId) {
+  // ── Open / close conversation ──────────────────────────────────────────────
+
+  /// Opens a conversation, marks messages as read, and subscribes to its
+  /// message stream so [activeConversation.messages] stays live.
+  Future<void> openConversation({
+    required String conversationId,
+    required String currentUserId,
+  }) async {
     final current = state;
     if (current is! MessagesLoaded) return;
 
+    // Optimistically zero the badge.
     final updatedConversations = current.conversations
-        .map(
-          (conversation) => conversation.id == conversationId
-              ? conversation.copyWith(unreadCount: 0)
-              : conversation,
-        )
+        .map((c) => c.id == conversationId ? c.copyWith(unreadCount: 0) : c)
         .toList();
 
     emit(
@@ -56,174 +76,108 @@ class MessagesCubit extends Cubit<MessagesState> {
         activeConversationId: conversationId,
       ),
     );
+
+    // Mark as read in Firestore (fire-and-forget).
+    _service
+        .markMessagesAsRead(
+          conversationId: conversationId,
+          currentUserId: currentUserId,
+        )
+        .ignore();
+
+    // Subscribe to live messages for this conversation.
+    _messagesSub?.cancel();
+    _messagesSub = _service
+        .watchMessages(conversationId)
+        .listen(
+          (messages) {
+            final s = state;
+            if (s is! MessagesLoaded) return;
+
+            final refreshed = s.conversations.map((c) {
+              return c.id == conversationId
+                  ? c.copyWith(messages: messages)
+                  : c;
+            }).toList();
+
+            emit(s.copyWith(conversations: refreshed));
+          },
+          onError: (Object e) {
+            // Non-fatal — just log; don't replace inbox state with an error.
+            debugPrint('Message stream error: $e');
+          },
+        );
   }
 
-  Future<void> sendMessage(String text) async {
+  void closeConversation() {
+    _messagesSub?.cancel();
+    _messagesSub = null;
+
+    final current = state;
+    if (current is! MessagesLoaded) return;
+    emit(current.copyWith(clearActiveConversation: true));
+  }
+
+  // ── Send ───────────────────────────────────────────────────────────────────
+
+  Future<void> sendMessage({
+    required String text,
+    required String senderId,
+  }) async {
     final current = state;
     if (current is! MessagesLoaded || current.activeConversation == null) {
       return;
     }
 
-    final trimmedText = text.trim();
-    if (trimmedText.isEmpty) return;
+    final trimmed = text.trim();
+    if (trimmed.isEmpty) return;
+
+    final conversation = current.activeConversation!;
 
     emit(current.copyWith(isSendingMessage: true));
 
-    // final message = ChatMessage(
-    //   id: DateTime.now().microsecondsSinceEpoch.toString(),
-    //   text: trimmedText,
-    //   sentAt: DateTime.now(),
-    //   isFromCurrentUser: true,
-    // );
-
-    final updatedConversation = current.activeConversation!.copyWith(
-      status: ConversationStatus.active,
-      messages: [],
-      //  [...current.activeConversation!.messages, message]   ,
-    );
-
-    final updatedConversations = current.conversations
-        .map(
-          (conversation) => conversation.id == updatedConversation.id
-              ? updatedConversation
-              : conversation,
-        )
-        .toList();
-
-    emit(
-      current.copyWith(
-        conversations: _sortConversations(updatedConversations),
-        activeConversationId: updatedConversation.id,
-        isSendingMessage: false,
-      ),
-    );
+    try {
+      await _service.sendMessage(
+        conversationId: conversation.id,
+        text: trimmed,
+        senderId: senderId,
+        receiverId: conversation.customerId,
+      );
+      // The message stream will push the new message automatically.
+    } on ChatServiceException catch (e) {
+      debugPrint('Send failed: $e');
+      // Restore non-sending state without showing a full error screen.
+    } finally {
+      final s = state;
+      if (s is MessagesLoaded) {
+        emit(s.copyWith(isSendingMessage: false));
+      }
+    }
   }
 
-  List<ConversationModel> _sortConversations(
-    List<ConversationModel> conversations,
-  ) {
-    final sorted = List<ConversationModel>.from(conversations);
-    sorted.sort((a, b) {
-      final aTime =
-          a.latestMessage?.sentAt ?? DateTime.fromMillisecondsSinceEpoch(0);
-      final bTime =
-          b.latestMessage?.sentAt ?? DateTime.fromMillisecondsSinceEpoch(0);
-      return bTime.compareTo(aTime);
-    });
-    return sorted;
+  // ── Conversation status ────────────────────────────────────────────────────
+
+  Future<void> updateStatus({
+    required String conversationId,
+    required ConversationStatus status,
+  }) async {
+    try {
+      await _service.updateConversationStatus(
+        conversationId: conversationId,
+        status: status,
+      );
+      // Stream will emit the update.
+    } on ChatServiceException catch (e) {
+      debugPrint('Status update failed: $e');
+    }
+  }
+
+  // ── Lifecycle ──────────────────────────────────────────────────────────────
+
+  @override
+  Future<void> close() {
+    _conversationsSub?.cancel();
+    _messagesSub?.cancel();
+    return super.close();
   }
 }
-
-final List<ConversationModel> _seedConversations = [
-  const ConversationModel(
-    id: 'conv-1',
-    customerName: 'Lina Hassan',
-    customerHandle: '@linah',
-    serviceTitle: 'Brand Identity Design',
-    serviceSummary: 'Logo package, brand colors, and social kit.',
-    serviceCategory: AdCategories.fashion,
-    serviceCity: AdCity.cairo,
-    servicePrice: 1200,
-    status: ConversationStatus.newLead,
-    unreadCount: 2,
-    isOnline: true,
-    messages: [
-      // ChatMessage(
-      //   id: 'msg-1',
-      //   text: 'Hi, are you available to design a full logo package this week?',
-      //   sentAt: DateTime.now().subtract(const Duration(minutes: 18)),
-      //   isFromCurrentUser: false,
-      //   deliveryStatus: MessageDeliveryStatus.read,
-      // ),
-      // ChatMessage(
-      //   id: 'msg-2',
-      //   text: 'Yes, I can do that. Do you already have a style direction?',
-      //   sentAt: DateTime.now().subtract(const Duration(minutes: 12)),
-      //   isFromCurrentUser: true,
-      //   deliveryStatus: MessageDeliveryStatus.read,
-      // ),
-      // ChatMessage(
-      //   id: 'msg-3',
-      //   text: 'I want something clean and premium. Can I send references here?',
-      //   sentAt: DateTime.now().subtract(const Duration(minutes: 4)),
-      //   isFromCurrentUser: false,
-      // ),
-    ],
-  ),
-  const ConversationModel(
-    id: 'conv-2',
-    customerName: 'Omar Nabil',
-    customerHandle: '@omar_n',
-    serviceTitle: 'Math Tutoring (K-12)',
-    serviceSummary: 'Weekly algebra and calculus support sessions.',
-    serviceCategory: AdCategories.education,
-    serviceCity: AdCity.giza,
-    servicePrice: 350,
-    status: ConversationStatus.active,
-    unreadCount: 0,
-    isOnline: false,
-    messages: [],
-  ),
-
-  // [
-  //   ChatMessage(
-  //     id: 'msg-4',
-  //     text: 'Can we lock our next session for Thursday at 7 PM?',
-  //     sentAt: DateTime.now().subtract(const Duration(hours: 3)),
-  //     isFromCurrentUser: false,
-  //     deliveryStatus: MessageDeliveryStatus.read,
-  //   ),
-  //   ChatMessage(
-  //     id: 'msg-5',
-  //     text: 'Thursday works. I will prepare the trigonometry worksheet.',
-  //     sentAt: DateTime.now().subtract(const Duration(hours: 2, minutes: 45)),
-  //     isFromCurrentUser: true,
-  //     deliveryStatus: MessageDeliveryStatus.read,
-  //   ),
-  // ],
-  //  ),
-  const ConversationModel(
-    id: 'conv-3',
-    customerName: 'Mariam Adel',
-    customerHandle: '@mariam.a',
-    serviceTitle: 'Deep Home Cleaning',
-    serviceSummary: 'One-time apartment deep clean with supplies included.',
-    serviceCategory: AdCategories.services,
-    serviceCity: AdCity.alexandria,
-    servicePrice: 900,
-    status: ConversationStatus.waiting,
-    unreadCount: 1,
-    isOnline: true,
-    messages: [
-      // ChatMessage(
-      //   id: 'msg-6',
-      //   text:
-      //       'I sent the building address. Waiting for your final confirmation.',
-      //   sentAt: DateTime.now().subtract(const Duration(days: 1, hours: 1)),
-      //   isFromCurrentUser: false,
-      // ),
-    ],
-  ),
-  const ConversationModel(
-    id: 'conv-4',
-    customerName: 'Youssef Samir',
-    customerHandle: '@youssef',
-    serviceTitle: 'Laptop Repair & Setup',
-    serviceSummary: 'Diagnostics, cleanup, and fresh software installation.',
-    serviceCategory: AdCategories.electronics,
-    serviceCity: AdCity.cairo,
-    servicePrice: 500,
-    status: ConversationStatus.active,
-    unreadCount: 0,
-    isOnline: false,
-    messages: [
-      // ChatMessage(
-      //   id: 'msg-7',
-      //   text: 'Thanks again. The machine is running perfectly now.',
-      //   sentAt: DateTime.now().subtract(const Duration(days: 5)),
-      //   isFromCurrentUser: false,
-      //   deliveryStatus: MessageDeliveryStatus.read,
-      // ),
-    ],
-  ),
-];

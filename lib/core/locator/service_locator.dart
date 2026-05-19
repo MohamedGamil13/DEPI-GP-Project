@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
 import 'package:skillbridge/core/services/auth/auth_service.dart';
 import 'package:skillbridge/core/services/auth/firebase_auth_service.dart';
+import 'package:skillbridge/core/services/chat/chat_service.dart';
 import 'package:skillbridge/core/services/cloudinary/cloudinary_sotrage_service.dart';
 import 'package:skillbridge/core/services/cloudinary/storage_service.dart';
 import 'package:skillbridge/core/services/firestore/firestore_repo.dart';
@@ -30,7 +31,6 @@ void setupLocator() {
   getIt.registerLazySingleton<Dio>(() => Dio());
 
   // ── Layer 2: Services ────────────────────────────────────────────────────
-  // StoreService must come before AuthService (AuthService depends on it)
   getIt.registerLazySingleton<StoreService>(
     () => FirestoreService(db: getIt<FirebaseFirestore>()),
   );
@@ -47,6 +47,11 @@ void setupLocator() {
       cloudName: 'dfgogg7jk',
       uploadPreset: 'ml_default',
     ),
+  );
+
+  // ChatService is a singleton — one Firestore connection shared app-wide.
+  getIt.registerLazySingleton<IChatService>(
+    () => ChatService(firestore: getIt<FirebaseFirestore>()),
   );
 
   // ── Layer 3: Repos ───────────────────────────────────────────────────────
@@ -72,7 +77,12 @@ void setupLocator() {
     () => HomeCubit(firestoreService: getIt<StoreService>()),
   );
 
-  getIt.registerFactory<MessagesCubit>(() => MessagesCubit());
+  // Factory so each route gets a fresh cubit with its own stream subscriptions.
+  // IChatService is a singleton so no duplicate Firestore listeners are opened.
+  getIt.registerFactory<MessagesCubit>(
+    () => MessagesCubit(chatService: getIt<IChatService>()),
+  );
+
   getIt.registerLazySingleton<AuthUser>(
     () => AuthUser.fromFirebaseUser(FirebaseAuth.instance.currentUser!),
   );

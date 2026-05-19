@@ -12,6 +12,8 @@ import 'package:skillbridge/features/auth/presentation/viewmodel/auth_cubit.dart
 import 'package:skillbridge/features/home/data/ad_model.dart';
 import 'package:skillbridge/features/home/presentation/cubits/home_cubit.dart';
 import 'package:skillbridge/features/home/presentation/screens/home_screen.dart';
+import 'package:skillbridge/features/messages/data/models/conversation_model.dart';
+import 'package:skillbridge/features/messages/presentation/screens/chat_detail_screen.dart';
 import 'package:skillbridge/features/messages/presentation/screens/messages_screen.dart';
 import 'package:skillbridge/features/messages/presentation/viewmodel/messages_cubit.dart';
 import 'package:skillbridge/features/posts/data/repos/post_ad_repo.dart';
@@ -35,118 +37,136 @@ final GoRouter router = GoRouter(
     // == Splash ==
     GoRoute(
       path: AppScreens.splashScreen,
-      builder: (context, state) {
-        return const SplashScreen();
-      },
+      builder: (context, state) => const SplashScreen(),
     ),
+
     // == Auth ==
     GoRoute(
       path: AppScreens.signinScreen,
-      builder: (context, state) {
-        return BlocProvider(
-          create: (context) => getIt<AuthCubit>(),
-          child: const SignInScreen(),
-        );
-      },
+      builder: (context, state) => BlocProvider(
+        create: (_) => getIt<AuthCubit>(),
+        child: const SignInScreen(),
+      ),
     ),
     GoRoute(
       path: AppScreens.signupScreen,
-      builder: (context, state) {
-        return BlocProvider(
-          create: (context) => getIt<AuthCubit>(),
-          child: const SignUpScreen(),
-        );
-      },
+      builder: (context, state) => BlocProvider(
+        create: (_) => getIt<AuthCubit>(),
+        child: const SignUpScreen(),
+      ),
     ),
     GoRoute(
       path: AppScreens.forgetPasswordScreen,
-      builder: (context, state) {
-        return BlocProvider(
-          create: (context) => getIt<AuthCubit>(),
-          child: const ForgotPasswordScreen(),
-        );
-      },
+      builder: (context, state) => BlocProvider(
+        create: (_) => getIt<AuthCubit>(),
+        child: const ForgotPasswordScreen(),
+      ),
     ),
 
     // == Home ==
     GoRoute(
       path: AppScreens.homeScreen,
-      builder: (context, state) {
-        return BlocProvider(
-          create: (context) => getIt<HomeCubit>()..getPosts(),
-          child: const HomeScreen(),
-        );
-      },
+      builder: (context, state) => BlocProvider(
+        create: (_) => getIt<HomeCubit>()..getPosts(),
+        child: const HomeScreen(),
+      ),
     ),
 
     // == Post Ad ==
     GoRoute(
       path: AppScreens.postAdScreen,
-      builder: (context, state) {
-        return BlocProvider(
-          create: (context) => getIt<AdPostingCubit>(),
-          child: const PostAdScreen(),
-        );
-      },
+      builder: (context, state) => BlocProvider(
+        create: (_) => getIt<AdPostingCubit>(),
+        child: const PostAdScreen(),
+      ),
     ),
 
     // == Profile ==
     GoRoute(
       path: AppScreens.profileScreen,
-      builder: (context, state) {
-        return BlocProvider(
-          create: (context) => ProfileCubit(ProfileRepoImplementation()),
-          child: const ProfileScreen(),
-        );
-      },
+      builder: (context, state) => BlocProvider(
+        create: (_) => ProfileCubit(ProfileRepoImplementation()),
+        child: const ProfileScreen(),
+      ),
     ),
 
     // == Messages ==
+    // MessagesScreen calls loadInbox(userId) itself in initState,
+    // so the cubit is provided here without triggering the load —
+    // this keeps the router free of auth state concerns.
     GoRoute(
       path: AppScreens.messagesScreen,
-      builder: (context, state) {
-        return BlocProvider(
-          create: (context) => getIt<MessagesCubit>()..loadInbox(),
-          child: const MessagesScreen(),
-        );
-      },
+      builder: (context, state) => BlocProvider(
+        create: (_) => getIt<MessagesCubit>(),
+        child: const MessagesScreen(),
+      ),
     ),
 
     // == Chat Detail ==
-    // GoRoute(
-    //   path: AppScreens.chatDetailScreen,
-    //   builder: (context, state) {
-    //     final conversation = state.extra;
-
-    //     if (conversation is! ServiceConversation) {
-    //       return const Scaffold(
-    //         body: Center(child: Text('Conversation unavailable')),
-    //       );
-    //     }
-
-    //     return BlocProvider(
-    //       create: (context) =>
-    //           getIt<MessagesCubit>()..loadConversation(conversation),
-    //       child: const ChatDetailScreen(),
-    //     );
-    //   },
-    // ),
+    // ChatDetailScreen reads the SAME MessagesCubit that MessagesScreen
+    // already populated (via BlocProvider.value from the parent route).
+    // A new cubit is only created as a fallback when navigating directly
+    // to this route (e.g. deep link / notification tap).
     GoRoute(
-      path: AppScreens.adDetailsScreen,
+      path: AppScreens.chatDetailScreen,
       builder: (context, state) {
-        return MultiBlocProvider(
-          providers: [
-            BlocProvider(create: (context) => CallCubit()),
-            BlocProvider(
-              create: (context) => UserDataCubit(getIt<PostAdRepo>()),
+        final conversation = state.extra;
+
+        if (conversation is! ConversationModel) {
+          return const Scaffold(
+            body: Center(child: Text('Conversation unavailable')),
+          );
+        }
+
+        // Try to reuse the parent inbox cubit if it's already in the tree.
+        // If not (direct deep-link), spin up a fresh one and open the
+        // conversation immediately.
+        final parentCubit = _tryReadCubit<MessagesCubit>(context);
+
+        if (parentCubit != null) {
+          // The cubit already has the conversation open (openConversation was
+          // called before pushing this route). Just share it downward.
+          return BlocProvider.value(
+            value: parentCubit,
+            child: const ChatDetailScreen(),
+          );
+        }
+
+        // Deep-link / notification path: create a fresh cubit and open the
+        // conversation so the message stream starts immediately.
+        return BlocProvider(
+          create: (_) => getIt<MessagesCubit>()
+            ..openConversation(
+              conversationId: conversation.id,
+              currentUserId: getIt<AuthService>().currentUser!.uid,
             ),
-          ],
-          child: AdDetailsScreen(ad: state.extra as AdModel),
+          child: const ChatDetailScreen(),
         );
       },
     ),
+
+    // == Ad Details ==
+    GoRoute(
+      path: AppScreens.adDetailsScreen,
+      builder: (context, state) => MultiBlocProvider(
+        providers: [
+          BlocProvider(create: (_) => CallCubit()),
+          BlocProvider(create: (_) => UserDataCubit(getIt<PostAdRepo>())),
+        ],
+        child: AdDetailsScreen(ad: state.extra as AdModel),
+      ),
+    ),
   ],
 );
+
+/// Safely tries to read [T] from the widget tree without throwing.
+T? _tryReadCubit<T extends Object>(BuildContext context) {
+  try {
+    return context.read<T>();
+  } catch (_) {
+    return null;
+  }
+}
 
 String? _redirect(BuildContext context, GoRouterState state) {
   final bool isLoggedIn = getIt<AuthService>().currentUser != null;
@@ -160,15 +180,8 @@ String? _redirect(BuildContext context, GoRouterState state) {
     AppScreens.forgetPasswordScreen,
   ].contains(state.matchedLocation);
 
-  // If user is NOT logged in and trying to access a protected route
-  if (!isLoggedIn && !isOnAuthRoute) {
-    return AppScreens.signinScreen;
-  }
-
-  // If user IS logged in and trying to access auth pages (sign in/up)
-  if (isLoggedIn && isOnAuthRoute) {
-    return AppScreens.homeScreen;
-  }
+  if (!isLoggedIn && !isOnAuthRoute) return AppScreens.signinScreen;
+  if (isLoggedIn && isOnAuthRoute) return AppScreens.homeScreen;
 
   return null;
 }

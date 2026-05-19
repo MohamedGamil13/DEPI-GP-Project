@@ -6,8 +6,23 @@ import 'package:skillbridge/core/theme/app_styles.dart';
 import 'package:skillbridge/features/messages/data/models/conversation_model.dart';
 import 'package:skillbridge/features/messages/presentation/viewmodel/messages_cubit.dart';
 
-class MessagesScreen extends StatelessWidget {
+/// Replace with your auth provider's current user id.
+const String _kCurrentUserId = 'provider-uid-001';
+
+class MessagesScreen extends StatefulWidget {
   const MessagesScreen({super.key});
+
+  @override
+  State<MessagesScreen> createState() => _MessagesScreenState();
+}
+
+class _MessagesScreenState extends State<MessagesScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Start the real-time inbox stream as soon as the screen mounts.
+    context.read<MessagesCubit>().loadInbox(_kCurrentUserId);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,17 +43,10 @@ class MessagesScreen extends StatelessWidget {
           }
 
           if (state is MessagesError) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Text(
-                  state.message,
-                  textAlign: TextAlign.center,
-                  style: AppStyles.font14Regular.copyWith(
-                    color: AppColors.textMedium,
-                  ),
-                ),
-              ),
+            return _ErrorView(
+              message: state.message,
+              onRetry: () =>
+                  context.read<MessagesCubit>().loadInbox(_kCurrentUserId),
             );
           }
 
@@ -59,6 +67,8 @@ class MessagesScreen extends StatelessWidget {
                 child: ListView.separated(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   scrollDirection: Axis.horizontal,
+                  itemCount: MessageFilter.values.length,
+                  separatorBuilder: (_, __) => const SizedBox(width: 8),
                   itemBuilder: (context, index) {
                     final filter = MessageFilter.values[index];
                     return _FilterChip(
@@ -68,8 +78,6 @@ class MessagesScreen extends StatelessWidget {
                           context.read<MessagesCubit>().selectFilter(filter),
                     );
                   },
-                  separatorBuilder: (_, index) => const SizedBox(width: 8),
-                  itemCount: MessageFilter.values.length,
                 ),
               ),
               const SizedBox(height: 12),
@@ -78,21 +86,25 @@ class MessagesScreen extends StatelessWidget {
                     ? const _EmptyInbox()
                     : ListView.separated(
                         padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+                        itemCount: conversations.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 12),
                         itemBuilder: (context, index) {
                           final conversation = conversations[index];
                           return _ConversationCard(
                             conversation: conversation,
-                            onTap: () {
-                              context.read<MessagesCubit>().openConversation(
-                                conversation.id,
-                              );
-                              context.goChatDetail(conversation);
+                            onTap: () async {
+                              await context
+                                  .read<MessagesCubit>()
+                                  .openConversation(
+                                    conversationId: conversation.id,
+                                    currentUserId: _kCurrentUserId,
+                                  );
+                              if (context.mounted) {
+                                context.goChatDetail(conversation);
+                              }
                             },
                           );
                         },
-                        separatorBuilder: (_, index) =>
-                            const SizedBox(height: 12),
-                        itemCount: conversations.length,
                       ),
               ),
             ],
@@ -102,6 +114,8 @@ class MessagesScreen extends StatelessWidget {
     );
   }
 }
+
+// ── Search Field ─────────────────────────────────────────────────────────────
 
 class _InboxSearchField extends StatefulWidget {
   final String initialValue;
@@ -155,6 +169,8 @@ class _InboxSearchFieldState extends State<_InboxSearchField> {
   }
 }
 
+// ── Filter Chip ──────────────────────────────────────────────────────────────
+
 class _FilterChip extends StatelessWidget {
   final String label;
   final bool isSelected;
@@ -190,6 +206,8 @@ class _FilterChip extends StatelessWidget {
     );
   }
 }
+
+// ── Conversation Card ─────────────────────────────────────────────────────────
 
 class _ConversationCard extends StatelessWidget {
   final ConversationModel conversation;
@@ -378,6 +396,44 @@ class _MetaChip extends StatelessWidget {
   }
 }
 
+// ── Error View ────────────────────────────────────────────────────────────────
+
+class _ErrorView extends StatelessWidget {
+  final String message;
+  final VoidCallback onRetry;
+
+  const _ErrorView({required this.message, required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: AppStyles.font14Regular.copyWith(
+                color: AppColors.textMedium,
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextButton.icon(
+              onPressed: onRetry,
+              icon: const Icon(Icons.refresh_rounded),
+              label: const Text('Try again'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Empty Inbox ───────────────────────────────────────────────────────────────
+
 class _EmptyInbox extends StatelessWidget {
   const _EmptyInbox();
 
@@ -422,6 +478,8 @@ class _EmptyInbox extends StatelessWidget {
   }
 }
 
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
 String _filterLabel(MessageFilter filter) => switch (filter) {
   MessageFilter.all => 'All',
   MessageFilter.newLeads => 'New Leads',
@@ -433,18 +491,21 @@ String _statusLabel(ConversationStatus status) => switch (status) {
   ConversationStatus.newLead => 'New Lead',
   ConversationStatus.active => 'Active',
   ConversationStatus.waiting => 'Waiting',
+  ConversationStatus.closed => 'Closed',
 };
 
 Color _statusBackground(ConversationStatus status) => switch (status) {
   ConversationStatus.newLead => const Color(0xFFE6F4EA),
   ConversationStatus.active => const Color(0xFFE8F0FF),
   ConversationStatus.waiting => const Color(0xFFFFF3D6),
+  ConversationStatus.closed => const Color(0xFFF3F4F6),
 };
 
 Color _statusForeground(ConversationStatus status) => switch (status) {
   ConversationStatus.newLead => const Color(0xFF15803D),
   ConversationStatus.active => AppColors.primaryColor,
   ConversationStatus.waiting => const Color(0xFFB7791F),
+  ConversationStatus.closed => AppColors.textMedium,
 };
 
 String _formatTimestamp(DateTime? value) {
@@ -460,12 +521,10 @@ String _formatTimestamp(DateTime? value) {
     final suffix = value.hour >= 12 ? 'PM' : 'AM';
     return '$hour:$minute $suffix';
   }
-
   if (difference.inDays == 1) return 'Yesterday';
   if (difference.inDays < 7) {
     const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     return weekdays[value.weekday - 1];
   }
-
   return '${value.day}/${value.month}';
 }

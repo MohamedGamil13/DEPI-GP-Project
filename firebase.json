@@ -1,1 +1,29 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"servimarket-83d3a","appId":"1:649211504330:android:6215a56773e611acdaf633","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"servimarket-83d3a","configurations":{"android":"1:649211504330:android:6215a56773e611acdaf633","ios":"1:649211504330:ios:fc50d69124698454daf633","macos":"1:649211504330:ios:fc50d69124698454daf633","web":"1:649211504330:web:a0216ed0327c5aa4daf633","windows":"1:649211504330:web:51da4549953ffa2fdaf633"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "servimarket-83d3a",
+          "appId": "1:649211504330:android:6215a56773e611acdaf633",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "servimarket-83d3a",
+          "configurations": {
+            "android": "1:649211504330:android:6215a56773e611acdaf633",
+            "ios": "1:649211504330:ios:fc50d69124698454daf633",
+            "macos": "1:649211504330:ios:fc50d69124698454daf633",
+            "web": "1:649211504330:web:a0216ed0327c5aa4daf633",
+            "windows": "1:649211504330:web:51da4549953ffa2fdaf633"
+          }
+        }
+      }
+    }
+  },
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  }
+}

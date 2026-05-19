@@ -27,13 +27,16 @@ final class MessagesLoaded extends MessagesState {
     MessageFilter? selectedFilter,
     String? searchQuery,
     String? activeConversationId,
+    bool? clearActiveConversation,
     bool? isSendingMessage,
   }) {
     return MessagesLoaded(
       conversations: conversations ?? this.conversations,
       selectedFilter: selectedFilter ?? this.selectedFilter,
       searchQuery: searchQuery ?? this.searchQuery,
-      activeConversationId: activeConversationId ?? this.activeConversationId,
+      activeConversationId: clearActiveConversation == true
+          ? null
+          : activeConversationId ?? this.activeConversationId,
       isSendingMessage: isSendingMessage ?? this.isSendingMessage,
     );
   }
@@ -73,6 +76,5 @@ final class MessagesLoaded extends MessagesState {
 
 final class MessagesError extends MessagesState {
   final String message;
-
   MessagesError(this.message);
 }
