@@ -8,7 +8,7 @@ final class MessagesInitial extends MessagesState {}
 final class MessagesLoading extends MessagesState {}
 
 final class MessagesLoaded extends MessagesState {
-  final List<ConversationService> conversations;
+  final List<ConversationModel> conversations;
   final MessageFilter selectedFilter;
   final String searchQuery;
   final String? activeConversationId;
@@ -23,7 +23,7 @@ final class MessagesLoaded extends MessagesState {
   });
 
   MessagesLoaded copyWith({
-    List<ConversationService>? conversations,
+    List<ConversationModel>? conversations,
     MessageFilter? selectedFilter,
     String? searchQuery,
     String? activeConversationId,
@@ -38,7 +38,7 @@ final class MessagesLoaded extends MessagesState {
     );
   }
 
-  List<ConversationService> get visibleConversations {
+  List<ConversationModel> get visibleConversations {
     final query = searchQuery.trim().toLowerCase();
 
     return conversations.where((conversation) {
@@ -50,8 +50,6 @@ final class MessagesLoaded extends MessagesState {
           conversation.status == ConversationStatus.active,
         MessageFilter.waiting =>
           conversation.status == ConversationStatus.waiting,
-        MessageFilter.archived =>
-          conversation.status == ConversationStatus.archived,
       };
 
       final matchesSearch =
@@ -64,7 +62,7 @@ final class MessagesLoaded extends MessagesState {
     }).toList();
   }
 
-  ConversationService? get activeConversation {
+  ConversationModel? get activeConversation {
     if (activeConversationId == null) return null;
     for (final conversation in conversations) {
       if (conversation.id == activeConversationId) return conversation;

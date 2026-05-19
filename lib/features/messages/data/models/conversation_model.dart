@@ -1,11 +1,11 @@
 import 'package:skillbridge/features/home/data/ad_model.dart';
 import 'package:skillbridge/features/messages/data/models/chat_message.dart';
 
-enum ConversationStatus { newLead, active, waiting, archived }
+enum ConversationStatus { newLead, active, waiting }
 
-enum MessageFilter { all, newLeads, active, waiting, archived }
+enum MessageFilter { all, newLeads, active, waiting }
 
-class ConversationService {
+class ConversationModel {
   final String id;
   final String customerName;
   final String customerHandle;
@@ -19,7 +19,7 @@ class ConversationService {
   final bool isOnline;
   final List<ChatMessage> messages;
 
-  const ConversationService({
+  const ConversationModel({
     required this.id,
     required this.customerName,
     required this.customerHandle,
@@ -34,7 +34,7 @@ class ConversationService {
     required this.messages,
   });
 
-  ConversationService copyWith({
+  ConversationModel copyWith({
     String? id,
     String? customerName,
     String? customerHandle,
@@ -48,7 +48,7 @@ class ConversationService {
     bool? isOnline,
     List<ChatMessage>? messages,
   }) {
-    return ConversationService(
+    return ConversationModel(
       id: id ?? this.id,
       customerName: customerName ?? this.customerName,
       customerHandle: customerHandle ?? this.customerHandle,

@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:skillbridge/core/routing/app_navigator.dart';
 import 'package:skillbridge/core/theme/app_colors.dart';
 import 'package:skillbridge/core/theme/app_styles.dart';
-import 'package:skillbridge/features/messages/data/models/conversation_service.dart';
+import 'package:skillbridge/features/messages/data/models/conversation_model.dart';
 import 'package:skillbridge/features/messages/presentation/viewmodel/messages_cubit.dart';
 
 class MessagesScreen extends StatelessWidget {
@@ -192,7 +192,7 @@ class _FilterChip extends StatelessWidget {
 }
 
 class _ConversationCard extends StatelessWidget {
-  final ConversationService conversation;
+  final ConversationModel conversation;
   final VoidCallback onTap;
 
   const _ConversationCard({required this.conversation, required this.onTap});
@@ -427,28 +427,24 @@ String _filterLabel(MessageFilter filter) => switch (filter) {
   MessageFilter.newLeads => 'New Leads',
   MessageFilter.active => 'Active',
   MessageFilter.waiting => 'Waiting',
-  MessageFilter.archived => 'Archived',
 };
 
 String _statusLabel(ConversationStatus status) => switch (status) {
   ConversationStatus.newLead => 'New Lead',
   ConversationStatus.active => 'Active',
   ConversationStatus.waiting => 'Waiting',
-  ConversationStatus.archived => 'Archived',
 };
 
 Color _statusBackground(ConversationStatus status) => switch (status) {
   ConversationStatus.newLead => const Color(0xFFE6F4EA),
   ConversationStatus.active => const Color(0xFFE8F0FF),
   ConversationStatus.waiting => const Color(0xFFFFF3D6),
-  ConversationStatus.archived => const Color(0xFFF3F4F6),
 };
 
 Color _statusForeground(ConversationStatus status) => switch (status) {
   ConversationStatus.newLead => const Color(0xFF15803D),
   ConversationStatus.active => AppColors.primaryColor,
   ConversationStatus.waiting => const Color(0xFFB7791F),
-  ConversationStatus.archived => AppColors.textMedium,
 };
 
 String _formatTimestamp(DateTime? value) {

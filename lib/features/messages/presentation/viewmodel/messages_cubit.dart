@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:skillbridge/features/home/data/ad_model.dart';
-import 'package:skillbridge/features/messages/data/models/conversation_service.dart';
+import 'package:skillbridge/features/messages/data/models/conversation_model.dart';
 
 part 'messages_state.dart';
 
@@ -12,12 +12,12 @@ class MessagesCubit extends Cubit<MessagesState> {
     emit(MessagesLoading());
     emit(
       MessagesLoaded(
-        conversations: List<ConversationService>.from(_seedConversations),
+        conversations: List<ConversationModel>.from(_seedConversations),
       ),
     );
   }
 
-  void loadConversation(ConversationService conversation) {
+  void loadConversation(ConversationModel conversation) {
     emit(
       MessagesLoaded(
         conversations: [conversation.copyWith(unreadCount: 0)],
@@ -99,10 +99,10 @@ class MessagesCubit extends Cubit<MessagesState> {
     );
   }
 
-  List<ConversationService> _sortConversations(
-    List<ConversationService> conversations,
+  List<ConversationModel> _sortConversations(
+    List<ConversationModel> conversations,
   ) {
-    final sorted = List<ConversationService>.from(conversations);
+    final sorted = List<ConversationModel>.from(conversations);
     sorted.sort((a, b) {
       final aTime =
           a.latestMessage?.sentAt ?? DateTime.fromMillisecondsSinceEpoch(0);
@@ -114,8 +114,8 @@ class MessagesCubit extends Cubit<MessagesState> {
   }
 }
 
-final List<ConversationService> _seedConversations = [
-  const ConversationService(
+final List<ConversationModel> _seedConversations = [
+  const ConversationModel(
     id: 'conv-1',
     customerName: 'Lina Hassan',
     customerHandle: '@linah',
@@ -150,7 +150,7 @@ final List<ConversationService> _seedConversations = [
       // ),
     ],
   ),
-  const ConversationService(
+  const ConversationModel(
     id: 'conv-2',
     customerName: 'Omar Nabil',
     customerHandle: '@omar_n',
@@ -182,7 +182,7 @@ final List<ConversationService> _seedConversations = [
   //   ),
   // ],
   //  ),
-  const ConversationService(
+  const ConversationModel(
     id: 'conv-3',
     customerName: 'Mariam Adel',
     customerHandle: '@mariam.a',
@@ -204,7 +204,7 @@ final List<ConversationService> _seedConversations = [
       // ),
     ],
   ),
-  const ConversationService(
+  const ConversationModel(
     id: 'conv-4',
     customerName: 'Youssef Samir',
     customerHandle: '@youssef',
@@ -213,7 +213,7 @@ final List<ConversationService> _seedConversations = [
     serviceCategory: AdCategories.electronics,
     serviceCity: AdCity.cairo,
     servicePrice: 500,
-    status: ConversationStatus.archived,
+    status: ConversationStatus.active,
     unreadCount: 0,
     isOnline: false,
     messages: [
