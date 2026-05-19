@@ -12,6 +12,3 @@ abstract interface class StoreService {
   Future<Result<UserProfileModel>> getUserById(String id);
   Future<Result<List<AdModel>>> getCurrentUserPosts();
 }
-
-  // Future<Result<List<AdModel>>> ();
-  // Future<Result<List<AdModel>>> getData();

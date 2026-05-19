@@ -8,7 +8,7 @@ final class MessagesInitial extends MessagesState {}
 final class MessagesLoading extends MessagesState {}
 
 final class MessagesLoaded extends MessagesState {
-  final List<ServiceConversation> conversations;
+  final List<ConversationModel> conversations;
   final MessageFilter selectedFilter;
   final String searchQuery;
   final String? activeConversationId;
@@ -23,22 +23,25 @@ final class MessagesLoaded extends MessagesState {
   });
 
   MessagesLoaded copyWith({
-    List<ServiceConversation>? conversations,
+    List<ConversationModel>? conversations,
     MessageFilter? selectedFilter,
     String? searchQuery,
     String? activeConversationId,
+    bool? clearActiveConversation,
     bool? isSendingMessage,
   }) {
     return MessagesLoaded(
       conversations: conversations ?? this.conversations,
       selectedFilter: selectedFilter ?? this.selectedFilter,
       searchQuery: searchQuery ?? this.searchQuery,
-      activeConversationId: activeConversationId ?? this.activeConversationId,
+      activeConversationId: clearActiveConversation == true
+          ? null
+          : activeConversationId ?? this.activeConversationId,
       isSendingMessage: isSendingMessage ?? this.isSendingMessage,
     );
   }
 
-  List<ServiceConversation> get visibleConversations {
+  List<ConversationModel> get visibleConversations {
     final query = searchQuery.trim().toLowerCase();
 
     return conversations.where((conversation) {
@@ -50,8 +53,6 @@ final class MessagesLoaded extends MessagesState {
           conversation.status == ConversationStatus.active,
         MessageFilter.waiting =>
           conversation.status == ConversationStatus.waiting,
-        MessageFilter.archived =>
-          conversation.status == ConversationStatus.archived,
       };
 
       final matchesSearch =
@@ -64,7 +65,7 @@ final class MessagesLoaded extends MessagesState {
     }).toList();
   }
 
-  ServiceConversation? get activeConversation {
+  ConversationModel? get activeConversation {
     if (activeConversationId == null) return null;
     for (final conversation in conversations) {
       if (conversation.id == activeConversationId) return conversation;
@@ -75,6 +76,5 @@ final class MessagesLoaded extends MessagesState {
 
 final class MessagesError extends MessagesState {
   final String message;
-
   MessagesError(this.message);
 }
