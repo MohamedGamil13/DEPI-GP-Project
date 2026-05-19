@@ -22,7 +22,7 @@ class ContentSection extends StatelessWidget {
           const SizedBox(height: 24),
           _DescriptionSection(description: ad.description),
           const SizedBox(height: 24),
-          const _FeaturesSection(),
+          // const _FeaturesSection(),
           const SizedBox(height: 24),
           const _ReviewsSection(),
         ],
@@ -78,40 +78,40 @@ class _ReviewsSection extends StatelessWidget {
   }
 }
 
-class _FeaturesSection extends StatelessWidget {
-  const _FeaturesSection();
+// class _FeatureItem extends StatelessWidget {
+//   final String text;
 
-  @override
-  Widget build(BuildContext context) {
-    return const Column(
-      children: [
-        _FeatureItem(text: "All equipment provided"),
-        _FeatureItem(text: "Insured and bonded professionals"),
-      ],
-    );
-  }
-}
+//   const _FeatureItem({required this.text});
 
-class _FeatureItem extends StatelessWidget {
-  final String text;
+//   @override
+//   Widget build(BuildContext context) {
+//     return Padding(
+//       padding: const EdgeInsets.only(bottom: 8),
+//       child: Row(
+//         children: [
+//           const Icon(
+//             Icons.check_circle_outline,
+//             color: AppColors.primaryColor,
+//             size: 20,
+//           ),
+//           const SizedBox(width: 8),
+//           Text(text, style: AppStyles.font14Regular),
+//         ],
+//       ),
+//     );
+//   }
+// }
 
-  const _FeatureItem({required this.text});
+// class _FeaturesSection extends StatelessWidget {
+//   const _FeaturesSection();
 
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
-        children: [
-          const Icon(
-            Icons.check_circle_outline,
-            color: AppColors.primaryColor,
-            size: 20,
-          ),
-          const SizedBox(width: 8),
-          Text(text, style: AppStyles.font14Regular),
-        ],
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return const Column(
+//       children: [
+//         _FeatureItem(text: "All equipment provided"),
+//         _FeatureItem(text: "Insured and bonded professionals"),
+//       ],
+//     );
+//   }
+// }

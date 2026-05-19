@@ -39,3 +39,15 @@ class ProfileFailure extends ProfileState {
   final String errorMessage;
   ProfileFailure({required this.errorMessage});
 }
+
+class ProfilePostsLoading extends ProfileState {}
+
+class ProfilePostsLoaded extends ProfileState {
+  final List<AdModel> posts;
+  ProfilePostsLoaded({required this.posts});
+}
+
+class ProfileError extends ProfileState {
+  final String message;
+  ProfileError({required this.message});
+}

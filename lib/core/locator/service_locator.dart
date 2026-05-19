@@ -73,16 +73,6 @@ void setupLocator() {
   );
 
   getIt.registerFactory<MessagesCubit>(() => MessagesCubit());
-}
-
-void registerUserAfterLogin() {
-  if (getIt.isRegistered<AuthUser>()) {
-    getIt.unregister<AuthUser>();
-  }
-  if (getIt.isRegistered<UserProfileModel>()) {
-    getIt.unregister<UserProfileModel>();
-  }
-
   getIt.registerLazySingleton<AuthUser>(
     () => AuthUser.fromFirebaseUser(FirebaseAuth.instance.currentUser!),
   );
