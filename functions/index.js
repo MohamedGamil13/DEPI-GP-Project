@@ -23,16 +23,27 @@ exports.onNewMessage = onDocumentCreated(
 
     const senderName = senderSnap.data()?.name ?? 'Someone';
 
-    await getMessaging().send({
-      token: fcmToken,
-      notification: {
-        title: senderName,
-        body: msg.text,
-      },
-      data: {
-        type: 'message',
-        conversationId,
-      },
-    });
+    try {
+      await getMessaging().send({
+        token: fcmToken,
+        notification: {
+          title: senderName,
+          body: msg.text,
+        },
+        data: {
+          type: 'message',
+          conversationId,
+        },
+      });
+    } catch (e) {
+      if (e.code === 'messaging/registration-token-not-registered') {
+        await db.collection('usersMetaData').doc(msg.receiverId).update({
+          fcmToken: null,
+          notificationsEnabled: false,
+        });
+      } else {
+        throw e;
+      }
+    }
   },
 );
