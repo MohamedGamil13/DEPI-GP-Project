@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get_it/get_it.dart';
 import 'package:skillbridge/core/services/auth/auth_service.dart';
 import 'package:skillbridge/core/services/auth/firebase_auth_service.dart';
@@ -14,6 +16,7 @@ import 'package:skillbridge/features/auth/data/repos/auth_repo.dart';
 import 'package:skillbridge/features/auth/data/repos/auth_repo_implementation.dart';
 import 'package:skillbridge/features/auth/presentation/viewmodel/auth_cubit.dart';
 import 'package:skillbridge/features/home/presentation/cubits/home_cubit.dart';
+import 'package:skillbridge/core/services/notifications/push_notifications_service.dart';
 import 'package:skillbridge/features/messages/presentation/viewmodel/messages_cubit.dart';
 import 'package:skillbridge/features/posts/data/repos/post_ad_repo.dart';
 import 'package:skillbridge/features/posts/data/repos/post_ad_repo_impl.dart';
@@ -27,6 +30,10 @@ void setupLocator() {
   getIt.registerLazySingleton<FirebaseAuth>(() => FirebaseAuth.instance);
   getIt.registerLazySingleton<FirebaseFirestore>(
     () => FirebaseFirestore.instance,
+  );
+  getIt.registerLazySingleton<FirebaseMessaging>(() => FirebaseMessaging.instance);
+  getIt.registerLazySingleton<FlutterLocalNotificationsPlugin>(
+    () => FlutterLocalNotificationsPlugin(),
   );
   getIt.registerLazySingleton<Dio>(() => Dio());
 
@@ -89,5 +96,17 @@ void setupLocator() {
 
   getIt.registerLazySingleton<UserProfileModel>(
     () => UserProfileModel.fromAuthUser(getIt<AuthUser>()),
+  );
+
+  // ── Notifications ────────────────────────────────────────────────────────
+  getIt.registerLazySingleton<PushNotificationsService>(
+    () => PushNotificationsService(
+      firebaseMessaging: getIt<FirebaseMessaging>(),
+      firestore: getIt<FirebaseFirestore>(),
+      authService: getIt<AuthService>(),
+      localNotificationsPlugin: getIt<FlutterLocalNotificationsPlugin>(),
+      chatService: getIt<IChatService>(),
+      storeService: getIt<StoreService>(),
+    ),
   );
 }
