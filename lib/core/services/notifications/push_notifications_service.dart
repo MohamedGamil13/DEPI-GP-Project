@@ -65,6 +65,8 @@ class PushNotificationsService {
   bool _isSyncingToken = false;
   String? _lastSyncedToken;
   String? _lastSyncedUserId;
+  // ponytail: stored here so routing fires after auth confirms the user is logged in
+  Map<String, dynamic>? _pendingTapData;
 
   Future<void> initFCM() async {
     if (_initialized) return;
@@ -103,21 +105,27 @@ class PushNotificationsService {
       (message) => unawaited(handleNotificationTapData(message.data)),
     );
 
+    // Store cold-start tap data — routed after auth confirms login (fix #2)
     final initialMessage = await _firebaseMessaging.getInitialMessage();
     if (initialMessage != null) {
-      WidgetsBinding.instance.addPostFrameCallback(
-        (_) => unawaited(handleNotificationTapData(initialMessage.data)),
-      );
+      _pendingTapData = initialMessage.data;
     }
 
     _authStateSubscription = _authService.authStateChanges.listen(
       (user) async {
         if (user == null) {
-          _lastSyncedToken = null;
-          _lastSyncedUserId = null;
+          await _clearTokenFromFirestore(); // fix #3
           return;
         }
         await _syncTokenToCurrentUser();
+        // Safe to route now — auth is confirmed, router redirect has settled
+        final pending = _pendingTapData;
+        if (pending != null) {
+          _pendingTapData = null;
+          WidgetsBinding.instance.addPostFrameCallback(
+            (_) => unawaited(handleNotificationTapData(pending)),
+          );
+        }
       },
     );
   }
@@ -157,6 +165,29 @@ class PushNotificationsService {
       log('FCM token synced for user ${currentUser.uid}.');
     } finally {
       _isSyncingToken = false;
+    }
+  }
+
+  // fix #3: removes token from Firestore on logout so Cloud Function stops delivering
+  Future<void> _clearTokenFromFirestore() async {
+    final uid = _lastSyncedUserId;
+    _lastSyncedToken = null;
+    _lastSyncedUserId = null;
+    if (uid == null) return;
+    try {
+      await _firestore
+          .collection(AppConstants.userMetaDataCollection)
+          .doc(uid)
+          .set(
+            {
+              'fcmToken': FieldValue.delete(),
+              'notificationsEnabled': false,
+              'updatedAt': FieldValue.serverTimestamp(),
+            },
+            SetOptions(merge: true),
+          );
+    } catch (e) {
+      log('Failed to clear FCM token on logout: $e');
     }
   }
 
@@ -228,8 +259,14 @@ class PushNotificationsService {
       return;
     }
 
+    // fix #1: messageId can be null; hashCode can be negative
+    final notificationId =
+        (message.messageId ?? DateTime.now().millisecondsSinceEpoch.toString())
+            .hashCode
+            .abs();
+
     await _localNotificationsPlugin.show(
-      message.messageId.hashCode,
+      notificationId,
       title,
       body,
       NotificationDetails(
@@ -255,6 +292,9 @@ class PushNotificationsService {
   }
 
   Future<void> handleNotificationTapData(Map<String, dynamic> data) async {
+    // fix #7: don't attempt protected navigation if user is not logged in
+    if (_authService.currentUser == null) return;
+
     final intent = NotificationRouteIntent.fromData(data);
 
     switch (intent.target) {
