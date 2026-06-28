@@ -71,5 +71,7 @@
   <string>sms</string>
   <string>tel</string>
 </array>
+	<key>FirebaseMessagingAutoInitEnabled</key>
+	<true/>
 </dict>
 </plist>
