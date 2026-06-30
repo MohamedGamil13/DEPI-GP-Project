@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:skillbridge/core/theme/app_colors.dart';
+import 'package:skillbridge/core/utils/constants/app_strings.dart';
 import 'package:skillbridge/features/profile/data/models/user_profile_model.dart';
 
 /// Displays the circular avatar with verified badge, user name, and member-since text.
@@ -31,7 +32,16 @@ class ProfileHeaderWidget extends StatelessWidget {
               child: CircleAvatar(
                 radius: 52.r,
                 backgroundColor: AppColors.backgroundColor,
-                backgroundImage: NetworkImage(profile.avatarUrl),
+                backgroundImage: profile.avatarUrl.isNotEmpty
+                    ? NetworkImage(profile.avatarUrl)
+                    : null,
+                child: profile.avatarUrl.isEmpty
+                    ? Icon(
+                        Icons.person,
+                        size: 34.sp,
+                        color: AppColors.primaryColor,
+                      )
+                    : null,
               ),
             ),
             if (profile.isVerified)
@@ -69,7 +79,7 @@ class ProfileHeaderWidget extends StatelessWidget {
 
         SizedBox(height: 4.h),
         Text(
-          'Member since ${DateFormat.yMMMM().format(profile.memberSince)}',
+          '${AppStrings.memberSince(context)} ${DateFormat.yMMMM().format(profile.memberSince)}',
           style: TextStyle(
             fontSize: 13.sp,
             color: AppColors.primaryColor,

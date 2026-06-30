@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:skillbridge/core/routing/app_navigator.dart';
 import 'package:skillbridge/core/theme/app_colors.dart';
+import 'package:skillbridge/core/utils/constants/app_strings.dart';
 import 'package:skillbridge/core/utils/helpers/snackbar_manger.dart';
 import 'package:skillbridge/features/home/data/ad_model.dart';
 import 'package:skillbridge/features/profile/presentation/viewmodel/profile_cubit.dart';
@@ -9,6 +11,7 @@ import 'package:skillbridge/features/profile/presentation/widgets/post_card_widg
 import 'package:skillbridge/features/profile/presentation/widgets/profile_header_widget.dart';
 import 'package:skillbridge/features/profile/presentation/widgets/profile_skills_widget.dart';
 import 'package:skillbridge/features/profile/presentation/widgets/profile_stats_widget.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -89,47 +92,44 @@ class _ProfileScreenState extends State<ProfileScreen>
       backgroundColor: AppColors.backgroundColor,
       elevation: 0,
       centerTitle: true,
-      title: const Text(
-        'Profile',
-        style: TextStyle(
+      title: Text(
+        AppStrings.profile(context),
+        style: const TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.w700,
           color: AppColors.textDark,
         ),
       ),
-      leading: GestureDetector(
-        onTap: () {},
-        child: Container(
-          margin: EdgeInsets.all(8.r),
-          decoration: BoxDecoration(
-            border: Border.all(color: AppColors.border),
-            borderRadius: BorderRadius.circular(10.r),
-          ),
-          child: Icon(
-            Icons.settings_outlined,
-            size: 18.sp,
-            color: AppColors.textDark,
-          ),
-        ),
-      ),
       actions: [
-        GestureDetector(
-          onTap: () => AppSnackBar.info(context, 'Share link copied!'),
-          child: Container(
-            margin: EdgeInsets.all(8.r),
-            decoration: BoxDecoration(
-              border: Border.all(color: AppColors.border),
-              borderRadius: BorderRadius.circular(10.r),
+        PopupMenuButton<String>(
+          icon: const Icon(Icons.more_vert_rounded, color: AppColors.textDark),
+          onSelected: (value) async {
+            if (value == 'contact') {
+              await _contactDevelopers();
+            }
+            if (value == 'signout') {
+              await context.read<ProfileCubit>().signOut();
+
+              if (mounted) {
+                context.gosignIn();
+
+                AppSnackBar.success(
+                  context,
+                  AppStrings.signedOutSuccessfully(context),
+                );
+              }
+            }
+          },
+          itemBuilder: (context) => [
+            PopupMenuItem(
+              value: 'contact',
+              child: Text(AppStrings.contactDevelopers(context)),
             ),
-            child: Padding(
-              padding: EdgeInsets.all(6.r),
-              child: Icon(
-                Icons.share_outlined,
-                size: 18.sp,
-                color: AppColors.textDark,
-              ),
+            PopupMenuItem(
+              value: 'signout',
+              child: Text(AppStrings.signOut(context)),
             ),
-          ),
+          ],
         ),
       ],
     );
@@ -188,9 +188,9 @@ class _ProfileScreenState extends State<ProfileScreen>
                 fontWeight: FontWeight.w500,
                 fontSize: 15.sp,
               ),
-              tabs: const [
-                Tab(text: 'My Posts'),
-                Tab(text: 'Activity'),
+              tabs: [
+                Tab(text: AppStrings.tabMyPosts(context)),
+                Tab(text: AppStrings.tabActivity(context)),
               ],
             ),
           ),
@@ -233,7 +233,7 @@ class _ProfileScreenState extends State<ProfileScreen>
           // Activity tab — wired up when backend is ready
           Center(
             child: Text(
-              'No activity yet.',
+              AppStrings.noActivityYet(context),
               style: TextStyle(
                 color: AppColors.secondaryColor,
                 fontSize: 14.sp,
@@ -253,7 +253,7 @@ class _ProfileScreenState extends State<ProfileScreen>
     if (posts.isEmpty) {
       return Center(
         child: Text(
-          'No posts yet.',
+          AppStrings.noPostsYet(context),
           style: TextStyle(color: AppColors.secondaryColor, fontSize: 14.sp),
         ),
       );
@@ -284,7 +284,7 @@ class _ProfileScreenState extends State<ProfileScreen>
           Icon(Icons.error_outline, size: 54.sp, color: AppColors.errorColor),
           SizedBox(height: 12.h),
           Text(
-            'Failed to load profile.',
+            AppStrings.failedToLoadProfile(context),
             style: TextStyle(fontSize: 15.sp, color: AppColors.secondaryColor),
           ),
           SizedBox(height: 16.h),
@@ -302,7 +302,7 @@ class _ProfileScreenState extends State<ProfileScreen>
               padding: EdgeInsets.symmetric(horizontal: 32.w, vertical: 12.h),
             ),
             child: Text(
-              'Retry',
+              AppStrings.retry(context),
               style: TextStyle(
                 color: AppColors.white,
                 fontWeight: FontWeight.w600,
@@ -323,7 +323,7 @@ class _ProfileScreenState extends State<ProfileScreen>
           Icon(Icons.error_outline, size: 40.sp, color: AppColors.errorColor),
           SizedBox(height: 12.h),
           Text(
-            'Failed to load posts.',
+            AppStrings.failedToLoadPosts(context),
             style: TextStyle(fontSize: 14.sp, color: AppColors.secondaryColor),
           ),
           SizedBox(height: 16.h),
@@ -338,7 +338,7 @@ class _ProfileScreenState extends State<ProfileScreen>
               padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 10.h),
             ),
             child: Text(
-              'Retry',
+              AppStrings.retry(context),
               style: TextStyle(
                 color: AppColors.white,
                 fontWeight: FontWeight.w600,
@@ -349,6 +349,15 @@ class _ProfileScreenState extends State<ProfileScreen>
         ],
       ),
     );
+  }
+}
+
+Future<void> _contactDevelopers() async {
+  final uri = Uri.parse(
+    'mailto:support@skillbridge.app?subject=SkillBridge%20Support',
+  );
+  if (await canLaunchUrl(uri)) {
+    await launchUrl(uri);
   }
 }
 

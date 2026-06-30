@@ -13,6 +13,8 @@ final class MessagesLoaded extends MessagesState {
   final String searchQuery;
   final String? activeConversationId;
   final bool isSendingMessage;
+  final bool isLoadingOlderMessages;
+  final bool hasMoreMessages;
 
   MessagesLoaded({
     required this.conversations,
@@ -20,6 +22,8 @@ final class MessagesLoaded extends MessagesState {
     this.searchQuery = '',
     this.activeConversationId,
     this.isSendingMessage = false,
+    this.isLoadingOlderMessages = false,
+    this.hasMoreMessages = true,
   });
 
   MessagesLoaded copyWith({
@@ -29,6 +33,8 @@ final class MessagesLoaded extends MessagesState {
     String? activeConversationId,
     bool? clearActiveConversation,
     bool? isSendingMessage,
+    bool? isLoadingOlderMessages,
+    bool? hasMoreMessages,
   }) {
     return MessagesLoaded(
       conversations: conversations ?? this.conversations,
@@ -38,6 +44,9 @@ final class MessagesLoaded extends MessagesState {
           ? null
           : activeConversationId ?? this.activeConversationId,
       isSendingMessage: isSendingMessage ?? this.isSendingMessage,
+      isLoadingOlderMessages:
+          isLoadingOlderMessages ?? this.isLoadingOlderMessages,
+      hasMoreMessages: hasMoreMessages ?? this.hasMoreMessages,
     );
   }
 

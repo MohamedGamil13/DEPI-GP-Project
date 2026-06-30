@@ -18,6 +18,7 @@ class MessagesCubit extends Cubit<MessagesState> {
   // Live subscriptions — cancelled on close()
   StreamSubscription<List<ConversationModel>>? _conversationsSub;
   StreamSubscription<List<ChatMessage>>? _messagesSub;
+  static const int _olderMessagesPageSize = 20;
 
   // ── Inbox ──────────────────────────────────────────────────────────────────
 
@@ -118,6 +119,47 @@ class MessagesCubit extends Cubit<MessagesState> {
     emit(current.copyWith(clearActiveConversation: true));
   }
 
+  Future<void> loadOlderMessages() async {
+    final current = state;
+    if (current is! MessagesLoaded || current.activeConversation == null) {
+      return;
+    }
+    if (current.isLoadingOlderMessages || !current.hasMoreMessages) return;
+
+    final conversation = current.activeConversation!;
+    if (conversation.messages.isEmpty) return;
+
+    emit(current.copyWith(isLoadingOlderMessages: true));
+
+    try {
+      final older = await _service.getOlderMessages(
+        conversationId: conversation.id,
+        before: conversation.messages.first.sentAt,
+        limit: _olderMessagesPageSize,
+      );
+
+      final merged = [...older, ...conversation.messages];
+      final loadedState = state;
+      if (loadedState is MessagesLoaded) {
+        emit(
+          loadedState.copyWith(
+            conversations: loadedState.conversations.map((c) {
+              return c.id == conversation.id ? c.copyWith(messages: merged) : c;
+            }).toList(),
+            isLoadingOlderMessages: false,
+            hasMoreMessages: older.length == _olderMessagesPageSize,
+          ),
+        );
+      }
+    } on ChatServiceException catch (e) {
+      debugPrint('Load older messages failed: $e');
+      final s = state;
+      if (s is MessagesLoaded) {
+        emit(s.copyWith(isLoadingOlderMessages: false));
+      }
+    }
+  }
+
   // ── Send ───────────────────────────────────────────────────────────────────
 
   Future<void> sendMessage({
@@ -137,11 +179,14 @@ class MessagesCubit extends Cubit<MessagesState> {
     emit(current.copyWith(isSendingMessage: true));
 
     try {
+      final receiverId = senderId == conversation.customerId
+          ? conversation.providerId
+          : conversation.customerId;
       await _service.sendMessage(
         conversationId: conversation.id,
         text: trimmed,
         senderId: senderId,
-        receiverId: conversation.customerId,
+        receiverId: receiverId,
       );
       // The message stream will push the new message automatically.
     } on ChatServiceException catch (e) {

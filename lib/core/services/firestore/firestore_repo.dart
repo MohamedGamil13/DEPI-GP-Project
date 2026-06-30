@@ -9,6 +9,11 @@ abstract interface class StoreService {
   Future<Result<void>> addPost(AdModel post);
   Future<Result<AdModel>> searchForPost(String title);
   Future<Result<void>> saveUserData(UserProfileModel user);
+  Future<Result<void>> updateUserToken({
+    required String userId,
+    required String token,
+    required bool add,
+  });
   Future<Result<UserProfileModel>> getUserById(String id);
   Future<Result<List<AdModel>>> getCurrentUserPosts();
 }

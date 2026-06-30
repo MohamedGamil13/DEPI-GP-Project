@@ -71,5 +71,16 @@
   <string>sms</string>
   <string>tel</string>
 </array>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>skillbridge</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>skillbridge</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>

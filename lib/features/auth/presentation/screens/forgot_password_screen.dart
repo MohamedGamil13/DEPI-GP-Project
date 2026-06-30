@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:skillbridge/core/routing/app_navigator.dart';
 import 'package:skillbridge/core/theme/app_colors.dart';
+import 'package:skillbridge/core/utils/constants/app_strings.dart';
 import 'package:skillbridge/core/utils/helpers/snackbar_manger.dart';
 import 'package:skillbridge/core/utils/validator/app_validator.dart';
 import 'package:skillbridge/features/auth/presentation/screens/widgets/auth_text_field.dart';
@@ -39,7 +40,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             }
 
             if (state is AuthSendPasswordSuccess) {
-              AppSnackBar.success(context, "Reset link sent to your email");
+              AppSnackBar.success(
+                context,
+                AppStrings.resetLinkSent(context),
+              );
               context.gosignIn();
             }
           },
@@ -95,9 +99,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   SizedBox(height: 24.h),
 
                   // ── Title ──
-                  const Center(
+                  Center(
                     child: Text(
-                      'Forgot Password',
+                      AppStrings.forgotPassword(context),
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.w800,

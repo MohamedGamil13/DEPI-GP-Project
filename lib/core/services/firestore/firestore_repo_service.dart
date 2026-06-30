@@ -1,16 +1,18 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:skillbridge/core/errors/database_exception.dart';
 import 'package:skillbridge/core/locator/service_locator.dart';
 import 'package:skillbridge/core/services/firestore/firestore_repo.dart';
 import 'package:skillbridge/core/utils/constants/app_constants.dart';
 import 'package:skillbridge/core/utils/validator/result.dart';
-import 'package:skillbridge/features/auth/data/models/auth_user_model.dart';
 import 'package:skillbridge/features/home/data/ad_model.dart';
 import 'package:skillbridge/features/profile/data/models/user_profile_model.dart';
 
 class FirestoreService implements StoreService {
   final FirebaseFirestore db;
+
   FirestoreService({required this.db});
+
   @override
   Future<Result<List<AdModel>>> getAllPosts() async {
     try {
@@ -21,9 +23,13 @@ class FirestoreService implements StoreService {
       final List<AdModel> allPosts = snapshot.docs
           .map((doc) => AdModel.fromJson(doc.data() as Map<String, dynamic>))
           .toList();
+
+      final currentUserId = getIt<FirebaseAuth>().currentUser!.uid;
+
       final List<AdModel> posts = allPosts
-          .where((post) => post.userId != getIt<AuthUser>().uid)
+          .where((post) => post.userId != currentUserId)
           .toList();
+
       return Success(posts);
     } on FirebaseException catch (e) {
       throw _mapException(e);
@@ -109,7 +115,27 @@ class FirestoreService implements StoreService {
       await db
           .collection(AppConstants.userMetaDataCollection)
           .doc(user.id)
-          .set(user.toJson());
+          .set(user.toJson(), SetOptions(merge: true));
+
+      return const Success(null);
+    } on FirebaseException catch (e) {
+      throw _mapException(e);
+    }
+  }
+
+  @override
+  Future<Result<void>> updateUserToken({
+    required String userId,
+    required String token,
+    required bool add,
+  }) async {
+    try {
+      await db.collection(AppConstants.userMetaDataCollection).doc(userId).set({
+        'fcmTokens': add
+            ? FieldValue.arrayUnion([token])
+            : FieldValue.arrayRemove([token]),
+      }, SetOptions(merge: true));
+
       return const Success(null);
     } on FirebaseException catch (e) {
       throw _mapException(e);
@@ -127,6 +153,7 @@ class FirestoreService implements StoreService {
       if (documentSnapshot.exists && documentSnapshot.data() != null) {
         final Map<String, dynamic> data =
             documentSnapshot.data() as Map<String, dynamic>;
+
         final UserProfileModel user = UserProfileModel.fromJson(data);
 
         return Success(user);
@@ -152,9 +179,13 @@ class FirestoreService implements StoreService {
       final List<AdModel> allPosts = snapshot.docs
           .map((doc) => AdModel.fromJson(doc.data() as Map<String, dynamic>))
           .toList();
+
+      final currentUserId = getIt<FirebaseAuth>().currentUser!.uid;
+
       final List<AdModel> currentUserPosts = allPosts
-          .where((post) => post.userId == getIt<AuthUser>().uid)
+          .where((post) => post.userId == currentUserId)
           .toList();
+
       return Success(currentUserPosts);
     } on FirebaseException catch (e) {
       throw _mapException(e);

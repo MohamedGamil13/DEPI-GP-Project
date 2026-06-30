@@ -15,6 +15,9 @@ class AuthCubit extends Cubit<AuthState> {
     emit(AuthLoading());
     final result = await authRepo.signUp(email, password);
 
+    // لو الـ Cubit اتقفل بسبب الـ GoRouter redirect، اخرج فوراً ومتعملش emit
+    if (isClosed) return;
+
     switch (result) {
       case Success(:final data):
         emit(AuthSuccess(user: data));
@@ -27,6 +30,8 @@ class AuthCubit extends Cubit<AuthState> {
     emit(AuthLoading());
     final result = await authRepo.signIn(email, password);
 
+    if (isClosed) return; // حماية هنا كمان
+
     switch (result) {
       case Success(:final data):
         emit(AuthSuccess(user: data));
@@ -38,6 +43,9 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> signInWithGoogle() async {
     emit(AuthLoading());
     final result = await authRepo.signInWithGoogle();
+
+    if (isClosed) return; // حماية هنا كمان
+
     switch (result) {
       case Success(:final data):
         emit(AuthSuccess(user: data));
@@ -49,6 +57,8 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> sendPasswordResetEmail(String email) async {
     emit(AuthLoading());
     final result = await authRepo.sendPasswordResetEmail(email);
+
+    if (isClosed) return; // حماية هنا كمان
 
     switch (result) {
       case Success():
