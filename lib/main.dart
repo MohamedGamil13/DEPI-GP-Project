@@ -7,6 +7,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:skillbridge/core/locator/service_locator.dart';
 import 'package:skillbridge/core/routing/app_router.dart';
 import 'package:skillbridge/core/services/notifications/app_push_service.dart';
+import 'package:skillbridge/core/services/location/location_service.dart';
 import 'package:skillbridge/core/utils/observers/bloc_observer.dart';
 import 'package:skillbridge/core/utils/helpers/init_hive.dart';
 import 'package:skillbridge/core/utils/locale_cubit.dart';
@@ -22,6 +23,7 @@ void main() async {
   Bloc.observer = AppBlocObserver();
   setupLocator();
   await getIt<LocaleCubit>().loadLocale();
+  await getIt<LocationService>().getCurrentLocation();
   await getIt<AppPushService>().initialize();
   runApp(const SkillBridge());
 }

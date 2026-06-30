@@ -5,6 +5,7 @@ import 'package:logger/logger.dart';
 import 'package:skillbridge/core/errors/auth_exception.dart';
 import 'package:skillbridge/core/services/auth/auth_service.dart';
 import 'package:skillbridge/core/services/firestore/firestore_repo.dart';
+import 'package:skillbridge/core/services/location/location_service.dart';
 import 'package:skillbridge/core/utils/validator/app_validator.dart';
 import 'package:skillbridge/features/auth/data/models/auth_user_model.dart';
 import 'package:skillbridge/features/profile/data/models/user_profile_model.dart';
@@ -13,6 +14,7 @@ class FirebaseAuthService implements AuthService {
   final FirebaseAuth _auth;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
   final StoreService service;
+  final LocationService locationService;
 
   final Logger _logger = Logger(
     printer: PrettyPrinter(
@@ -24,7 +26,11 @@ class FirebaseAuthService implements AuthService {
     ),
   );
 
-  FirebaseAuthService(this._auth, {required this.service});
+  FirebaseAuthService(
+    this._auth, {
+    required this.service,
+    required this.locationService,
+  });
 
   @override
   Stream<AuthUser?> get authStateChanges => _auth.authStateChanges().map(
@@ -38,7 +44,7 @@ class FirebaseAuthService implements AuthService {
   }
 
   @override
-  Future<AuthUser> register(String email, String password) async {
+  Future<AuthUser> register(String email, String password, {String bio = ''}) async {
     String? emailError = AppValidator.validateEmail(email);
 
     if (emailError != null) {
@@ -59,7 +65,17 @@ class FirebaseAuthService implements AuthService {
       );
       await credential.user?.sendEmailVerification();
       AuthUser tempUser = _mapUser(credential.user!);
-      await service.saveUserData(UserProfileModel.fromAuthUser(tempUser));
+      final locationFields = await _locationFields();
+      await service.saveUserData(
+        UserProfileModel.fromAuthUser(tempUser).copyWith(
+          bio: bio.trim(),
+          city: locationFields['city'] as String?,
+          governorate: locationFields['governorate'] as String?,
+          country: locationFields['country'] as String?,
+          latitude: locationFields['latitude'] as double?,
+          longitude: locationFields['longitude'] as double?,
+        ),
+      );
 
       _logger.i(
         "===============  AUTH RESPONSE ===============\n"
@@ -161,7 +177,16 @@ class FirebaseAuthService implements AuthService {
 
       if (isNewUser) {
         _logger.i(" New Google User Detected! Saving profile to Firestore...");
-        await service.saveUserData(UserProfileModel.fromAuthUser(authUser));
+        final locationFields = await _locationFields();
+        await service.saveUserData(
+          UserProfileModel.fromAuthUser(authUser).copyWith(
+            city: locationFields['city'] as String?,
+            governorate: locationFields['governorate'] as String?,
+            country: locationFields['country'] as String?,
+            latitude: locationFields['latitude'] as double?,
+            longitude: locationFields['longitude'] as double?,
+          ),
+        );
       }
 
       _logger.i(
@@ -239,6 +264,19 @@ class FirebaseAuthService implements AuthService {
   }
 
   AuthUser _mapUser(User user) => AuthUser.fromFirebaseUser(user);
+
+  Future<Map<String, dynamic>> _locationFields() async {
+    final location = await locationService.getCachedLocation() ??
+        await locationService.getCurrentLocation();
+
+    return {
+      'city': location?.city ?? '',
+      'governorate': location?.governorate ?? '',
+      'country': location?.country ?? '',
+      'latitude': location?.latitude,
+      'longitude': location?.longitude,
+    };
+  }
 
   void _validateInputs(String email, String password) {
     if (email.trim().isEmpty || password.isEmpty) {

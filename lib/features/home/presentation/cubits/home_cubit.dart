@@ -2,23 +2,30 @@ import 'package:bloc/bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:skillbridge/core/services/firestore/firestore_repo.dart';
+import 'package:skillbridge/core/services/location/location_service.dart';
 import 'package:skillbridge/core/utils/validator/result.dart';
 import 'package:skillbridge/features/home/data/ad_model.dart';
+import 'package:skillbridge/features/location/data/location_data.dart';
 
 part 'home_state.dart';
 
 class HomeCubit extends Cubit<HomeState> {
   final StoreService _firestoreService;
+  final LocationService _locationService;
 
-  HomeCubit({required StoreService firestoreService})
-    : _firestoreService = firestoreService,
-      super(HomeInitial());
+  HomeCubit({
+    required StoreService firestoreService,
+    required LocationService locationService,
+  }) : _firestoreService = firestoreService,
+       _locationService = locationService,
+       super(HomeInitial());
 
   List<AdModel> _sourcePosts = [];
   Set<int> _favoriteIds = {};
   String _searchQuery = '';
   AdCategories _selectedCategory = AdCategories.all;
   HomeFeedMode _mode = HomeFeedMode.all;
+  LocationData? _location;
 
   static String normalizeSearch(String input) {
     return input.trim().toLowerCase().replaceAll(RegExp(r'\s+'), ' ');
@@ -68,7 +75,31 @@ class HomeCubit extends Cubit<HomeState> {
           .toList();
     }
 
-    return filtered
+    List<AdModel> sorted = [...filtered];
+
+    if (_location == null) {
+      sorted.sort((a, b) => b.adID.compareTo(a.adID));
+    } else {
+      sorted.sort(
+        (a, b) => _locationService
+            .distanceBetween(
+              startLatitude: _location!.latitude,
+              startLongitude: _location!.longitude,
+              endLatitude: a.latitude,
+              endLongitude: a.longitude,
+            )
+            .compareTo(
+              _locationService.distanceBetween(
+                startLatitude: _location!.latitude,
+                startLongitude: _location!.longitude,
+                endLatitude: b.latitude,
+                endLongitude: b.longitude,
+              ),
+            ),
+      );
+    }
+
+    return sorted
         .map(
           (post) => post.copyWith(isFavorite: _favoriteIds.contains(post.adID)),
         )
@@ -97,6 +128,9 @@ class HomeCubit extends Cubit<HomeState> {
     _mode = mode;
     emit(HomeLoading());
     try {
+      _location ??= await _locationService.getCachedLocation();
+      _location ??= await _locationService.getCurrentLocation();
+
       final favoritesResult = await _firestoreService.getFavoritePostIds();
       if (favoritesResult case Success<Set<int>>(:final data)) {
         _favoriteIds = data;

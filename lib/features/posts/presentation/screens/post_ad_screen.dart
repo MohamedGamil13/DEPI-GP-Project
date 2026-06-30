@@ -7,6 +7,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:skillbridge/core/locator/service_locator.dart';
 import 'package:skillbridge/core/routing/app_navigator.dart';
+import 'package:skillbridge/core/services/location/location_service.dart';
 import 'package:skillbridge/core/theme/app_colors.dart';
 import 'package:skillbridge/core/utils/helpers/snackbar_manger.dart';
 import 'package:skillbridge/core/utils/validator/app_validator.dart';
@@ -37,8 +38,6 @@ class _PostAdScreenState extends State<PostAdScreen> {
   static final List<String> _categories = AdCategories.values
       .map((e) => e.label)
       .toList();
-
-  AdCity _selectedCity = AdCity.cairo;
 
   @override
   void dispose() {
@@ -74,14 +73,12 @@ class _PostAdScreenState extends State<PostAdScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(height: 20.h),
-
                   PhotoUploadSection(
                     images: state.images,
                     onSelectImages: () => _pickImages(cubit),
                     onRemoveImage: cubit.removeImage,
                   ),
                   SizedBox(height: 24.h),
-
                   const FieldLabel(label: 'Service Title'),
                   PostAdTextField(
                     controller: _titleController,
@@ -89,7 +86,6 @@ class _PostAdScreenState extends State<PostAdScreen> {
                     validator: AppValidator.validateService,
                   ),
                   SizedBox(height: 18.h),
-
                   const FieldLabel(label: 'Category'),
                   CategoryDropdown(
                     selectedCategory: state.selectedCategory,
@@ -97,7 +93,6 @@ class _PostAdScreenState extends State<PostAdScreen> {
                     onChanged: cubit.selectCategory,
                   ),
                   SizedBox(height: 18.h),
-
                   const FieldLabel(label: 'Description'),
                   PostAdTextField(
                     controller: _descriptionController,
@@ -109,61 +104,27 @@ class _PostAdScreenState extends State<PostAdScreen> {
                     validator: AppValidator.validateDescription,
                   ),
                   SizedBox(height: 18.h),
-
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const FieldLabel(label: 'Price (EGP)'),
-                            PostAdTextField(
-                              controller: _priceController,
-                              hint: '0.00',
-                              keyboardType:
-                                  const TextInputType.numberWithOptions(
-                                    decimal: true,
-                                  ),
-                              inputFormatters: [
-                                FilteringTextInputFormatter.allow(
-                                  RegExp(r'^\d*\.?\d{0,2}'),
-                                ),
-                              ],
-                              validator: AppValidator.validatePrice,
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(width: 14.w),
-
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const FieldLabel(label: 'City'),
-                            _CityDropdown(
-                              value: _selectedCity,
-                              onChanged: (city) {
-                                if (city != null) {
-                                  setState(() => _selectedCity = city);
-                                }
-                              },
-                            ),
-                          ],
-                        ),
+                  const FieldLabel(label: 'Price (EGP)'),
+                  PostAdTextField(
+                    controller: _priceController,
+                    hint: '0.00',
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(
+                        RegExp(r'^\d*\.?\d{0,2}'),
                       ),
                     ],
+                    validator: AppValidator.validatePrice,
                   ),
                   SizedBox(height: 18.h),
-
                   const FieldLabel(label: 'Relevant Skills'),
                   SkillsSection(
                     skills: state.skills,
                     onToggle: cubit.toggleSkill,
                   ),
                   SizedBox(height: 32.h),
-
                   isLoading
                       ? const Center(
                           child: CircularProgressIndicator(
@@ -174,7 +135,6 @@ class _PostAdScreenState extends State<PostAdScreen> {
                           label: 'Publish Ad',
                           onTap: () => _onPublish(context, cubit),
                         ),
-
                   SizedBox(height: 32.h),
                 ],
               ),
@@ -209,16 +169,20 @@ class _PostAdScreenState extends State<PostAdScreen> {
         )
         .toList();
 
+    final location = await getIt<LocationService>().getCurrentLocation();
+
     final ad = AdModel(
       adID: DateTime.now().millisecondsSinceEpoch,
       title: _titleController.text.trim(),
       description: _descriptionController.text.trim(),
-      city: _selectedCity.label,
+      city: location?.city ?? '',
+      latitude: location?.latitude ?? 0,
+      longitude: location?.longitude ?? 0,
       photos: [],
       price: double.parse(_priceController.text.trim()),
       category: category,
       relevantSkills: selectedSkills,
-      adCity: _selectedCity,
+      adCity: _resolveAdCity(location?.city, location?.governorate),
       userId: getIt<AuthUser>().uid,
     );
 
@@ -232,41 +196,20 @@ class _PostAdScreenState extends State<PostAdScreen> {
       cubit.addImages(picked.map((xf) => File(xf.path)).toList());
     }
   }
-}
 
-// ─── City Dropdown Widget ────────────────────────────────────────────────────
+  AdCity _resolveAdCity(String? city, String? governorate) {
+    final candidates = [city, governorate]
+        .whereType<String>()
+        .map((value) => value.toLowerCase())
+        .toList();
 
-class _CityDropdown extends StatelessWidget {
-  final AdCity value;
-  final ValueChanged<AdCity?> onChanged;
+    for (final adCity in AdCity.values) {
+      final label = adCity.label.toLowerCase();
+      if (candidates.any((candidate) => candidate.contains(label))) {
+        return adCity;
+      }
+    }
 
-  const _CityDropdown({required this.value, required this.onChanged});
-
-  @override
-  Widget build(BuildContext context) {
-    return DropdownButtonFormField<AdCity>(
-      initialValue: value,
-      isExpanded: true,
-      decoration: InputDecoration(
-        contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 14.h),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8.r),
-          borderSide: BorderSide(color: Colors.grey.shade300),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8.r),
-          borderSide: BorderSide(color: Colors.grey.shade300),
-        ),
-      ),
-      items: AdCity.values
-          .map(
-            (city) => DropdownMenuItem(
-              value: city,
-              child: Text(city.label, overflow: TextOverflow.ellipsis),
-            ),
-          )
-          .toList(),
-      onChanged: onChanged,
-    );
+    return AdCity.cairo;
   }
 }

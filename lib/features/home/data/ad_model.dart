@@ -5,6 +5,8 @@ class AdModel {
   final String title;
   final String description;
   final String city;
+  final double latitude;
+  final double longitude;
   final List<String> photos;
   final double price;
   final AdCategories category;
@@ -20,6 +22,8 @@ class AdModel {
     required this.title,
     required this.description,
     required this.city,
+    required this.latitude,
+    required this.longitude,
     required this.photos,
     required this.price,
     required this.category,
@@ -41,6 +45,8 @@ class AdModel {
       "title": title,
       "description": description,
       "city": city,
+      "latitude": latitude,
+      "longitude": longitude,
       "photos": photos,
       "price": price,
       "category": category.name,
@@ -57,6 +63,8 @@ class AdModel {
     String? title,
     String? description,
     String? city,
+    double? latitude,
+    double? longitude,
     List<String>? photos,
     double? price,
     AdCategories? category,
@@ -72,6 +80,8 @@ class AdModel {
       title: title ?? this.title,
       description: description ?? this.description,
       city: city ?? this.city,
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
       photos: photos ?? this.photos,
       price: price ?? this.price,
       category: category ?? this.category,
@@ -91,6 +101,8 @@ class AdModel {
       title: json['title'] as String,
       description: json['description'] as String,
       city: json['city'] as String,
+      latitude: (json['latitude'] as num?)?.toDouble() ?? 0,
+      longitude: (json['longitude'] as num?)?.toDouble() ?? 0,
       photos: List<String>.from(json['photos'] ?? []),
       price: (json['price'] as num).toDouble(),
       category: AdCategories.values.firstWhere(

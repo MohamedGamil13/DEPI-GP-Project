@@ -6,16 +6,19 @@ import 'package:skillbridge/core/routing/app_navigator.dart';
 import 'package:skillbridge/core/services/auth/auth_service.dart';
 import 'package:skillbridge/core/theme/app_colors.dart';
 import 'package:skillbridge/core/utils/constants/app_strings.dart';
+import 'package:skillbridge/core/utils/constants/shared_skills.dart';
 import 'package:skillbridge/core/utils/helpers/snackbar_manger.dart';
 import 'package:skillbridge/core/utils/locale_cubit.dart';
+import 'package:skillbridge/features/auth/presentation/screens/widgets/primary_button.dart';
 import 'package:skillbridge/features/home/data/ad_model.dart';
+import 'package:skillbridge/features/profile/data/models/user_profile_model.dart';
 import 'package:skillbridge/features/profile/presentation/viewmodel/profile_cubit.dart';
 import 'package:skillbridge/features/profile/presentation/widgets/post_card_widget.dart';
 import 'package:skillbridge/features/profile/presentation/widgets/profile_header_widget.dart';
 import 'package:skillbridge/features/profile/presentation/widgets/profile_skills_widget.dart';
 import 'package:skillbridge/features/profile/presentation/widgets/profile_stats_widget.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:skillbridge/generated/l10n.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ProfileScreen extends StatefulWidget {
   final String? userId;
@@ -57,6 +60,8 @@ class _ProfileScreenState extends State<ProfileScreen>
 
   @override
   Widget build(BuildContext context) {
+    final profileCubit = context.read<ProfileCubit>();
+
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       appBar: _buildAppBar(),
@@ -88,7 +93,7 @@ class _ProfileScreenState extends State<ProfileScreen>
             }
 
             if (state is ProfileSuccess) {
-              return _buildBody(state);
+              return _buildBody(state, profileCubit);
             }
 
             return const SizedBox.shrink();
@@ -124,7 +129,10 @@ class _ProfileScreenState extends State<ProfileScreen>
       actions: [
         if (!_isOtherUserProfile)
           PopupMenuButton<String>(
-            icon: const Icon(Icons.more_vert_rounded, color: AppColors.textDark),
+            icon: const Icon(
+              Icons.more_vert_rounded,
+              color: AppColors.textDark,
+            ),
             onSelected: (value) async {
               if (value == 'contact') {
                 await _contactDevelopers();
@@ -168,7 +176,7 @@ class _ProfileScreenState extends State<ProfileScreen>
   // Body
   // ─────────────────────────────────────────────
 
-  Widget _buildBody(ProfileSuccess state) {
+  Widget _buildBody(ProfileSuccess state, ProfileCubit profileCubit) {
     if (_tabController.index != state.selectedTabIndex) {
       _tabController.animateTo(state.selectedTabIndex);
     }
@@ -185,11 +193,47 @@ class _ProfileScreenState extends State<ProfileScreen>
                 ProfileHeaderWidget(profile: state.userProfile),
                 SizedBox(height: 24.h),
                 ProfileStatsWidget(profile: state.userProfile),
+                if (_formatLocation(state.userProfile) != null) ...[
+                  SizedBox(height: 14.h),
+                  Text(
+                    _formatLocation(state.userProfile)!,
+                    style: TextStyle(
+                      color: AppColors.secondaryColor,
+                      fontSize: 13.sp,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+                if (state.userProfile.bio.trim().isNotEmpty) ...[
+                  SizedBox(height: 20.h),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      state.userProfile.bio,
+                      style: TextStyle(
+                        color: AppColors.textMedium,
+                        fontSize: 14.sp,
+                        height: 1.5,
+                      ),
+                    ),
+                  ),
+                ],
                 SizedBox(height: 28.h),
                 Align(
                   alignment: Alignment.centerLeft,
                   child: ProfileSkillsWidget(
-                    skills: state.userProfile.skills ?? [],
+                    skills: state.userProfile.skills,
+                    onAddSkill: state.isOtherUserProfile
+                        ? null
+                        : () =>
+                              _showSkillPicker(profileCubit, state.userProfile),
+                    onRemoveSkill: state.isOtherUserProfile
+                        ? null
+                        : (skill) => _removeSkill(
+                            profileCubit,
+                            state.userProfile,
+                            skill,
+                          ),
                   ),
                 ),
                 SizedBox(height: 24.h),
@@ -274,6 +318,141 @@ class _ProfileScreenState extends State<ProfileScreen>
     );
   }
 
+  Future<void> _showSkillPicker(
+    ProfileCubit profileCubit,
+    UserProfileModel profile,
+  ) async {
+    final selectedSkills = <String>{...profile.skills};
+    final searchController = TextEditingController();
+    var query = '';
+
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      builder: (sheetContext) {
+        return DraggableScrollableSheet(
+          expand: false,
+          initialChildSize: 0.75,
+          minChildSize: 0.5,
+          maxChildSize: 0.95,
+          builder: (context, scrollController) {
+            return StatefulBuilder(
+              builder: (context, setSheetState) {
+                final filtered = SharedSkills.all.where((skill) {
+                  return skill.toLowerCase().contains(query.toLowerCase());
+                }).toList();
+
+                return Padding(
+                  padding: EdgeInsets.only(
+                    left: 20.w,
+                    right: 20.w,
+                    top: 20.h,
+                    bottom:
+                        MediaQuery.of(sheetContext).viewInsets.bottom + 20.h,
+                  ),
+                  child: SingleChildScrollView(
+                    controller: scrollController,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Add Skill',
+                          style: TextStyle(
+                            fontSize: 18.sp,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        SizedBox(height: 12.h),
+                        TextField(
+                          controller: searchController,
+                          decoration: const InputDecoration(
+                            hintText: 'Search skills',
+                            prefixIcon: Icon(Icons.search),
+                          ),
+                          onChanged: (value) {
+                            setSheetState(() => query = value);
+                          },
+                        ),
+                        SizedBox(height: 16.h),
+                        Wrap(
+                          spacing: 8.w,
+                          runSpacing: 8.h,
+                          children: filtered.map((skill) {
+                            final isSelected = selectedSkills.contains(skill);
+                            return FilterChip(
+                              label: Text(skill),
+                              selected: isSelected,
+                              onSelected: (selected) {
+                                setSheetState(() {
+                                  if (selected) {
+                                    selectedSkills.add(skill);
+                                  } else {
+                                    selectedSkills.remove(skill);
+                                  }
+                                });
+                              },
+                            );
+                          }).toList(),
+                        ),
+                        SizedBox(height: 16.h),
+                        PrimaryButton(
+                          label: 'Save Skills',
+                          onTap: () async {
+                            final updated = profile.copyWith(
+                              skills: selectedSkills.toList()..sort(),
+                            );
+                            await profileCubit.updateProfile(updated);
+                            if (sheetContext.mounted) {
+                              Navigator.of(sheetContext).pop();
+                            }
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            );
+          },
+        );
+      },
+    );
+
+    searchController.dispose();
+  }
+
+  Future<void> _removeSkill(
+    ProfileCubit profileCubit,
+    UserProfileModel profile,
+    String skill,
+  ) async {
+    final updatedSkills = profile.skills
+        .where((item) => item != skill)
+        .toList();
+    await profileCubit.updateProfile(profile.copyWith(skills: updatedSkills));
+  }
+
+  String? _formatLocation(UserProfileModel profile) {
+    final city = profile.city.trim();
+    final governorate = profile.governorate.trim();
+    final country = profile.country.trim();
+
+    final parts = <String>[];
+    if (city.isNotEmpty) parts.add(city);
+    if (governorate.isNotEmpty &&
+        governorate.toLowerCase() != city.toLowerCase()) {
+      parts.add(governorate);
+    }
+    if (country.isNotEmpty &&
+        country.toLowerCase() != governorate.toLowerCase() &&
+        country.toLowerCase() != city.toLowerCase()) {
+      parts.add(country);
+    }
+
+    if (parts.isEmpty) return null;
+    return parts.join(', ');
+  }
+
   // ─────────────────────────────────────────────
   // Posts List
   // ─────────────────────────────────────────────
@@ -317,15 +496,16 @@ class _ProfileScreenState extends State<ProfileScreen>
           ),
           SizedBox(height: 16.h),
           ElevatedButton(
-            onPressed: () => context.read<ProfileCubit>().loadProfile(
-              userId: widget.userId,
-            ).then((_) {
-              if (mounted) {
-                context.read<ProfileCubit>().loadCurrentUserPosts(
-                  userId: widget.userId,
-                );
-              }
-            }),
+            onPressed: () => context
+                .read<ProfileCubit>()
+                .loadProfile(userId: widget.userId)
+                .then((_) {
+                  if (mounted) {
+                    context.read<ProfileCubit>().loadCurrentUserPosts(
+                      userId: widget.userId,
+                    );
+                  }
+                }),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primaryColor,
               shape: RoundedRectangleBorder(

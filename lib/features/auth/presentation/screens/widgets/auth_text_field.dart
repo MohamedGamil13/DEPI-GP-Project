@@ -9,6 +9,8 @@ class AuthTextField extends StatefulWidget {
   final bool showToggle;
   final TextEditingController? controller;
   final String? Function(String?)? validator;
+  final int? maxLines;
+  final int? maxLength;
 
   const AuthTextField({
     super.key,
@@ -18,6 +20,8 @@ class AuthTextField extends StatefulWidget {
     this.showToggle = false,
     this.controller,
     this.validator,
+    this.maxLines = 1,
+    this.maxLength,
   });
 
   @override
@@ -39,6 +43,8 @@ class _AuthTextFieldState extends State<AuthTextField> {
       validator: widget.validator,
       controller: widget.controller,
       obscureText: _obscure,
+      maxLines: widget.maxLines,
+      maxLength: widget.maxLength,
       cursorColor: AppColors.primaryColor,
       style: AppStyles.font14w600,
       decoration: InputDecoration(

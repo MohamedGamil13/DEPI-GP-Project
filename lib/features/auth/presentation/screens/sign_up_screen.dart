@@ -24,6 +24,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _bioController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -31,6 +32,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
+    _bioController.dispose();
     super.dispose();
   }
 
@@ -105,7 +107,25 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     obscure: true,
                     showToggle: true,
                   ),
-                  SizedBox(height: 32.h),
+                  SizedBox(height: 18.h),
+
+                  // â”€â”€ Bio â”€â”€ 
+                  const FieldLabel(label: 'Bio'),
+                  AuthTextField(
+                    controller: _bioController,
+                    hint: 'Tell others a little about yourself',
+                    prefixIcon: Icons.edit_outlined,
+                    maxLines: 4,
+                    maxLength: 300,
+                    validator: (value) {
+                      if (value == null) return null;
+                      if (value.trim().length > 300) {
+                        return 'Bio must be 300 characters or less';
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: 28.h),
 
                   // ── Sign Up Button (With BlocBuilder) ──
                   BlocBuilder<AuthCubit, AuthState>(
@@ -124,6 +144,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             context.read<AuthCubit>().signUp(
                               _emailController.text.trim(),
                               _passwordController.text,
+                              bio: _bioController.text.trim(),
                             );
                           }
                         },
