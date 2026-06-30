@@ -19,6 +19,11 @@ class ChatServiceException implements Exception {
 abstract interface class IChatService {
   // ── One-shot fetches ───────────────────────────────────────────────────────
   Future<List<ChatMessage>> getChatMessages(String conversationId);
+  Future<List<ChatMessage>> getOlderMessages({
+    required String conversationId,
+    required DateTime before,
+    int limit,
+  });
   Future<List<ConversationModel>> getAllConversations(String userId);
   Future<ConversationModel?> getConversation(String conversationId);
 
@@ -45,6 +50,12 @@ abstract interface class IChatService {
   });
 
   Future<ConversationModel> createConversation(ConversationModel conversation);
+
+  Future<ConversationModel?> findConversation({
+    required String providerId,
+    required String customerId,
+    required String serviceId,
+  });
 
   Future<void> deleteConversation(String conversationId);
 }
@@ -83,6 +94,31 @@ class ChatService implements IChatService {
     } on FirebaseException catch (e) {
       throw ChatServiceException(
         'Failed to fetch messages for conversation $conversationId',
+        cause: e,
+      );
+    }
+  }
+
+  @override
+  Future<List<ChatMessage>> getOlderMessages({
+    required String conversationId,
+    required DateTime before,
+    int limit = 20,
+  }) async {
+    try {
+      final snapshot = await _messages(conversationId)
+          .orderBy('sentAt', descending: true)
+          .where('sentAt', isLessThan: Timestamp.fromDate(before))
+          .limit(limit)
+          .get();
+
+      final messages = snapshot.docs
+          .map((doc) => ChatMessage.fromMap(doc.data(), id: doc.id))
+          .toList();
+      return messages.reversed.toList();
+    } on FirebaseException catch (e) {
+      throw ChatServiceException(
+        'Failed to fetch older messages for conversation $conversationId',
         cause: e,
       );
     }
@@ -257,6 +293,7 @@ class ChatService implements IChatService {
       batch.update(_conversations.doc(conversationId), {
         'lastActivityAt': Timestamp.fromDate(now),
         'unreadCount': FieldValue.increment(1),
+        'lastMessageText': text.trim(),
       });
 
       await batch.commit();
@@ -316,6 +353,42 @@ class ChatService implements IChatService {
   }
 
   @override
+  Future<ConversationModel?> findConversation({
+    required String providerId,
+    required String customerId,
+    required String serviceId,
+  }) async {
+    try {
+      final results = await Future.wait([
+        _conversations
+            .where('providerId', isEqualTo: providerId)
+            .where('customerId', isEqualTo: customerId)
+            .get(),
+        _conversations
+            .where('providerId', isEqualTo: customerId)
+            .where('customerId', isEqualTo: providerId)
+            .get(),
+      ]);
+
+      for (final snapshot in results) {
+        for (final doc in snapshot.docs) {
+          final conversation = ConversationModel.fromMap(
+            doc.data(),
+            id: doc.id,
+          );
+          if (conversation.serviceId == serviceId) {
+            return conversation;
+          }
+        }
+      }
+
+      return null;
+    } on FirebaseException catch (e) {
+      throw ChatServiceException('Failed to find conversation', cause: e);
+    }
+  }
+
+  @override
   Future<ConversationModel> createConversation(
     ConversationModel conversation,
   ) async {
@@ -351,4 +424,5 @@ class ChatService implements IChatService {
       throw ChatServiceException('Failed to delete conversation', cause: e);
     }
   }
+
 }

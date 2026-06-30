@@ -34,6 +34,7 @@ dependencies:
   dio: ^5.9.2
   firebase_auth: ^6.1.4
   firebase_core: ^4.4.0
+  firebase_messaging: ^16.4.1
   flutter:
     sdk: flutter
   flutter_bloc: ^9.1.1
@@ -50,6 +51,8 @@ dependencies:
   intl: ^0.20.2
   logger: ^2.7.0
   lottie: ^3.3.3
+  app_links: ^6.3.3
+  flutter_local_notifications: ^19.5.0
   url_launcher: ^6.3.2
 
 dev_dependencies:

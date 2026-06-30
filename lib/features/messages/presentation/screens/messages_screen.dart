@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:skillbridge/core/locator/service_locator.dart';
 import 'package:skillbridge/core/routing/app_navigator.dart';
+import 'package:skillbridge/core/services/auth/auth_service.dart';
 import 'package:skillbridge/core/theme/app_colors.dart';
 import 'package:skillbridge/core/theme/app_styles.dart';
+import 'package:skillbridge/core/utils/constants/app_strings.dart';
 import 'package:skillbridge/features/messages/data/models/conversation_model.dart';
 import 'package:skillbridge/features/messages/presentation/viewmodel/messages_cubit.dart';
-
-/// Replace with your auth provider's current user id.
-const String _kCurrentUserId = 'provider-uid-001';
 
 class MessagesScreen extends StatefulWidget {
   const MessagesScreen({super.key});
@@ -20,8 +20,10 @@ class _MessagesScreenState extends State<MessagesScreen> {
   @override
   void initState() {
     super.initState();
-    // Start the real-time inbox stream as soon as the screen mounts.
-    context.read<MessagesCubit>().loadInbox(_kCurrentUserId);
+    final currentUser = getIt<AuthService>().currentUser;
+    if (currentUser != null) {
+      context.read<MessagesCubit>().loadInbox(currentUser.uid);
+    }
   }
 
   @override
@@ -32,7 +34,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
         elevation: 0,
         backgroundColor: AppColors.backgroundColor,
         foregroundColor: AppColors.textDark,
-        title: const Text('Messages'),
+        title: Text(AppStrings.messages(context)),
       ),
       body: BlocBuilder<MessagesCubit, MessagesState>(
         builder: (context, state) {
@@ -45,8 +47,12 @@ class _MessagesScreenState extends State<MessagesScreen> {
           if (state is MessagesError) {
             return _ErrorView(
               message: state.message,
-              onRetry: () =>
-                  context.read<MessagesCubit>().loadInbox(_kCurrentUserId),
+              onRetry: () {
+                final currentUser = getIt<AuthService>().currentUser;
+                if (currentUser != null) {
+                  context.read<MessagesCubit>().loadInbox(currentUser.uid);
+                }
+              },
             );
           }
 
@@ -72,7 +78,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                   itemBuilder: (context, index) {
                     final filter = MessageFilter.values[index];
                     return _FilterChip(
-                      label: _filterLabel(filter),
+                      label: _filterLabel(context, filter),
                       isSelected: loadedState.selectedFilter == filter,
                       onTap: () =>
                           context.read<MessagesCubit>().selectFilter(filter),
@@ -97,7 +103,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
                                   .read<MessagesCubit>()
                                   .openConversation(
                                     conversationId: conversation.id,
-                                    currentUserId: _kCurrentUserId,
+                                    currentUserId:
+                                        getIt<AuthService>().currentUser!.uid,
                                   );
                               if (context.mounted) {
                                 context.goChatDetail(conversation);
@@ -151,7 +158,7 @@ class _InboxSearchFieldState extends State<_InboxSearchField> {
       controller: _controller,
       onChanged: widget.onChanged,
       decoration: InputDecoration(
-        hintText: 'Search by customer or service',
+        hintText: AppStrings.searchConversations(context),
         prefixIcon: const Icon(Icons.search_rounded),
         filled: true,
         fillColor: AppColors.surfaceColor,
@@ -251,7 +258,7 @@ class _ConversationCard extends StatelessWidget {
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          _formatTimestamp(latestMessage?.sentAt),
+                          _formatTimestamp(context, latestMessage?.sentAt),
                           style: AppStyles.font13w500.copyWith(
                             color: AppColors.textLight,
                           ),
@@ -260,7 +267,7 @@ class _ConversationCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      latestMessage?.text ?? 'No messages yet',
+                      latestMessage?.text ?? AppStrings.noMessagesYet(context),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: AppStyles.font14Regular.copyWith(
@@ -280,7 +287,7 @@ class _ConversationCard extends StatelessWidget {
                         ),
                         _MetaChip(
                           icon: Icons.flag_outlined,
-                          label: _statusLabel(conversation.status),
+                          label: _statusLabel(context, conversation.status),
                           color: _statusBackground(conversation.status),
                           textColor: _statusForeground(conversation.status),
                         ),
@@ -423,7 +430,7 @@ class _ErrorView extends StatelessWidget {
             TextButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh_rounded),
-              label: const Text('Try again'),
+              label: Text(AppStrings.tryAgain(context)),
             ),
           ],
         ),
@@ -458,14 +465,14 @@ class _EmptyInbox extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 18),
-            const Text(
-              'No conversations yet',
+            Text(
+              AppStrings.noConversations(context),
               style: AppStyles.font17Bold,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
             Text(
-              'When someone contacts you about a service, it will appear here.',
+              AppStrings.emptyInboxDescription(context),
               textAlign: TextAlign.center,
               style: AppStyles.font14Regular.copyWith(
                 color: AppColors.textMedium,
@@ -480,18 +487,18 @@ class _EmptyInbox extends StatelessWidget {
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-String _filterLabel(MessageFilter filter) => switch (filter) {
-  MessageFilter.all => 'All',
-  MessageFilter.newLeads => 'New Leads',
-  MessageFilter.active => 'Active',
-  MessageFilter.waiting => 'Waiting',
+String _filterLabel(BuildContext _context, MessageFilter filter) => switch (filter) {
+  MessageFilter.all => AppStrings.all(_context),
+  MessageFilter.newLeads => AppStrings.newLeads(_context),
+  MessageFilter.active => AppStrings.active(_context),
+  MessageFilter.waiting => AppStrings.waiting(_context),
 };
 
-String _statusLabel(ConversationStatus status) => switch (status) {
-  ConversationStatus.newLead => 'New Lead',
-  ConversationStatus.active => 'Active',
-  ConversationStatus.waiting => 'Waiting',
-  ConversationStatus.closed => 'Closed',
+String _statusLabel(BuildContext _context, ConversationStatus status) => switch (status) {
+  ConversationStatus.newLead => AppStrings.newLead(_context),
+  ConversationStatus.active => AppStrings.active(_context),
+  ConversationStatus.waiting => AppStrings.waiting(_context),
+  ConversationStatus.closed => AppStrings.closed(_context),
 };
 
 Color _statusBackground(ConversationStatus status) => switch (status) {
@@ -508,7 +515,7 @@ Color _statusForeground(ConversationStatus status) => switch (status) {
   ConversationStatus.closed => AppColors.textMedium,
 };
 
-String _formatTimestamp(DateTime? value) {
+String _formatTimestamp(BuildContext context, DateTime? value) {
   if (value == null) return '';
   final now = DateTime.now();
   final difference = now.difference(value);
@@ -521,7 +528,7 @@ String _formatTimestamp(DateTime? value) {
     final suffix = value.hour >= 12 ? 'PM' : 'AM';
     return '$hour:$minute $suffix';
   }
-  if (difference.inDays == 1) return 'Yesterday';
+  if (difference.inDays == 1) return AppStrings.yesterdayShort(context);
   if (difference.inDays < 7) {
     const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     return weekdays[value.weekday - 1];

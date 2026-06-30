@@ -1,1 +1,24 @@
-{}
+{
+  "@@locale": "en",
+  "appName": "ServiMarket",
+  "favorites": "Favorites",
+  "noFavoritesYet": "No favorites yet.",
+  "allReviews": "All Reviews",
+  "noReviewsYet": "No reviews yet.",
+  "seeAll": "See All",
+  "serviceDescription": "Service Description",
+  "review": "Review",
+  "reviews": "Reviews",
+  "messagePoster": "Message Poster",
+  "submitReview": "Submit Review",
+  "writeReview": "Write a Review",
+  "shareExperienceOptional": "Share your experience (optional)",
+  "viewProfile": "View Profile",
+  "ratingSummary": "ratings",
+  "language": "Language",
+  "english": "English",
+  "arabic": "Arabic",
+  "signOut": "Sign Out",
+  "contactDevelopers": "Contact Developers",
+  "profile": "Profile"
+}

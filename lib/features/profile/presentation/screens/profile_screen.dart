@@ -1,17 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:skillbridge/core/locator/service_locator.dart';
+import 'package:skillbridge/core/routing/app_navigator.dart';
+import 'package:skillbridge/core/services/auth/auth_service.dart';
 import 'package:skillbridge/core/theme/app_colors.dart';
+import 'package:skillbridge/core/utils/constants/app_strings.dart';
 import 'package:skillbridge/core/utils/helpers/snackbar_manger.dart';
+import 'package:skillbridge/core/utils/locale_cubit.dart';
 import 'package:skillbridge/features/home/data/ad_model.dart';
 import 'package:skillbridge/features/profile/presentation/viewmodel/profile_cubit.dart';
 import 'package:skillbridge/features/profile/presentation/widgets/post_card_widget.dart';
 import 'package:skillbridge/features/profile/presentation/widgets/profile_header_widget.dart';
 import 'package:skillbridge/features/profile/presentation/widgets/profile_skills_widget.dart';
 import 'package:skillbridge/features/profile/presentation/widgets/profile_stats_widget.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:skillbridge/generated/l10n.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  final String? userId;
+
+  const ProfileScreen({super.key, this.userId});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -21,13 +30,22 @@ class _ProfileScreenState extends State<ProfileScreen>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
 
+  bool get _isOtherUserProfile {
+    if (widget.userId == null) return false;
+    final currentUserId = getIt<AuthService>().currentUser?.uid;
+    return widget.userId != currentUserId;
+  }
+
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    // Load profile first, then posts
-    context.read<ProfileCubit>().loadProfile().then((_) {
-      if (mounted) context.read<ProfileCubit>().loadCurrentUserPosts();
+    context.read<ProfileCubit>().loadProfile(userId: widget.userId).then((_) {
+      if (mounted) {
+        context.read<ProfileCubit>().loadCurrentUserPosts(
+          userId: widget.userId,
+        );
+      }
     });
   }
 
@@ -89,48 +107,59 @@ class _ProfileScreenState extends State<ProfileScreen>
       backgroundColor: AppColors.backgroundColor,
       elevation: 0,
       centerTitle: true,
-      title: const Text(
-        'Profile',
-        style: TextStyle(
+      leading: _isOtherUserProfile
+          ? IconButton(
+              icon: const Icon(Icons.arrow_back, color: AppColors.textDark),
+              onPressed: () => context.popPage(),
+            )
+          : null,
+      title: Text(
+        _isOtherUserProfile ? S.of(context).profile : S.of(context).profile,
+        style: const TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.w700,
           color: AppColors.textDark,
         ),
       ),
-      leading: GestureDetector(
-        onTap: () {},
-        child: Container(
-          margin: EdgeInsets.all(8.r),
-          decoration: BoxDecoration(
-            border: Border.all(color: AppColors.border),
-            borderRadius: BorderRadius.circular(10.r),
-          ),
-          child: Icon(
-            Icons.settings_outlined,
-            size: 18.sp,
-            color: AppColors.textDark,
-          ),
-        ),
-      ),
       actions: [
-        GestureDetector(
-          onTap: () => AppSnackBar.info(context, 'Share link copied!'),
-          child: Container(
-            margin: EdgeInsets.all(8.r),
-            decoration: BoxDecoration(
-              border: Border.all(color: AppColors.border),
-              borderRadius: BorderRadius.circular(10.r),
-            ),
-            child: Padding(
-              padding: EdgeInsets.all(6.r),
-              child: Icon(
-                Icons.share_outlined,
-                size: 18.sp,
-                color: AppColors.textDark,
+        if (!_isOtherUserProfile)
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert_rounded, color: AppColors.textDark),
+            onSelected: (value) async {
+              if (value == 'contact') {
+                await _contactDevelopers();
+              }
+              if (value == 'language') {
+                await _showLanguageDialog(context);
+              }
+              if (value == 'signout') {
+                await context.read<ProfileCubit>().signOut();
+
+                if (mounted) {
+                  context.gosignIn();
+
+                  AppSnackBar.success(
+                    context,
+                    AppStrings.signedOutSuccessfully(context),
+                  );
+                }
+              }
+            },
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: 'language',
+                child: Text(S.of(context).language),
               ),
-            ),
+              PopupMenuItem(
+                value: 'contact',
+                child: Text(S.of(context).contactDevelopers),
+              ),
+              PopupMenuItem(
+                value: 'signout',
+                child: Text(S.of(context).signOut),
+              ),
+            ],
           ),
-        ),
       ],
     );
   }
@@ -188,9 +217,9 @@ class _ProfileScreenState extends State<ProfileScreen>
                 fontWeight: FontWeight.w500,
                 fontSize: 15.sp,
               ),
-              tabs: const [
-                Tab(text: 'My Posts'),
-                Tab(text: 'Activity'),
+              tabs: [
+                Tab(text: AppStrings.tabMyPosts(context)),
+                Tab(text: AppStrings.tabActivity(context)),
               ],
             ),
           ),
@@ -233,7 +262,7 @@ class _ProfileScreenState extends State<ProfileScreen>
           // Activity tab — wired up when backend is ready
           Center(
             child: Text(
-              'No activity yet.',
+              AppStrings.noActivityYet(context),
               style: TextStyle(
                 color: AppColors.secondaryColor,
                 fontSize: 14.sp,
@@ -253,7 +282,7 @@ class _ProfileScreenState extends State<ProfileScreen>
     if (posts.isEmpty) {
       return Center(
         child: Text(
-          'No posts yet.',
+          AppStrings.noPostsYet(context),
           style: TextStyle(color: AppColors.secondaryColor, fontSize: 14.sp),
         ),
       );
@@ -265,8 +294,7 @@ class _ProfileScreenState extends State<ProfileScreen>
       itemBuilder: (context, index) {
         return PostCardWidget(
           post: posts[index],
-          onTap: () =>
-              AppSnackBar.info(context, 'Opening: ${posts[index].title}'),
+          onTap: () => context.goAdDetails(posts[index]),
         );
       },
     );
@@ -284,15 +312,19 @@ class _ProfileScreenState extends State<ProfileScreen>
           Icon(Icons.error_outline, size: 54.sp, color: AppColors.errorColor),
           SizedBox(height: 12.h),
           Text(
-            'Failed to load profile.',
+            AppStrings.failedToLoadProfile(context),
             style: TextStyle(fontSize: 15.sp, color: AppColors.secondaryColor),
           ),
           SizedBox(height: 16.h),
           ElevatedButton(
-            onPressed: () => context.read<ProfileCubit>().loadProfile().then((
-              _,
-            ) {
-              if (mounted) context.read<ProfileCubit>().loadCurrentUserPosts();
+            onPressed: () => context.read<ProfileCubit>().loadProfile(
+              userId: widget.userId,
+            ).then((_) {
+              if (mounted) {
+                context.read<ProfileCubit>().loadCurrentUserPosts(
+                  userId: widget.userId,
+                );
+              }
             }),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primaryColor,
@@ -302,7 +334,7 @@ class _ProfileScreenState extends State<ProfileScreen>
               padding: EdgeInsets.symmetric(horizontal: 32.w, vertical: 12.h),
             ),
             child: Text(
-              'Retry',
+              AppStrings.retry(context),
               style: TextStyle(
                 color: AppColors.white,
                 fontWeight: FontWeight.w600,
@@ -323,13 +355,14 @@ class _ProfileScreenState extends State<ProfileScreen>
           Icon(Icons.error_outline, size: 40.sp, color: AppColors.errorColor),
           SizedBox(height: 12.h),
           Text(
-            'Failed to load posts.',
+            AppStrings.failedToLoadPosts(context),
             style: TextStyle(fontSize: 14.sp, color: AppColors.secondaryColor),
           ),
           SizedBox(height: 16.h),
           ElevatedButton(
-            onPressed: () =>
-                context.read<ProfileCubit>().loadCurrentUserPosts(),
+            onPressed: () => context.read<ProfileCubit>().loadCurrentUserPosts(
+              userId: widget.userId,
+            ),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primaryColor,
               shape: RoundedRectangleBorder(
@@ -338,7 +371,7 @@ class _ProfileScreenState extends State<ProfileScreen>
               padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 10.h),
             ),
             child: Text(
-              'Retry',
+              AppStrings.retry(context),
               style: TextStyle(
                 color: AppColors.white,
                 fontWeight: FontWeight.w600,
@@ -350,6 +383,56 @@ class _ProfileScreenState extends State<ProfileScreen>
       ),
     );
   }
+}
+
+Future<void> _contactDevelopers() async {
+  final uri = Uri.parse(
+    'mailto:support@skillbridge.app?subject=SkillBridge%20Support',
+  );
+  if (await canLaunchUrl(uri)) {
+    await launchUrl(uri);
+  }
+}
+
+Future<void> _showLanguageDialog(BuildContext context) async {
+  final localeCubit = context.read<LocaleCubit>();
+  final currentLocale = Localizations.localeOf(context).languageCode;
+
+  await showDialog<void>(
+    context: context,
+    builder: (dialogContext) {
+      return AlertDialog(
+        title: Text(S.of(dialogContext).language),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            RadioListTile<String>(
+              value: 'en',
+              groupValue: currentLocale,
+              title: Text(S.of(dialogContext).english),
+              onChanged: (value) async {
+                if (value != null) {
+                  await localeCubit.setLocale(const Locale('en'));
+                  if (dialogContext.mounted) Navigator.of(dialogContext).pop();
+                }
+              },
+            ),
+            RadioListTile<String>(
+              value: 'ar',
+              groupValue: currentLocale,
+              title: Text(S.of(dialogContext).arabic),
+              onChanged: (value) async {
+                if (value != null) {
+                  await localeCubit.setLocale(const Locale('ar'));
+                  if (dialogContext.mounted) Navigator.of(dialogContext).pop();
+                }
+              },
+            ),
+          ],
+        ),
+      );
+    },
+  );
 }
 
 // ─────────────────────────────────────────────

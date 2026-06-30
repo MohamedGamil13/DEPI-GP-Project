@@ -12,12 +12,14 @@ class ProfileSuccess extends ProfileState {
   final List<AdModel> myPosts;
   final List<AdModel> activityPosts;
   final int selectedTabIndex;
+  final bool isOtherUserProfile;
 
   ProfileSuccess({
     required this.userProfile,
     required this.myPosts,
     required this.activityPosts,
     this.selectedTabIndex = 0,
+    this.isOtherUserProfile = false,
   });
 
   ProfileSuccess copyWith({
@@ -25,12 +27,14 @@ class ProfileSuccess extends ProfileState {
     List<AdModel>? myPosts,
     List<AdModel>? activityPosts,
     int? selectedTabIndex,
+    bool? isOtherUserProfile,
   }) {
     return ProfileSuccess(
       userProfile: userProfile ?? this.userProfile,
       myPosts: myPosts ?? this.myPosts,
       activityPosts: activityPosts ?? this.activityPosts,
       selectedTabIndex: selectedTabIndex ?? this.selectedTabIndex,
+      isOtherUserProfile: isOtherUserProfile ?? this.isOtherUserProfile,
     );
   }
 }

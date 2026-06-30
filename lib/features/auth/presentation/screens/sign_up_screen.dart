@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:skillbridge/core/routing/app_navigator.dart';
 import 'package:skillbridge/core/theme/app_colors.dart';
+import 'package:skillbridge/core/utils/constants/app_strings.dart';
 import 'package:skillbridge/core/utils/helpers/snackbar_manger.dart';
 import 'package:skillbridge/core/utils/validator/app_validator.dart';
 import 'package:skillbridge/features/auth/presentation/screens/widgets/auth_text_field.dart';
@@ -54,8 +55,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   SizedBox(height: 40.h),
 
                   // ── Title ──
-                  const Text(
-                    'Create Account',
+                  Text(
+                    AppStrings.createAccount(context),
                     style: TextStyle(
                       fontSize: 30,
                       fontWeight: FontWeight.w800,
