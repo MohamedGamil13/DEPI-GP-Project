@@ -9,40 +9,47 @@ class CategoriesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const SliverToBoxAdapter(
-      child: Padding(
-        padding: EdgeInsets.only(bottom: 16.0),
-        child: SizedBox(height: 48, child: _CategoriesListView()),
-      ),
+    return BlocBuilder<HomeCubit, HomeState>(
+      buildWhen: (previous, current) =>
+          current is HomeSuccess || current is HomeLoading,
+      builder: (context, state) {
+        final selectedCategory = state is HomeSuccess
+            ? state.selectedCategory
+            : AdCategories.all;
+
+        return SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 16.0),
+            child: SizedBox(
+              height: 48,
+              child: _CategoriesListView(selectedCategory: selectedCategory),
+            ),
+          ),
+        );
+      },
     );
   }
 }
 
-class _CategoriesListView extends StatefulWidget {
-  const _CategoriesListView();
+class _CategoriesListView extends StatelessWidget {
+  final AdCategories selectedCategory;
 
-  @override
-  State<_CategoriesListView> createState() => __CategoriesListViewState();
-}
-
-class __CategoriesListViewState extends State<_CategoriesListView> {
-  int _currentIndex = 0;
+  const _CategoriesListView({required this.selectedCategory});
 
   @override
   Widget build(BuildContext context) {
-    const List<AdCategories> categories = AdCategories.values;
+    const categories = AdCategories.values;
     return ListView.builder(
       scrollDirection: Axis.horizontal,
       itemCount: categories.length,
       itemBuilder: (BuildContext context, int index) {
-        final AdCategories category = categories[index];
+        final category = categories[index];
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           child: CategoryTab(
             adCategories: category,
-            selected: index == _currentIndex,
+            selected: category == selectedCategory,
             onTap: () {
-              setState(() => _currentIndex = index);
               context.read<HomeCubit>().getFilteredPosts(category);
             },
           ),

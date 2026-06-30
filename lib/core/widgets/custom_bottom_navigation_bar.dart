@@ -4,7 +4,9 @@ import 'package:skillbridge/core/routing/app_navigator.dart';
 import 'package:skillbridge/core/theme/app_colors.dart';
 
 class CustomBottomNavigationBar extends StatefulWidget {
-  const CustomBottomNavigationBar({super.key});
+  final int initialIndex;
+
+  const CustomBottomNavigationBar({super.key, this.initialIndex = 0});
 
   @override
   State<CustomBottomNavigationBar> createState() =>
@@ -12,7 +14,14 @@ class CustomBottomNavigationBar extends StatefulWidget {
 }
 
 class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
-  int _bottomNavIndex = 0;
+  late int _bottomNavIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    _bottomNavIndex = widget.initialIndex;
+  }
+
   @override
   Widget build(BuildContext context) {
     return AnimatedBottomNavigationBar(
@@ -30,12 +39,20 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
       leftCornerRadius: 32,
       rightCornerRadius: 32,
       onTap: (index) {
+        if (index == 1) {
+          context.goFavorites();
+          return;
+        }
         if (index == 2) {
           context.goMessages();
           return;
         }
         if (index == 3) {
           context.goProfile();
+          return;
+        }
+        if (index == 0) {
+          context.goHome();
           return;
         }
 

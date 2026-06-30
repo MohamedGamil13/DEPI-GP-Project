@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:skillbridge/core/locator/service_locator.dart';
 import 'package:skillbridge/core/routing/app_navigator.dart';
+import 'package:skillbridge/core/services/auth/auth_service.dart';
 import 'package:skillbridge/core/theme/app_colors.dart';
 import 'package:skillbridge/core/utils/constants/app_strings.dart';
 import 'package:skillbridge/core/utils/helpers/snackbar_manger.dart';
@@ -14,7 +16,9 @@ import 'package:skillbridge/features/profile/presentation/widgets/profile_stats_
 import 'package:url_launcher/url_launcher.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  final String? userId;
+
+  const ProfileScreen({super.key, this.userId});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -24,13 +28,22 @@ class _ProfileScreenState extends State<ProfileScreen>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
 
+  bool get _isOtherUserProfile {
+    if (widget.userId == null) return false;
+    final currentUserId = getIt<AuthService>().currentUser?.uid;
+    return widget.userId != currentUserId;
+  }
+
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    // Load profile first, then posts
-    context.read<ProfileCubit>().loadProfile().then((_) {
-      if (mounted) context.read<ProfileCubit>().loadCurrentUserPosts();
+    context.read<ProfileCubit>().loadProfile(userId: widget.userId).then((_) {
+      if (mounted) {
+        context.read<ProfileCubit>().loadCurrentUserPosts(
+          userId: widget.userId,
+        );
+      }
     });
   }
 
@@ -92,8 +105,14 @@ class _ProfileScreenState extends State<ProfileScreen>
       backgroundColor: AppColors.backgroundColor,
       elevation: 0,
       centerTitle: true,
+      leading: _isOtherUserProfile
+          ? IconButton(
+              icon: const Icon(Icons.arrow_back, color: AppColors.textDark),
+              onPressed: () => context.popPage(),
+            )
+          : null,
       title: Text(
-        AppStrings.profile(context),
+        _isOtherUserProfile ? 'Profile' : AppStrings.profile(context),
         style: const TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.w700,
@@ -101,36 +120,37 @@ class _ProfileScreenState extends State<ProfileScreen>
         ),
       ),
       actions: [
-        PopupMenuButton<String>(
-          icon: const Icon(Icons.more_vert_rounded, color: AppColors.textDark),
-          onSelected: (value) async {
-            if (value == 'contact') {
-              await _contactDevelopers();
-            }
-            if (value == 'signout') {
-              await context.read<ProfileCubit>().signOut();
-
-              if (mounted) {
-                context.gosignIn();
-
-                AppSnackBar.success(
-                  context,
-                  AppStrings.signedOutSuccessfully(context),
-                );
+        if (!_isOtherUserProfile)
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert_rounded, color: AppColors.textDark),
+            onSelected: (value) async {
+              if (value == 'contact') {
+                await _contactDevelopers();
               }
-            }
-          },
-          itemBuilder: (context) => [
-            PopupMenuItem(
-              value: 'contact',
-              child: Text(AppStrings.contactDevelopers(context)),
-            ),
-            PopupMenuItem(
-              value: 'signout',
-              child: Text(AppStrings.signOut(context)),
-            ),
-          ],
-        ),
+              if (value == 'signout') {
+                await context.read<ProfileCubit>().signOut();
+
+                if (mounted) {
+                  context.gosignIn();
+
+                  AppSnackBar.success(
+                    context,
+                    AppStrings.signedOutSuccessfully(context),
+                  );
+                }
+              }
+            },
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: 'contact',
+                child: Text(AppStrings.contactDevelopers(context)),
+              ),
+              PopupMenuItem(
+                value: 'signout',
+                child: Text(AppStrings.signOut(context)),
+              ),
+            ],
+          ),
       ],
     );
   }
@@ -265,8 +285,7 @@ class _ProfileScreenState extends State<ProfileScreen>
       itemBuilder: (context, index) {
         return PostCardWidget(
           post: posts[index],
-          onTap: () =>
-              AppSnackBar.info(context, 'Opening: ${posts[index].title}'),
+          onTap: () => context.goAdDetails(posts[index]),
         );
       },
     );
@@ -289,10 +308,14 @@ class _ProfileScreenState extends State<ProfileScreen>
           ),
           SizedBox(height: 16.h),
           ElevatedButton(
-            onPressed: () => context.read<ProfileCubit>().loadProfile().then((
-              _,
-            ) {
-              if (mounted) context.read<ProfileCubit>().loadCurrentUserPosts();
+            onPressed: () => context.read<ProfileCubit>().loadProfile(
+              userId: widget.userId,
+            ).then((_) {
+              if (mounted) {
+                context.read<ProfileCubit>().loadCurrentUserPosts(
+                  userId: widget.userId,
+                );
+              }
             }),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primaryColor,
@@ -328,8 +351,9 @@ class _ProfileScreenState extends State<ProfileScreen>
           ),
           SizedBox(height: 16.h),
           ElevatedButton(
-            onPressed: () =>
-                context.read<ProfileCubit>().loadCurrentUserPosts(),
+            onPressed: () => context.read<ProfileCubit>().loadCurrentUserPosts(
+              userId: widget.userId,
+            ),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primaryColor,
               shape: RoundedRectangleBorder(

@@ -4,16 +4,29 @@ import 'package:skillbridge/core/theme/app_styles.dart';
 import 'package:skillbridge/core/widgets/search_bar.dart';
 
 class HomeHeader extends StatelessWidget {
-  const HomeHeader({super.key});
+  final String searchQuery;
+  final ValueChanged<String> onSearchChanged;
+
+  const HomeHeader({
+    super.key,
+    required this.searchQuery,
+    required this.onSearchChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return const SliverToBoxAdapter(
+    return SliverToBoxAdapter(
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [CustomSearchBar(), _HomePageSectionTitle()],
+          children: [
+            CustomSearchBar(
+              initialValue: searchQuery,
+              onChanged: onSearchChanged,
+            ),
+            const _HomePageSectionTitle(),
+          ],
         ),
       ),
     );

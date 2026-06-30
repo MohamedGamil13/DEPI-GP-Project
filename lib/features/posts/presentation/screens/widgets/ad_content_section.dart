@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:skillbridge/core/theme/app_colors.dart';
 import 'package:skillbridge/core/theme/app_styles.dart';
 import 'package:skillbridge/features/home/data/ad_model.dart';
+import 'package:skillbridge/features/posts/presentation/screens/all_reviews_screen.dart';
 import 'package:skillbridge/features/posts/presentation/screens/widgets/ad_details_widget.dart';
+import 'package:skillbridge/features/posts/presentation/screens/widgets/review_item_widget.dart';
+import 'package:skillbridge/features/posts/presentation/viewModel/ad_details_cubit/ad_details_cubit.dart';
 
 class ContentSection extends StatelessWidget {
   const ContentSection({super.key, required this.ad});
@@ -16,15 +20,13 @@ class ContentSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // InfoSection(ad: ad),
           const SizedBox(height: 20),
           SellerCard(authorId: ad.userId),
           const SizedBox(height: 24),
           _DescriptionSection(description: ad.description),
           const SizedBox(height: 24),
-          // const _FeaturesSection(),
           const SizedBox(height: 24),
-          const _ReviewsSection(),
+          _ReviewsSection(ad: ad),
         ],
       ),
     );
@@ -56,62 +58,78 @@ class _DescriptionSection extends StatelessWidget {
 }
 
 class _ReviewsSection extends StatelessWidget {
-  const _ReviewsSection();
+  final AdModel ad;
+
+  const _ReviewsSection({required this.ad});
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        const Text("Reviews", style: AppStyles.font17Bold),
-        TextButton(
-          onPressed: () {},
-          child: Text(
-            "See All",
-            style: AppStyles.font14Regular.copyWith(
-              color: AppColors.primaryColor,
+    return BlocBuilder<AdDetailsCubit, AdDetailsState>(
+      builder: (context, state) {
+        final reviews = state is AdDetailsLoaded ? state.reviews : const [];
+        final previewReviews = reviews.take(3).toList();
+
+        final totalReviews = state is AdDetailsLoaded
+            ? state.ad.totalReviews
+            : ad.totalReviews;
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Reviews ($totalReviews)',
+                  style: AppStyles.font17Bold,
+                ),
+                if (reviews.isNotEmpty)
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                          builder: (_) => BlocProvider.value(
+                            value: context.read<AdDetailsCubit>(),
+                            child: AllReviewsScreen(ad: ad),
+                          ),
+                        ),
+                      );
+                    },
+                    child: Text(
+                      "See All",
+                      style: AppStyles.font14Regular.copyWith(
+                        color: AppColors.primaryColor,
+                      ),
+                    ),
+                  ),
+              ],
             ),
-          ),
-        ),
-      ],
+            if (state is AdDetailsLoading)
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 24),
+                child: Center(
+                  child: CircularProgressIndicator(
+                    color: AppColors.primaryColor,
+                  ),
+                ),
+              )
+            else if (reviews.isEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: Text(
+                  'No reviews yet.',
+                  style: AppStyles.font14Regular.copyWith(
+                    color: AppColors.textMedium,
+                  ),
+                ),
+              )
+            else
+              ...previewReviews.map(
+                (review) => ReviewItemWidget(review: review),
+              ),
+          ],
+        );
+      },
     );
   }
 }
-
-// class _FeatureItem extends StatelessWidget {
-//   final String text;
-
-//   const _FeatureItem({required this.text});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Padding(
-//       padding: const EdgeInsets.only(bottom: 8),
-//       child: Row(
-//         children: [
-//           const Icon(
-//             Icons.check_circle_outline,
-//             color: AppColors.primaryColor,
-//             size: 20,
-//           ),
-//           const SizedBox(width: 8),
-//           Text(text, style: AppStyles.font14Regular),
-//         ],
-//       ),
-//     );
-//   }
-// }
-
-// class _FeaturesSection extends StatelessWidget {
-//   const _FeaturesSection();
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return const Column(
-//       children: [
-//         _FeatureItem(text: "All equipment provided"),
-//         _FeatureItem(text: "Insured and bonded professionals"),
-//       ],
-//     );
-//   }
-// }

@@ -4,7 +4,9 @@ import 'package:skillbridge/features/profile/data/models/user_profile_model.dart
 
 abstract class ProfileRepo {
   Future<Result<UserProfileModel>> getUserProfile();
+  Future<Result<UserProfileModel>> getUserProfileById(String userId);
   Future<Result<List<AdModel>>> getCurrentUserPosts();
+  Future<Result<List<AdModel>>> getUserPosts(String userId);
   Future<Result<UserProfileModel>> updateUserProfile(UserProfileModel profile);
   Future<Result<void>> signOut();
 }

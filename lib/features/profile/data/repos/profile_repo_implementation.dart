@@ -21,14 +21,30 @@ class ProfileRepoImplementation extends ProfileRepo {
         );
       }
 
-      final profileResult = await getIt<StoreService>().getUserById(
-        authUser.uid,
-      );
+      return getUserProfileById(authUser.uid);
+    } on AppException catch (e) {
+      return Failure(e);
+    }
+  }
+
+  @override
+  Future<Result<UserProfileModel>> getUserProfileById(String userId) async {
+    try {
+      final profileResult = await getIt<StoreService>().getUserById(userId);
       switch (profileResult) {
         case Success(:final data):
           return Success(data);
         case Failure():
-          return Success(UserProfileModel.fromAuthUser(authUser));
+          final authUser = getIt<AuthService>().currentUser;
+          if (authUser != null && authUser.uid == userId) {
+            return Success(UserProfileModel.fromAuthUser(authUser));
+          }
+          return const Failure(
+            AppException(
+              code: 'not-found',
+              message: 'User profile not found.',
+            ),
+          );
       }
     } on AppException catch (e) {
       return Failure(e);
@@ -39,6 +55,15 @@ class ProfileRepoImplementation extends ProfileRepo {
   Future<Result<List<AdModel>>> getCurrentUserPosts() async {
     try {
       return await getIt<StoreService>().getCurrentUserPosts();
+    } on AppException catch (e) {
+      return Failure(e);
+    }
+  }
+
+  @override
+  Future<Result<List<AdModel>>> getUserPosts(String userId) async {
+    try {
+      return await getIt<StoreService>().getPostsByUserId(userId);
     } on AppException catch (e) {
       return Failure(e);
     }

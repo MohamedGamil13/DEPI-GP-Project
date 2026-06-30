@@ -14,6 +14,7 @@ import 'package:skillbridge/features/auth/presentation/screens/sign_up_screen.da
 import 'package:skillbridge/features/auth/presentation/viewmodel/auth_cubit.dart';
 import 'package:skillbridge/features/home/data/ad_model.dart';
 import 'package:skillbridge/features/home/presentation/cubits/home_cubit.dart';
+import 'package:skillbridge/features/home/presentation/screens/favorites_screen.dart';
 import 'package:skillbridge/features/home/presentation/screens/home_screen.dart';
 import 'package:skillbridge/features/messages/data/models/conversation_model.dart';
 import 'package:skillbridge/features/messages/presentation/screens/chat_detail_screen.dart';
@@ -23,7 +24,6 @@ import 'package:skillbridge/features/posts/data/repos/post_ad_repo.dart';
 import 'package:skillbridge/features/posts/presentation/screens/ad_details_screen.dart';
 import 'package:skillbridge/features/posts/presentation/screens/post_ad_screen.dart';
 import 'package:skillbridge/features/posts/presentation/viewModel/ad_posting_cubit/ad_posting_cubit.dart';
-import 'package:skillbridge/features/posts/presentation/viewModel/call_cubit/call_cubit.dart';
 import 'package:skillbridge/features/posts/presentation/viewModel/user_data_cubit/user_data_cubit.dart';
 import 'package:skillbridge/features/profile/data/repos/profile_repo_implementation.dart';
 import 'package:skillbridge/features/profile/presentation/screens/profile_screen.dart';
@@ -75,6 +75,12 @@ final GoRouter router = GoRouter(
       ),
     ),
 
+    // == Favorites ==
+    GoRoute(
+      path: AppScreens.favoritesScreen,
+      builder: (context, state) => const FavoritesScreen(),
+    ),
+
     // == Post Ad ==
     GoRoute(
       path: AppScreens.postAdScreen,
@@ -87,10 +93,13 @@ final GoRouter router = GoRouter(
     // == Profile ==
     GoRoute(
       path: AppScreens.profileScreen,
-      builder: (context, state) => BlocProvider(
-        create: (_) => ProfileCubit(ProfileRepoImplementation()),
-        child: const ProfileScreen(),
-      ),
+      builder: (context, state) {
+        final userId = state.uri.queryParameters['userId'];
+        return BlocProvider(
+          create: (_) => ProfileCubit(ProfileRepoImplementation()),
+          child: ProfileScreen(userId: userId),
+        );
+      },
     ),
 
     // == Messages ==
@@ -183,11 +192,8 @@ final GoRouter router = GoRouter(
     // == Ad Details ==
     GoRoute(
       path: AppScreens.adDetailsScreen,
-      builder: (context, state) => MultiBlocProvider(
-        providers: [
-          BlocProvider(create: (_) => CallCubit()),
-          BlocProvider(create: (_) => UserDataCubit(getIt<PostAdRepo>())),
-        ],
+      builder: (context, state) => BlocProvider(
+        create: (_) => UserDataCubit(getIt<PostAdRepo>()),
         child: AdDetailsScreen(ad: state.extra as AdModel),
       ),
     ),

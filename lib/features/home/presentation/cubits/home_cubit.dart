@@ -14,13 +14,95 @@ class HomeCubit extends Cubit<HomeState> {
     : _firestoreService = firestoreService,
       super(HomeInitial());
 
-  Future<void> getPosts() async {
+  List<AdModel> _sourcePosts = [];
+  Set<int> _favoriteIds = {};
+  String _searchQuery = '';
+  AdCategories _selectedCategory = AdCategories.all;
+  HomeFeedMode _mode = HomeFeedMode.all;
+
+  static String normalizeSearch(String input) {
+    return input.trim().toLowerCase().replaceAll(RegExp(r'\s+'), ' ');
+  }
+
+  static bool matchesSearch(AdModel ad, String query) {
+    final normalizedQuery = normalizeSearch(query);
+    if (normalizedQuery.isEmpty) return true;
+
+    final fields = [
+      ad.title,
+      ad.serviceName,
+      ad.category.label,
+      ad.description,
+    ];
+
+    return fields.any(
+      (field) => normalizeSearch(field).contains(normalizedQuery),
+    );
+  }
+
+  List<AdModel> _applyFilters(List<AdModel> source) {
+    var filtered = source;
+
+    if (_selectedCategory != AdCategories.all) {
+      filtered = filtered
+          .where((post) => post.category == _selectedCategory)
+          .toList();
+    }
+
+    if (_searchQuery.isNotEmpty) {
+      filtered = filtered
+          .where((post) => matchesSearch(post, _searchQuery))
+          .toList();
+    }
+
+    return filtered
+        .map(
+          (post) => post.copyWith(isFavorite: _favoriteIds.contains(post.adID)),
+        )
+        .toList();
+  }
+
+  void _emitFiltered({bool loading = false}) {
+    if (loading) {
+      emit(HomeLoading());
+    }
+
+    final filtered = _applyFilters(_sourcePosts);
+    emit(
+      HomeSuccess(
+        allPosts: _sourcePosts,
+        posts: filtered,
+        searchQuery: _searchQuery,
+        selectedCategory: _selectedCategory,
+        favoriteIds: _favoriteIds,
+        mode: _mode,
+      ),
+    );
+  }
+
+  Future<void> getPosts({HomeFeedMode mode = HomeFeedMode.all}) async {
+    _mode = mode;
     emit(HomeLoading());
     try {
-      final result = await _firestoreService.getAllPosts();
+      final favoritesResult = await _firestoreService.getFavoritePostIds();
+      if (favoritesResult case Success<Set<int>>(:final data)) {
+        _favoriteIds = data;
+      }
+
+      final result = switch (mode) {
+        HomeFeedMode.all => await _firestoreService.getAllPosts(),
+        HomeFeedMode.favorites => await _firestoreService.getFavoritePosts(),
+      };
+
       switch (result) {
         case Success<List<AdModel>>(:final data):
-          emit(HomeSuccess(posts: data));
+          _sourcePosts = data
+              .map(
+                (post) =>
+                    post.copyWith(isFavorite: _favoriteIds.contains(post.adID)),
+              )
+              .toList();
+          _emitFiltered();
         case Failure<List<AdModel>>(:final exception):
           emit(HomeError(exception.message));
       }
@@ -31,37 +113,58 @@ class HomeCubit extends Cubit<HomeState> {
     }
   }
 
-  // Fetch Filtered Posts By Category
+  Future<void> refreshPosts() => getPosts(mode: _mode);
 
   Future<void> getFilteredPosts(AdCategories category) async {
-    emit(HomeLoading());
-    try {
-      final result = await _firestoreService.getFilteredPosts(category);
-      switch (result) {
-        case Success<List<AdModel>>(:final data):
-          emit(HomeSuccess(posts: data));
-        case Failure<List<AdModel>>(:final exception):
-          emit(HomeError(exception.message));
-      }
-    } catch (e) {
-      emit(HomeError('Something went wrong: ${e.toString()}'));
-    }
+    _selectedCategory = category;
+    _emitFiltered();
   }
 
-  //  Search Post By Title
+  void searchPosts(String query) {
+    _searchQuery = normalizeSearch(query);
+    _emitFiltered();
+  }
 
-  Future<void> searchPost(String title) async {
-    emit(HomeLoading());
-    try {
-      final result = await _firestoreService.searchForPost(title);
-      switch (result) {
-        case Success<AdModel>(:final data):
-          emit(HomeSuccess(posts: [data]));
-        case Failure<AdModel>(:final exception):
-          emit(HomeError(exception.message));
+  Future<void> toggleFavorite(int postId) async {
+    final current = state;
+    if (current is! HomeSuccess) return;
+
+    final isCurrentlyFavorite = _favoriteIds.contains(postId);
+    final updatedFavorites = Set<int>.from(_favoriteIds);
+
+    if (isCurrentlyFavorite) {
+      updatedFavorites.remove(postId);
+    } else {
+      updatedFavorites.add(postId);
+    }
+
+    _favoriteIds = updatedFavorites;
+
+    if (_mode == HomeFeedMode.favorites && isCurrentlyFavorite) {
+      _sourcePosts = _sourcePosts.where((post) => post.adID != postId).toList();
+    } else {
+      _sourcePosts = _sourcePosts
+          .map(
+            (post) => post.adID == postId
+                ? post.copyWith(isFavorite: !isCurrentlyFavorite)
+                : post.copyWith(isFavorite: _favoriteIds.contains(post.adID)),
+          )
+          .toList();
+    }
+
+    _emitFiltered();
+
+    final result = isCurrentlyFavorite
+        ? await _firestoreService.removeFavorite(postId)
+        : await _firestoreService.addFavorite(postId);
+
+    if (result case Failure(:final exception)) {
+      if (isCurrentlyFavorite) {
+        _favoriteIds.add(postId);
+      } else {
+        _favoriteIds.remove(postId);
       }
-    } catch (e) {
-      emit(HomeError('Something went wrong: ${e.toString()}'));
+      _emitFiltered();
     }
   }
 }

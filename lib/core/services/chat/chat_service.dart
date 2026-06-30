@@ -51,6 +51,12 @@ abstract interface class IChatService {
 
   Future<ConversationModel> createConversation(ConversationModel conversation);
 
+  Future<ConversationModel?> findConversation({
+    required String providerId,
+    required String customerId,
+    required String serviceId,
+  });
+
   Future<void> deleteConversation(String conversationId);
 }
 
@@ -343,6 +349,42 @@ class ChatService implements IChatService {
         'Failed to update conversation status',
         cause: e,
       );
+    }
+  }
+
+  @override
+  Future<ConversationModel?> findConversation({
+    required String providerId,
+    required String customerId,
+    required String serviceId,
+  }) async {
+    try {
+      final results = await Future.wait([
+        _conversations
+            .where('providerId', isEqualTo: providerId)
+            .where('customerId', isEqualTo: customerId)
+            .get(),
+        _conversations
+            .where('providerId', isEqualTo: customerId)
+            .where('customerId', isEqualTo: providerId)
+            .get(),
+      ]);
+
+      for (final snapshot in results) {
+        for (final doc in snapshot.docs) {
+          final conversation = ConversationModel.fromMap(
+            doc.data(),
+            id: doc.id,
+          );
+          if (conversation.serviceId == serviceId) {
+            return conversation;
+          }
+        }
+      }
+
+      return null;
+    } on FirebaseException catch (e) {
+      throw ChatServiceException('Failed to find conversation', cause: e);
     }
   }
 
