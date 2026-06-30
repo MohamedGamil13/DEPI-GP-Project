@@ -487,19 +487,20 @@ class _EmptyInbox extends StatelessWidget {
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-String _filterLabel(BuildContext _context, MessageFilter filter) => switch (filter) {
-  MessageFilter.all => AppStrings.all(_context),
-  MessageFilter.newLeads => AppStrings.newLeads(_context),
-  MessageFilter.active => AppStrings.active(_context),
-  MessageFilter.waiting => AppStrings.waiting(_context),
-};
+String _filterLabel(BuildContext context, MessageFilter filter) =>
+    switch (filter) {
+      MessageFilter.all => AppStrings.all(context),
+      MessageFilter.newLeads => AppStrings.newLeads(context),
+      MessageFilter.active => AppStrings.active(context),
+    };
 
-String _statusLabel(BuildContext _context, ConversationStatus status) => switch (status) {
-  ConversationStatus.newLead => AppStrings.newLead(_context),
-  ConversationStatus.active => AppStrings.active(_context),
-  ConversationStatus.waiting => AppStrings.waiting(_context),
-  ConversationStatus.closed => AppStrings.closed(_context),
-};
+String _statusLabel(BuildContext context, ConversationStatus status) =>
+    switch (status) {
+      ConversationStatus.newLead => AppStrings.newLead(context),
+      ConversationStatus.active => AppStrings.active(context),
+      ConversationStatus.waiting => AppStrings.waiting(context),
+      ConversationStatus.closed => AppStrings.closed(context),
+    };
 
 Color _statusBackground(ConversationStatus status) => switch (status) {
   ConversationStatus.newLead => const Color(0xFFE6F4EA),

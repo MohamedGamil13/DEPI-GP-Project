@@ -57,7 +57,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   // ── Title ──
                   Text(
                     AppStrings.createAccount(context),
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 30,
                       fontWeight: FontWeight.w800,
                       color: AppColors.textDark,

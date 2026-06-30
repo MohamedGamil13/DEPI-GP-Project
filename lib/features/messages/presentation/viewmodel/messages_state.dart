@@ -60,8 +60,6 @@ final class MessagesLoaded extends MessagesState {
           conversation.status == ConversationStatus.newLead,
         MessageFilter.active =>
           conversation.status == ConversationStatus.active,
-        MessageFilter.waiting =>
-          conversation.status == ConversationStatus.waiting,
       };
 
       final matchesSearch =

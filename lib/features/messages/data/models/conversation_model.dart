@@ -15,7 +15,7 @@ extension ConversationStatusX on ConversationStatus {
   }
 }
 
-enum MessageFilter { all, newLeads, active, waiting }
+enum MessageFilter { all, newLeads, active }
 
 class ConversationModel {
   final String id;
@@ -136,7 +136,6 @@ class ConversationModel {
     MessageFilter.all => true,
     MessageFilter.newLeads => status == ConversationStatus.newLead,
     MessageFilter.active => status == ConversationStatus.active,
-    MessageFilter.waiting => status == ConversationStatus.waiting,
   };
 
   // ── copyWith ───────────────────────────────────────────────────────────────
