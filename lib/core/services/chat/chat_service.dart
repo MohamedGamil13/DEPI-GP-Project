@@ -359,16 +359,20 @@ class ChatService implements IChatService {
     required String serviceId,
   }) async {
     try {
-      final results = await Future.wait([
-        _conversations
-            .where('providerId', isEqualTo: providerId)
-            .where('customerId', isEqualTo: customerId)
-            .get(),
-        _conversations
-            .where('providerId', isEqualTo: customerId)
-            .where('customerId', isEqualTo: providerId)
-            .get(),
-      ]);
+      // نضع الـ timeout هنا مباشرة على طلبات الفايرستور لحمايتها
+      final results =
+          await Future.wait([
+            _conversations
+                .where('providerId', isEqualTo: providerId)
+                .where('customerId', isEqualTo: customerId)
+                .get(),
+            _conversations
+                .where('providerId', isEqualTo: customerId)
+                .where('customerId', isEqualTo: providerId)
+                .get(),
+          ]).timeout(
+            const Duration(seconds: 10),
+          ); // إذا علق الفايرستور بسبب الفهرس، سينفجر الخطأ بعد 10 ثوانٍ
 
       for (final snapshot in results) {
         for (final doc in snapshot.docs) {
@@ -424,5 +428,4 @@ class ChatService implements IChatService {
       throw ChatServiceException('Failed to delete conversation', cause: e);
     }
   }
-
 }
