@@ -10,7 +10,7 @@ class LocaleCubit extends Cubit<Locale> {
     final box = Hive.box(AppConstants.appSettingsBox);
     final languageCode = box.get(AppConstants.localeKey) as String?;
     if (languageCode == 'ar' || languageCode == 'en') {
-      emit(Locale(languageCode));
+      emit(Locale(languageCode ?? 'en'));
     }
   }
 
