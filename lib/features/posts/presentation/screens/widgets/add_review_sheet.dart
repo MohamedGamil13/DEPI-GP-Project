@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:skillbridge/core/theme/app_colors.dart';
 import 'package:skillbridge/core/theme/app_styles.dart';
+import 'package:skillbridge/generated/l10n.dart';
 
 class AddReviewSheet extends StatefulWidget {
   final bool isSubmitting;
@@ -60,7 +61,7 @@ class _AddReviewSheetState extends State<AddReviewSheet> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Write a Review', style: AppStyles.font17Bold),
+          Text(S.of(context).writeReview, style: AppStyles.font17Bold),
           const SizedBox(height: 16),
           Row(
             children: List.generate(5, (index) {
@@ -83,7 +84,7 @@ class _AddReviewSheetState extends State<AddReviewSheet> {
             enabled: !widget.isSubmitting,
             maxLines: 4,
             decoration: InputDecoration(
-              hintText: 'Share your experience (optional)',
+              hintText: S.of(context).shareExperienceOptional,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -111,7 +112,7 @@ class _AddReviewSheetState extends State<AddReviewSheet> {
                         color: Colors.white,
                       ),
                     )
-                  : const Text('Submit Review'),
+                  : Text(S.of(context).submitReview),
             ),
           ),
         ],

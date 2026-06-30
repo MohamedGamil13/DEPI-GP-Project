@@ -7,6 +7,7 @@ import 'package:skillbridge/features/home/data/ad_model.dart';
 import 'package:skillbridge/features/posts/presentation/screens/widgets/add_review_sheet.dart';
 import 'package:skillbridge/features/posts/presentation/viewModel/ad_details_cubit/ad_details_cubit.dart';
 import 'package:skillbridge/features/posts/presentation/viewModel/user_data_cubit/user_data_cubit.dart';
+import 'package:skillbridge/generated/l10n.dart';
 
 class AdImageHeader extends StatelessWidget {
   const AdImageHeader({
@@ -130,7 +131,7 @@ class SellerCard extends StatelessWidget {
                             size: 16,
                           ),
                           Text(
-                            " ${user.rating} (${user.reviews} reviews)",
+                            ' ${user.rating} (${user.reviews} ${S.of(context).reviews})',
                             style: const TextStyle(color: Colors.grey),
                           ),
                         ],
@@ -140,7 +141,7 @@ class SellerCard extends StatelessWidget {
                 ),
                 OutlinedButton(
                   onPressed: () => context.goProfile(userId: authorId),
-                  child: const Text("View Profile"),
+                  child: Text(S.of(context).viewProfile),
                 ),
               ],
             );
@@ -195,7 +196,7 @@ class ContactButtons extends StatelessWidget {
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
                     : const Icon(Icons.rate_review_outlined),
-                label: const Text("Review"),
+                label: Text(S.of(context).review),
                 style: OutlinedButton.styleFrom(
                   minimumSize: const Size(0, 50),
                   shape: RoundedRectangleBorder(
@@ -220,7 +221,7 @@ class ContactButtons extends StatelessWidget {
                         ),
                       )
                     : const Icon(Icons.chat),
-                label: const Text("Message Poster"),
+                label: Text(S.of(context).messagePoster),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,
                   foregroundColor: Colors.white,

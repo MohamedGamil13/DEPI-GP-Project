@@ -2,10 +2,12 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:skillbridge/core/locator/service_locator.dart';
 import 'package:skillbridge/core/services/auth/auth_service.dart';
 import 'package:skillbridge/core/services/chat/chat_service.dart';
 import 'package:skillbridge/core/services/firestore/firestore_repo.dart';
 import 'package:skillbridge/core/utils/validator/result.dart';
+import 'package:skillbridge/features/home/presentation/cubits/home_cubit.dart';
 import 'package:skillbridge/features/home/data/ad_model.dart';
 import 'package:skillbridge/features/messages/data/models/conversation_model.dart';
 import 'package:skillbridge/features/posts/data/models/review_model.dart';
@@ -143,10 +145,14 @@ class AdDetailsCubit extends Cubit<AdDetailsState> {
 
     switch (result) {
       case Success<void>():
+        final homeCubit = _tryReadHomeCubit();
+        homeCubit?.syncFavoriteState(postId, nextValue);
         emit(
           (state as AdDetailsLoaded).copyWith(isTogglingFavorite: false),
         );
       case Failure<void>(:final exception):
+        final homeCubit = _tryReadHomeCubit();
+        homeCubit?.syncFavoriteState(postId, !nextValue);
         emit(
           current.copyWith(
             isFavorite: !nextValue,
@@ -232,5 +238,13 @@ class AdDetailsCubit extends Cubit<AdDetailsState> {
   Future<void> close() {
     _reviewsSub?.cancel();
     return super.close();
+  }
+
+  HomeCubit? _tryReadHomeCubit() {
+    try {
+      return getIt<HomeCubit>();
+    } catch (_) {
+      return null;
+    }
   }
 }

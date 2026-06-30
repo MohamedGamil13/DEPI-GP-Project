@@ -7,6 +7,7 @@ import 'package:skillbridge/features/posts/presentation/screens/all_reviews_scre
 import 'package:skillbridge/features/posts/presentation/screens/widgets/ad_details_widget.dart';
 import 'package:skillbridge/features/posts/presentation/screens/widgets/review_item_widget.dart';
 import 'package:skillbridge/features/posts/presentation/viewModel/ad_details_cubit/ad_details_cubit.dart';
+import 'package:skillbridge/generated/l10n.dart';
 
 class ContentSection extends StatelessWidget {
   const ContentSection({super.key, required this.ad});
@@ -20,8 +21,8 @@ class ContentSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(height: 20),
-          SellerCard(authorId: ad.userId),
+        const SizedBox(height: 20),
+        SellerCard(authorId: ad.userId),
           const SizedBox(height: 24),
           _DescriptionSection(description: ad.description),
           const SizedBox(height: 24),
@@ -43,7 +44,7 @@ class _DescriptionSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text("Service Description", style: AppStyles.font17Bold),
+        Text(S.of(context).serviceDescription, style: AppStyles.font17Bold),
         const SizedBox(height: 8),
         Text(
           description,
@@ -80,7 +81,7 @@ class _ReviewsSection extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Reviews ($totalReviews)',
+                  '${S.of(context).reviews} ($totalReviews)',
                   style: AppStyles.font17Bold,
                 ),
                 if (reviews.isNotEmpty)
@@ -96,7 +97,7 @@ class _ReviewsSection extends StatelessWidget {
                       );
                     },
                     child: Text(
-                      "See All",
+                      S.of(context).seeAll,
                       style: AppStyles.font14Regular.copyWith(
                         color: AppColors.primaryColor,
                       ),
@@ -117,7 +118,7 @@ class _ReviewsSection extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 child: Text(
-                  'No reviews yet.',
+                  S.of(context).noReviewsYet,
                   style: AppStyles.font14Regular.copyWith(
                     color: AppColors.textMedium,
                   ),

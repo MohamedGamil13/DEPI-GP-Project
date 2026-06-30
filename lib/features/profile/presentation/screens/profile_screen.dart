@@ -7,6 +7,7 @@ import 'package:skillbridge/core/services/auth/auth_service.dart';
 import 'package:skillbridge/core/theme/app_colors.dart';
 import 'package:skillbridge/core/utils/constants/app_strings.dart';
 import 'package:skillbridge/core/utils/helpers/snackbar_manger.dart';
+import 'package:skillbridge/core/utils/locale_cubit.dart';
 import 'package:skillbridge/features/home/data/ad_model.dart';
 import 'package:skillbridge/features/profile/presentation/viewmodel/profile_cubit.dart';
 import 'package:skillbridge/features/profile/presentation/widgets/post_card_widget.dart';
@@ -14,6 +15,7 @@ import 'package:skillbridge/features/profile/presentation/widgets/profile_header
 import 'package:skillbridge/features/profile/presentation/widgets/profile_skills_widget.dart';
 import 'package:skillbridge/features/profile/presentation/widgets/profile_stats_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:skillbridge/generated/l10n.dart';
 
 class ProfileScreen extends StatefulWidget {
   final String? userId;
@@ -112,7 +114,7 @@ class _ProfileScreenState extends State<ProfileScreen>
             )
           : null,
       title: Text(
-        _isOtherUserProfile ? 'Profile' : AppStrings.profile(context),
+        _isOtherUserProfile ? S.of(context).profile : S.of(context).profile,
         style: const TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.w700,
@@ -126,6 +128,9 @@ class _ProfileScreenState extends State<ProfileScreen>
             onSelected: (value) async {
               if (value == 'contact') {
                 await _contactDevelopers();
+              }
+              if (value == 'language') {
+                await _showLanguageDialog(context);
               }
               if (value == 'signout') {
                 await context.read<ProfileCubit>().signOut();
@@ -142,12 +147,16 @@ class _ProfileScreenState extends State<ProfileScreen>
             },
             itemBuilder: (context) => [
               PopupMenuItem(
+                value: 'language',
+                child: Text(S.of(context).language),
+              ),
+              PopupMenuItem(
                 value: 'contact',
-                child: Text(AppStrings.contactDevelopers(context)),
+                child: Text(S.of(context).contactDevelopers),
               ),
               PopupMenuItem(
                 value: 'signout',
-                child: Text(AppStrings.signOut(context)),
+                child: Text(S.of(context).signOut),
               ),
             ],
           ),
@@ -383,6 +392,47 @@ Future<void> _contactDevelopers() async {
   if (await canLaunchUrl(uri)) {
     await launchUrl(uri);
   }
+}
+
+Future<void> _showLanguageDialog(BuildContext context) async {
+  final localeCubit = context.read<LocaleCubit>();
+  final currentLocale = Localizations.localeOf(context).languageCode;
+
+  await showDialog<void>(
+    context: context,
+    builder: (dialogContext) {
+      return AlertDialog(
+        title: Text(S.of(dialogContext).language),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            RadioListTile<String>(
+              value: 'en',
+              groupValue: currentLocale,
+              title: Text(S.of(dialogContext).english),
+              onChanged: (value) async {
+                if (value != null) {
+                  await localeCubit.setLocale(const Locale('en'));
+                  if (dialogContext.mounted) Navigator.of(dialogContext).pop();
+                }
+              },
+            ),
+            RadioListTile<String>(
+              value: 'ar',
+              groupValue: currentLocale,
+              title: Text(S.of(dialogContext).arabic),
+              onChanged: (value) async {
+                if (value != null) {
+                  await localeCubit.setLocale(const Locale('ar'));
+                  if (dialogContext.mounted) Navigator.of(dialogContext).pop();
+                }
+              },
+            ),
+          ],
+        ),
+      );
+    },
+  );
 }
 
 // ─────────────────────────────────────────────

@@ -1,35 +1,55 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:skillbridge/core/locator/service_locator.dart';
-import 'package:skillbridge/core/routing/app_navigator.dart';
-import 'package:skillbridge/core/theme/app_colors.dart';
-import 'package:skillbridge/core/widgets/app_title.dart';
-import 'package:skillbridge/core/widgets/custom_bottom_navigation_bar.dart';
+import 'package:skillbridge/features/home/data/ad_model.dart';
 import 'package:skillbridge/features/home/presentation/cubits/home_cubit.dart';
-import 'package:skillbridge/features/home/presentation/screens/widgets/home_screen_body.dart';
+import 'package:skillbridge/features/home/presentation/screens/widgets/ad_list_section.dart';
+import 'package:skillbridge/features/home/presentation/screens/widgets/categories_section.dart';
+import 'package:skillbridge/features/home/presentation/screens/widgets/home_header.dart';
+import 'package:skillbridge/generated/l10n.dart';
 
 class FavoritesScreen extends StatelessWidget {
   const FavoritesScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) =>
-          getIt<HomeCubit>()..getPosts(mode: HomeFeedMode.favorites),
-      child: Scaffold(
-        backgroundColor: AppColors.backgroundColor,
-        appBar: AppBar(
-          scrolledUnderElevation: 0,
-          backgroundColor: Colors.transparent,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () => context.popPage(),
-          ),
-          title: const AppTitle(),
-        ),
-        body: const HomeScreenBody(showCategories: true),
-        bottomNavigationBar: const CustomBottomNavigationBar(initialIndex: 1),
-      ),
+    return BlocBuilder<HomeCubit, HomeState>(
+      builder: (context, state) {
+        final List<AdModel> favoritePosts = state is HomeSuccess
+            ? state.posts.where((post) => post.isFavorite).toList()
+            : const [];
+
+        return CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            HomeHeader(
+              searchQuery: state is HomeSuccess ? state.searchQuery : '',
+              onSearchChanged: context.read<HomeCubit>().searchPosts,
+            ),
+            const CategoriesSection(),
+            if (state is HomeLoading)
+              const SliverFillRemaining(
+                hasScrollBody: false,
+                child: Center(child: CircularProgressIndicator()),
+              )
+            else if (state is HomeError)
+              SliverFillRemaining(
+                hasScrollBody: false,
+                child: Center(child: Text(state.message)),
+              )
+            else if (favoritePosts.isEmpty)
+              SliverFillRemaining(
+                hasScrollBody: false,
+                child: Center(child: Text(S.of(context).noFavoritesYet)),
+              )
+            else
+              AdListSection(
+                ads: favoritePosts,
+                onFavoriteToggle: (postId) =>
+                    context.read<HomeCubit>().toggleFavorite(postId),
+              ),
+          ],
+        );
+      },
     );
   }
 }

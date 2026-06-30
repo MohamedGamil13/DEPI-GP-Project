@@ -20,6 +20,7 @@ import 'package:skillbridge/features/messages/presentation/viewmodel/messages_cu
 import 'package:skillbridge/features/posts/data/repos/post_ad_repo.dart';
 import 'package:skillbridge/features/posts/data/repos/post_ad_repo_impl.dart';
 import 'package:skillbridge/features/posts/presentation/viewModel/ad_posting_cubit/ad_posting_cubit.dart';
+import 'package:skillbridge/core/utils/locale_cubit.dart';
 
 GetIt getIt = GetIt.instance;
 
@@ -82,9 +83,11 @@ void setupLocator() {
     () => AdPostingCubit(getIt<PostAdRepo>()),
   );
 
-  getIt.registerFactory<HomeCubit>(
+  getIt.registerLazySingleton<HomeCubit>(
     () => HomeCubit(firestoreService: getIt<StoreService>()),
   );
+
+  getIt.registerLazySingleton<LocaleCubit>(() => LocaleCubit());
 
   // Factory so each route gets a fresh cubit with its own stream subscriptions.
   // IChatService is a singleton so no duplicate Firestore listeners are opened.

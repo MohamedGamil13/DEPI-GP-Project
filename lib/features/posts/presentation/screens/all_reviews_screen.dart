@@ -5,6 +5,7 @@ import 'package:skillbridge/core/theme/app_styles.dart';
 import 'package:skillbridge/features/home/data/ad_model.dart';
 import 'package:skillbridge/features/posts/presentation/screens/widgets/review_item_widget.dart';
 import 'package:skillbridge/features/posts/presentation/viewModel/ad_details_cubit/ad_details_cubit.dart';
+import 'package:skillbridge/generated/l10n.dart';
 
 class AllReviewsScreen extends StatelessWidget {
   final AdModel ad;
@@ -15,11 +16,11 @@ class AllReviewsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
-      appBar: AppBar(
-        backgroundColor: AppColors.backgroundColor,
-        foregroundColor: AppColors.textDark,
-        title: const Text('All Reviews'),
-      ),
+        appBar: AppBar(
+          backgroundColor: AppColors.backgroundColor,
+          foregroundColor: AppColors.textDark,
+          title: Text(S.of(context).allReviews),
+        ),
       body: BlocBuilder<AdDetailsCubit, AdDetailsState>(
         builder: (context, state) {
           if (state is AdDetailsLoading) {
@@ -32,7 +33,7 @@ class AllReviewsScreen extends StatelessWidget {
             if (state.reviews.isEmpty) {
               return Center(
                 child: Text(
-                  'No reviews yet.',
+                  S.of(context).noReviewsYet,
                   style: AppStyles.font14Regular.copyWith(
                     color: AppColors.textMedium,
                   ),

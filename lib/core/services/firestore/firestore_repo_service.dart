@@ -427,16 +427,32 @@ class FirestoreService implements StoreService {
       final postDoc = await _getPostDocByAdId(postId);
       if (postDoc == null) throw DocumentNotFoundException();
 
+      final reviewsRef = postDoc.reference
+          .collection(AppConstants.reviewsSubCollection);
+      final existingQuery = await reviewsRef
+          .where('userId', isEqualTo: userId)
+          .limit(1)
+          .get();
+      final existingDoc =
+          existingQuery.docs.isEmpty ? null : existingQuery.docs.first;
+
       final postData = postDoc.data();
       final currentTotal = (postData['totalReviews'] as num?)?.toInt() ?? 0;
       final currentAvg = (postData['averageRating'] as num?)?.toDouble() ?? 0.0;
-      final newTotal = currentTotal + 1;
-      final newAvg = ((currentAvg * currentTotal) + rating) / newTotal;
+      final normalizedComment = comment.trim();
+      final now = DateTime.now();
+      final previousRating = (existingDoc?.data()['rating'] as num?)?.toInt();
+      final newTotal = currentTotal + (existingDoc == null ? 1 : 0);
+      final newAvg = existingDoc == null
+          ? ((currentAvg * currentTotal) + rating) / newTotal
+          : currentTotal == 0
+              ? 0.0
+              : (((currentAvg * currentTotal) -
+                          (previousRating ?? rating) +
+                          rating) /
+                      currentTotal);
 
-      final reviewRef = postDoc.reference
-          .collection(AppConstants.reviewsSubCollection)
-          .doc();
-
+      final reviewRef = existingDoc?.reference ?? reviewsRef.doc();
       final review = ReviewModel(
         id: reviewRef.id,
         postId: postId,
@@ -444,13 +460,15 @@ class FirestoreService implements StoreService {
         userName: userName,
         userImage: userImage,
         rating: rating,
-        comment: comment.trim(),
-        createdAt: DateTime.now(),
+        comment: normalizedComment,
+        createdAt: existingDoc == null
+            ? now
+            : ((existingDoc.data()['createdAt'] as Timestamp?)?.toDate() ??
+                  now),
       );
 
       final batch = db.batch();
 
-      // تحويل الـ Review لـ Json والتأكد من إرسال الوقت بشكل متوافق مع Firestore
       final reviewJson = review.toJson();
       reviewJson['createdAt'] = Timestamp.fromDate(review.createdAt);
 

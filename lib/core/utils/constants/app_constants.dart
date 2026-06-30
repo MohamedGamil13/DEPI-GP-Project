@@ -4,7 +4,8 @@ abstract class AppConstants {
   static const String adPostsCollection = 'ADPosts';
   static const String reviewsSubCollection = 'reviews';
   static const String favoritesSubCollection = 'favorites';
-  // static const String userMetaDataBox = 'UserBox';
+  static const String appSettingsBox = 'AppSettingsBox';
+  static const String localeKey = 'localeKey';
   static const String userMetaDataCollection = 'usersMetaData';
   AppConstants._();
 }

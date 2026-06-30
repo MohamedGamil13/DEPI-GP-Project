@@ -40,6 +40,19 @@ class HomeCubit extends Cubit<HomeState> {
     );
   }
 
+  bool _matchesCurrentFilters(AdModel post) {
+    if (_selectedCategory != AdCategories.all &&
+        post.category != _selectedCategory) {
+      return false;
+    }
+
+    if (_searchQuery.isNotEmpty && !matchesSearch(post, _searchQuery)) {
+      return false;
+    }
+
+    return true;
+  }
+
   List<AdModel> _applyFilters(List<AdModel> source) {
     var filtered = source;
 
@@ -166,5 +179,35 @@ class HomeCubit extends Cubit<HomeState> {
       }
       _emitFiltered();
     }
+  }
+
+  void syncFavoriteState(int postId, bool isFavorite) {
+    final updatedFavorites = Set<int>.from(_favoriteIds);
+    if (isFavorite) {
+      updatedFavorites.add(postId);
+    } else {
+      updatedFavorites.remove(postId);
+    }
+
+    _favoriteIds = updatedFavorites;
+    _sourcePosts = _sourcePosts
+        .map(
+          (post) => post.adID == postId
+              ? post.copyWith(isFavorite: isFavorite)
+              : post.copyWith(isFavorite: _favoriteIds.contains(post.adID)),
+        )
+        .toList();
+
+    if (state is HomeSuccess) {
+      _emitFiltered();
+    }
+  }
+
+  List<AdModel> visibleFavorites() {
+    return _sourcePosts
+        .where((post) => _favoriteIds.contains(post.adID))
+        .where(_matchesCurrentFilters)
+        .map((post) => post.copyWith(isFavorite: true))
+        .toList();
   }
 }
