@@ -9,44 +9,81 @@ class LocationService {
 
   Future<LocationData?> getCurrentLocation({bool allowCached = true}) async {
     try {
-      final cached = allowCached ? await _readCachedLocation() : null;
-      if (cached != null) return cached;
-
-      final permission = await Geolocator.checkPermission();
-      var effectivePermission = permission;
+      // تأكد أن خدمة الموقع مفعلة
+      final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        return allowCached ? await _readCachedLocation() : null;
+      }
+      print(
+        "Location Service Enabled: ${await Geolocator.isLocationServiceEnabled()}",
+      );
+      // الصلاحيات
+      var permission = await Geolocator.checkPermission();
+      print("Permission Before: $permission");
 
       if (permission == LocationPermission.denied) {
-        effectivePermission = await Geolocator.requestPermission();
+        permission = await Geolocator.requestPermission();
+      }
+      print("Permission After: $permission");
+      if (permission == LocationPermission.denied ||
+          permission == LocationPermission.deniedForever) {
+        return allowCached ? await _readCachedLocation() : null;
       }
 
-      if (effectivePermission == LocationPermission.denied ||
-          effectivePermission == LocationPermission.deniedForever) {
-        return null;
-      }
-
+      // احصل دائماً على أحدث Location
       final position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
+        desiredAccuracy: LocationAccuracy.best,
       );
+
       final placemarks = await placemarkFromCoordinates(
         position.latitude,
         position.longitude,
       );
 
-      final placemark = placemarks.isNotEmpty ? placemarks.first : null;
+      final placemark = placemarks.first;
+
+      // للتأكد أثناء التطوير
+      print('========== LOCATION ==========');
+      print('Latitude : ${position.latitude}');
+      print('Longitude: ${position.longitude}');
+      print('Country  : ${placemark.country}');
+      print('Governor : ${placemark.administrativeArea}');
+      print('City     : ${placemark.locality}');
+      print('District : ${placemark.subLocality}');
+      print('Sub Admin: ${placemark.subAdministrativeArea}');
+      print('==============================');
+
       final location = LocationData(
         latitude: position.latitude,
         longitude: position.longitude,
-        city: placemark?.locality ?? placemark?.subAdministrativeArea ?? '',
+
+        // في مصر locality أحياناً تكون فارغة
+        city: (placemark.locality?.isNotEmpty ?? false)
+            ? placemark.locality!
+            : (placemark.subLocality?.isNotEmpty ?? false)
+            ? placemark.subLocality!
+            : placemark.subAdministrativeArea ?? '',
+
         governorate:
-            placemark?.administrativeArea ??
-            placemark?.subAdministrativeArea ??
+            placemark.administrativeArea ??
+            placemark.subAdministrativeArea ??
             '',
-        country: placemark?.country ?? '',
+
+        country: placemark.country ?? '',
       );
 
+      // حدث الكاش دائماً
       await _cacheLocation(location);
+
       return location;
-    } catch (_) {
+    } catch (e) {
+      print('Location Error: $e');
+
+      // لو حصل خطأ استخدم الكاش فقط كحل احتياطي
+      if (allowCached) {
+        return await _readCachedLocation();
+      }
+
       return null;
     }
   }
@@ -54,6 +91,11 @@ class LocationService {
   Future<LocationData?> getCachedLocation() async => _readCachedLocation();
 
   Future<void> cacheLocation(LocationData location) => _cacheLocation(location);
+
+  Future<void> clearCachedLocation() async {
+    final box = Hive.box(AppConstants.appSettingsBox);
+    await box.delete(_cacheKey);
+  }
 
   double distanceBetween({
     required double startLatitude,
@@ -72,9 +114,11 @@ class LocationService {
   Future<LocationData?> _readCachedLocation() async {
     final box = Hive.box(AppConstants.appSettingsBox);
     final cached = box.get(_cacheKey);
+
     if (cached is Map) {
       return LocationData.fromJson(Map<String, dynamic>.from(cached));
     }
+
     return null;
   }
 

@@ -45,6 +45,7 @@ class FirebaseAuthService implements AuthService {
 
   @override
   Future<AuthUser> register(
+    String name,
     String email,
     String password, {
     String bio = '',
@@ -67,19 +68,28 @@ class FirebaseAuthService implements AuthService {
         email: email.trim(),
         password: password,
       );
-      await credential.user?.sendEmailVerification();
-      AuthUser tempUser = _mapUser(credential.user!);
+
+      await credential.user!.updateDisplayName(name);
+      await credential.user!.reload();
+
+      await credential.user!.sendEmailVerification();
+
+      final firebaseUser = _auth.currentUser!;
+      final tempUser = _mapUser(firebaseUser);
+
       final locationFields = await _locationFields();
-      await service.saveUserData(
-        UserProfileModel.fromAuthUser(tempUser).copyWith(
-          bio: bio.trim(),
-          city: locationFields['city'] as String?,
-          governorate: locationFields['governorate'] as String?,
-          country: locationFields['country'] as String?,
-          latitude: locationFields['latitude'] as double?,
-          longitude: locationFields['longitude'] as double?,
-        ),
+
+      final profile = UserProfileModel.fromAuthUser(tempUser).copyWith(
+        name: name,
+        bio: bio.trim(),
+        city: locationFields['city'] as String?,
+        governorate: locationFields['governorate'] as String?,
+        country: locationFields['country'] as String?,
+        latitude: locationFields['latitude'] as double?,
+        longitude: locationFields['longitude'] as double?,
       );
+
+      await service.saveUserData(profile);
 
       _logger.i(
         "===============  AUTH RESPONSE ===============\n"

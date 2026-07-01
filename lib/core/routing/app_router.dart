@@ -114,10 +114,6 @@ final GoRouter router = GoRouter(
       },
     ),
 
-    // == Messages ==
-    // MessagesScreen calls loadInbox(userId) itself in initState,
-    // so the cubit is provided here without triggering the load —
-    // this keeps the router free of auth state concerns.
     GoRoute(
       path: AppScreens.messagesScreen,
       builder: (context, state) => BlocProvider(
@@ -127,10 +123,6 @@ final GoRouter router = GoRouter(
     ),
 
     // == Chat Detail ==
-    // ChatDetailScreen reads the SAME MessagesCubit that MessagesScreen
-    // already populated (via BlocProvider.value from the parent route).
-    // A new cubit is only created as a fallback when navigating directly
-    // to this route (e.g. deep link / notification tap).
     GoRoute(
       path: AppScreens.chatDetailScreen,
       builder: (context, state) {

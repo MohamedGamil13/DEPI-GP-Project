@@ -144,6 +144,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             context.read<AuthCubit>().signUp(
                               _emailController.text.trim(),
                               _passwordController.text,
+                              _nameController.text,
                               bio: _bioController.text.trim(),
                             );
                           }

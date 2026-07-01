@@ -11,9 +11,14 @@ class AuthCubit extends Cubit<AuthState> {
 
   AuthCubit(this.authRepo) : super(AuthInitial());
 
-  Future<void> signUp(String email, String password, {String bio = ''}) async {
+  Future<void> signUp(
+    String email,
+    String password,
+    String name, {
+    String bio = '',
+  }) async {
     emit(AuthLoading());
-    final result = await authRepo.signUp(email, password, bio: bio);
+    final result = await authRepo.signUp(name, email, password, bio: bio);
 
     if (isClosed) return;
 

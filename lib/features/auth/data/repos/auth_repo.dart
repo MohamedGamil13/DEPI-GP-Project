@@ -8,6 +8,7 @@ abstract class AuthRepo {
   AuthRepo({required this.authService});
   Future<Result<AuthUser>> signIn(String email, String password);
   Future<Result<AuthUser>> signUp(
+    String name,
     String email,
     String password, {
     String bio = '',

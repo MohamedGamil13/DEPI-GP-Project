@@ -54,7 +54,6 @@ void setupLocator() {
     ),
   );
 
-  // ChatService is a singleton — one Firestore connection shared app-wide.
   getIt.registerLazySingleton<IChatService>(
     () => ChatService(firestore: getIt<FirebaseFirestore>()),
   );
