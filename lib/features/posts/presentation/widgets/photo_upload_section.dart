@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:skillbridge/core/theme/app_colors.dart';
@@ -30,11 +31,13 @@ class PhotoUploadSection extends StatelessWidget {
           width: 1.5,
         ),
       ),
-      child: images.isEmpty ? _EmptyState(onSelectImages: onSelectImages) : _FilledState(
-        images: images,
-        onSelectImages: onSelectImages,
-        onRemoveImage: onRemoveImage,
-      ),
+      child: images.isEmpty
+          ? _EmptyState(onSelectImages: onSelectImages)
+          : _FilledState(
+              images: images,
+              onSelectImages: onSelectImages,
+              onRemoveImage: onRemoveImage,
+            ),
     );
   }
 }
@@ -108,8 +111,11 @@ class _EmptyState extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.upload_rounded,
-                      color: AppColors.white, size: 16.sp),
+                  Icon(
+                    Icons.upload_rounded,
+                    color: AppColors.white,
+                    size: 16.sp,
+                  ),
                   SizedBox(width: 8.w),
                   Text(
                     'Select Images',

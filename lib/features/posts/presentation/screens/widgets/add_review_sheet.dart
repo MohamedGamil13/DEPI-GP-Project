@@ -25,10 +25,8 @@ class AddReviewSheet extends StatefulWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (_) => AddReviewSheet(
-        isSubmitting: isSubmitting,
-        onSubmit: onSubmit,
-      ),
+      builder: (_) =>
+          AddReviewSheet(isSubmitting: isSubmitting, onSubmit: onSubmit),
     );
   }
 

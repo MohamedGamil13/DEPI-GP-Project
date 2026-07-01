@@ -15,11 +15,20 @@ class ProfileStatsWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        _StatCard(value: profile.rating.toString(), label: AppStrings.rating(context)),
+        _StatCard(
+          value: profile.rating.toString(),
+          label: AppStrings.rating(context),
+        ),
         SizedBox(width: 12.w),
-        _StatCard(value: profile.reviews.toString(), label: AppStrings.reviews(context)),
+        _StatCard(
+          value: profile.reviews.toString(),
+          label: AppStrings.reviews(context),
+        ),
         SizedBox(width: 12.w),
-        _StatCard(value: profile.postsCount.toString(), label: AppStrings.posts(context)),
+        _StatCard(
+          value: profile.postsCount.toString(),
+          label: AppStrings.posts(context),
+        ),
       ],
     );
   }

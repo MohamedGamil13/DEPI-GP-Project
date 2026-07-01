@@ -427,14 +427,16 @@ class FirestoreService implements StoreService {
       final postDoc = await _getPostDocByAdId(postId);
       if (postDoc == null) throw DocumentNotFoundException();
 
-      final reviewsRef = postDoc.reference
-          .collection(AppConstants.reviewsSubCollection);
+      final reviewsRef = postDoc.reference.collection(
+        AppConstants.reviewsSubCollection,
+      );
       final existingQuery = await reviewsRef
           .where('userId', isEqualTo: userId)
           .limit(1)
           .get();
-      final existingDoc =
-          existingQuery.docs.isEmpty ? null : existingQuery.docs.first;
+      final existingDoc = existingQuery.docs.isEmpty
+          ? null
+          : existingQuery.docs.first;
 
       final postData = postDoc.data();
       final currentTotal = (postData['totalReviews'] as num?)?.toInt() ?? 0;
@@ -446,11 +448,11 @@ class FirestoreService implements StoreService {
       final newAvg = existingDoc == null
           ? ((currentAvg * currentTotal) + rating) / newTotal
           : currentTotal == 0
-              ? 0.0
-              : (((currentAvg * currentTotal) -
-                          (previousRating ?? rating) +
-                          rating) /
-                      currentTotal);
+          ? 0.0
+          : (((currentAvg * currentTotal) -
+                    (previousRating ?? rating) +
+                    rating) /
+                currentTotal);
 
       final reviewRef = existingDoc?.reference ?? reviewsRef.doc();
       final review = ReviewModel(

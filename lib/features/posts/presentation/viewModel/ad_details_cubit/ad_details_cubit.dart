@@ -7,8 +7,8 @@ import 'package:skillbridge/core/services/auth/auth_service.dart';
 import 'package:skillbridge/core/services/chat/chat_service.dart';
 import 'package:skillbridge/core/services/firestore/firestore_repo.dart';
 import 'package:skillbridge/core/utils/validator/result.dart';
-import 'package:skillbridge/features/home/presentation/cubits/home_cubit.dart';
 import 'package:skillbridge/features/home/data/ad_model.dart';
+import 'package:skillbridge/features/home/presentation/cubits/home_cubit.dart';
 import 'package:skillbridge/features/messages/data/models/conversation_model.dart';
 import 'package:skillbridge/features/posts/data/models/review_model.dart';
 import 'package:skillbridge/features/profile/data/models/user_profile_model.dart';
@@ -59,17 +59,19 @@ class AdDetailsCubit extends Cubit<AdDetailsState> {
     );
 
     _reviewsSub?.cancel();
-    _reviewsSub = _storeService.watchPostReviews(ad.adID).listen(
-      (reviews) {
-        final current = state;
-        if (current is AdDetailsLoaded) {
-          emit(current.copyWith(reviews: reviews));
-        }
-      },
-      onError: (Object error) {
-        _emitError('Failed to load reviews: $error');
-      },
-    );
+    _reviewsSub = _storeService
+        .watchPostReviews(ad.adID)
+        .listen(
+          (reviews) {
+            final current = state;
+            if (current is AdDetailsLoaded) {
+              emit(current.copyWith(reviews: reviews));
+            }
+          },
+          onError: (Object error) {
+            _emitError('Failed to load reviews: $error');
+          },
+        );
   }
 
   Future<void> submitReview({
@@ -112,12 +114,7 @@ class AdDetailsCubit extends Cubit<AdDetailsState> {
           ),
           Failure<AdModel>() => current.ad,
         };
-        emit(
-          current.copyWith(
-            ad: updatedAd,
-            isSubmittingReview: false,
-          ),
-        );
+        emit(current.copyWith(ad: updatedAd, isSubmittingReview: false));
       case Failure<ReviewModel>(:final exception):
         emit(current.copyWith(isSubmittingReview: false));
         _emitError(exception.message);
@@ -147,9 +144,7 @@ class AdDetailsCubit extends Cubit<AdDetailsState> {
       case Success<void>():
         final homeCubit = _tryReadHomeCubit();
         homeCubit?.syncFavoriteState(postId, nextValue);
-        emit(
-          (state as AdDetailsLoaded).copyWith(isTogglingFavorite: false),
-        );
+        emit((state as AdDetailsLoaded).copyWith(isTogglingFavorite: false));
       case Failure<void>(:final exception):
         final homeCubit = _tryReadHomeCubit();
         homeCubit?.syncFavoriteState(postId, !nextValue);

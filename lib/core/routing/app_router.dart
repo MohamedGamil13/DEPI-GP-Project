@@ -8,7 +8,6 @@ import 'package:skillbridge/core/services/auth/auth_service.dart';
 import 'package:skillbridge/core/services/chat/chat_service.dart';
 import 'package:skillbridge/core/theme/app_colors.dart';
 import 'package:skillbridge/core/utils/constants/app_strings.dart';
-import 'package:skillbridge/generated/l10n.dart';
 import 'package:skillbridge/features/auth/presentation/screens/forgot_password_screen.dart';
 import 'package:skillbridge/features/auth/presentation/screens/sign_in_screen.dart';
 import 'package:skillbridge/features/auth/presentation/screens/sign_up_screen.dart';
@@ -30,6 +29,7 @@ import 'package:skillbridge/features/profile/data/repos/profile_repo_implementat
 import 'package:skillbridge/features/profile/presentation/screens/profile_screen.dart';
 import 'package:skillbridge/features/profile/presentation/viewmodel/profile_cubit.dart';
 import 'package:skillbridge/features/splash/splash_screen.dart';
+import 'package:skillbridge/generated/l10n.dart';
 
 final GoRouter router = GoRouter(
   initialLocation: AppScreens.splashScreen,
@@ -114,10 +114,6 @@ final GoRouter router = GoRouter(
       },
     ),
 
-    // == Messages ==
-    // MessagesScreen calls loadInbox(userId) itself in initState,
-    // so the cubit is provided here without triggering the load —
-    // this keeps the router free of auth state concerns.
     GoRoute(
       path: AppScreens.messagesScreen,
       builder: (context, state) => BlocProvider(
@@ -127,10 +123,6 @@ final GoRouter router = GoRouter(
     ),
 
     // == Chat Detail ==
-    // ChatDetailScreen reads the SAME MessagesCubit that MessagesScreen
-    // already populated (via BlocProvider.value from the parent route).
-    // A new cubit is only created as a fallback when navigating directly
-    // to this route (e.g. deep link / notification tap).
     GoRoute(
       path: AppScreens.chatDetailScreen,
       builder: (context, state) {

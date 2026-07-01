@@ -18,9 +18,14 @@ class AuthRepoImplementation extends AuthRepo {
   }
 
   @override
-  Future<Result<AuthUser>> signUp(String email, String password) async {
+  Future<Result<AuthUser>> signUp(
+    String name,
+    String email,
+    String password, {
+    String bio = '',
+  }) async {
     try {
-      final user = await authService.register(email, password);
+      final user = await authService.register(name, email, password, bio: bio);
       return Success(user);
     } on AuthException catch (e) {
       return Failure(e);

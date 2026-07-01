@@ -11,7 +11,9 @@ import 'package:skillbridge/core/services/cloudinary/cloudinary_sotrage_service.
 import 'package:skillbridge/core/services/cloudinary/storage_service.dart';
 import 'package:skillbridge/core/services/firestore/firestore_repo.dart';
 import 'package:skillbridge/core/services/firestore/firestore_repo_service.dart';
+import 'package:skillbridge/core/services/location/location_service.dart';
 import 'package:skillbridge/core/services/notifications/app_push_service.dart';
+import 'package:skillbridge/core/utils/locale_cubit.dart';
 import 'package:skillbridge/features/auth/data/repos/auth_repo.dart';
 import 'package:skillbridge/features/auth/data/repos/auth_repo_implementation.dart';
 import 'package:skillbridge/features/auth/presentation/viewmodel/auth_cubit.dart';
@@ -20,7 +22,6 @@ import 'package:skillbridge/features/messages/presentation/viewmodel/messages_cu
 import 'package:skillbridge/features/posts/data/repos/post_ad_repo.dart';
 import 'package:skillbridge/features/posts/data/repos/post_ad_repo_impl.dart';
 import 'package:skillbridge/features/posts/presentation/viewModel/ad_posting_cubit/ad_posting_cubit.dart';
-import 'package:skillbridge/core/utils/locale_cubit.dart';
 
 GetIt getIt = GetIt.instance;
 
@@ -36,11 +37,13 @@ void setupLocator() {
   getIt.registerLazySingleton<StoreService>(
     () => FirestoreService(db: getIt<FirebaseFirestore>()),
   );
+  getIt.registerLazySingleton<LocationService>(() => LocationService());
 
   getIt.registerLazySingleton<AuthService>(
     () => FirebaseAuthService(
       getIt<FirebaseAuth>(),
       service: getIt<StoreService>(),
+      locationService: getIt<LocationService>(),
     ),
   );
 
@@ -51,7 +54,6 @@ void setupLocator() {
     ),
   );
 
-  // ChatService is a singleton — one Firestore connection shared app-wide.
   getIt.registerLazySingleton<IChatService>(
     () => ChatService(firestore: getIt<FirebaseFirestore>()),
   );
@@ -84,7 +86,10 @@ void setupLocator() {
   );
 
   getIt.registerLazySingleton<HomeCubit>(
-    () => HomeCubit(firestoreService: getIt<StoreService>()),
+    () => HomeCubit(
+      firestoreService: getIt<StoreService>(),
+      locationService: getIt<LocationService>(),
+    ),
   );
 
   getIt.registerLazySingleton<LocaleCubit>(() => LocaleCubit());

@@ -18,10 +18,9 @@ class AppStrings {
   static String continueWith(BuildContext context) =>
       _isArabic(context) ? 'المتابعة باستخدام ' : 'Continue with ';
 
-  static String resetLinkSent(BuildContext context) =>
-      _isArabic(context)
-          ? 'تم إرسال رابط إعادة التعيين إلى بريدك'
-          : 'Reset link sent to your email';
+  static String resetLinkSent(BuildContext context) => _isArabic(context)
+      ? 'تم إرسال رابط إعادة التعيين إلى بريدك'
+      : 'Reset link sent to your email';
 
   static String profile(BuildContext context) =>
       _isArabic(context) ? 'الملف الشخصي' : 'Profile';
@@ -98,18 +97,15 @@ class AppStrings {
   static String tabActivity(BuildContext context) =>
       _isArabic(context) ? 'النشاط' : 'Activity';
 
-  static String failedToLoadProfile(BuildContext context) =>
-      _isArabic(context)
-          ? 'فشل تحميل الملف الشخصي.'
-          : 'Failed to load profile.';
+  static String failedToLoadProfile(BuildContext context) => _isArabic(context)
+      ? 'فشل تحميل الملف الشخصي.'
+      : 'Failed to load profile.';
 
   static String failedToLoadPosts(BuildContext context) =>
       _isArabic(context) ? 'فشل تحميل المنشورات.' : 'Failed to load posts.';
 
   static String conversationUnavailable(BuildContext context) =>
-      _isArabic(context)
-          ? 'المحادثة غير متاحة'
-          : 'Conversation unavailable';
+      _isArabic(context) ? 'المحادثة غير متاحة' : 'Conversation unavailable';
 
   static String onlineNow(BuildContext context) =>
       _isArabic(context) ? 'متصل الآن' : 'Online now';
@@ -117,10 +113,9 @@ class AppStrings {
   static String startConversation(BuildContext context) =>
       _isArabic(context) ? 'ابدأ المحادثة' : 'Start the conversation';
 
-  static String sendMessageHint(BuildContext context) =>
-      _isArabic(context)
-          ? 'اكتب ردًا عن هذه الخدمة...'
-          : 'Reply about this service...';
+  static String sendMessageHint(BuildContext context) => _isArabic(context)
+      ? 'اكتب ردًا عن هذه الخدمة...'
+      : 'Reply about this service...';
 
   static String markAsActive(BuildContext context) =>
       _isArabic(context) ? 'تحديد كمفتوح' : 'Mark as Active';
@@ -137,26 +132,25 @@ class AppStrings {
   static String yesterday(BuildContext context) =>
       _isArabic(context) ? 'أمس' : 'Yesterday';
 
-  static String loadingOlderMessages(BuildContext context) =>
-      _isArabic(context) ? 'جارٍ تحميل رسائل أقدم...' : 'Loading older messages...';
+  static String loadingOlderMessages(BuildContext context) => _isArabic(context)
+      ? 'جارٍ تحميل رسائل أقدم...'
+      : 'Loading older messages...';
 
   static String signedOutSuccessfully(BuildContext context) =>
       _isArabic(context) ? 'تم تسجيل الخروج بنجاح' : 'Signed out successfully';
 
-  static String searchConversations(BuildContext context) =>
-      _isArabic(context)
-          ? 'ابحث باسم العميل أو الخدمة'
-          : 'Search by customer or service';
+  static String searchConversations(BuildContext context) => _isArabic(context)
+      ? 'ابحث باسم العميل أو الخدمة'
+      : 'Search by customer or service';
 
   static String emptyInboxDescription(BuildContext context) =>
       _isArabic(context)
-          ? 'لما حد يتواصل معاك بخصوص خدمة، هتظهر هنا.'
-          : 'When someone contacts you about a service, it will appear here.';
+      ? 'لما حد يتواصل معاك بخصوص خدمة، هتظهر هنا.'
+      : 'When someone contacts you about a service, it will appear here.';
 
-  static String sendMessagePrompt(BuildContext context) =>
-      _isArabic(context)
-          ? 'ابعت رسالة عشان تبدأ المحادثة.'
-          : 'Send a message to get things moving.';
+  static String sendMessagePrompt(BuildContext context) => _isArabic(context)
+      ? 'ابعت رسالة عشان تبدأ المحادثة.'
+      : 'Send a message to get things moving.';
 
   static String all(BuildContext context) =>
       _isArabic(context) ? 'الكل' : 'All';

@@ -12,14 +12,14 @@ extension AppNavigator on BuildContext {
   void gosignUp() => go(AppScreens.signupScreen);
   void goForgetPassword() => go(AppScreens.forgetPasswordScreen);
   void goAddPost() => push(AppScreens.postAdScreen);
+  void goMessages() => push(AppScreens.messagesScreen);
+  void goChatDetail(ConversationModel conversation) =>
+      push(AppScreens.chatDetailScreen, extra: conversation);
+  void goAdDetails(AdModel ad) => push(AppScreens.adDetailsScreen, extra: ad);
   void goProfile({String? userId}) => push(
     userId == null
         ? AppScreens.profileScreen
         : '${AppScreens.profileScreen}?userId=$userId',
   );
-  void goMessages() => push(AppScreens.messagesScreen);
-  void goChatDetail(ConversationModel conversation) =>
-      push(AppScreens.chatDetailScreen, extra: conversation);
-  void goAdDetails(AdModel ad) => push(AppScreens.adDetailsScreen, extra: ad);
   void popPage() => pop();
 }

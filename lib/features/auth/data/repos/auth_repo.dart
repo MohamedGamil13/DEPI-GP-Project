@@ -7,7 +7,12 @@ abstract class AuthRepo {
 
   AuthRepo({required this.authService});
   Future<Result<AuthUser>> signIn(String email, String password);
-  Future<Result<AuthUser>> signUp(String email, String password);
+  Future<Result<AuthUser>> signUp(
+    String name,
+    String email,
+    String password, {
+    String bio = '',
+  });
   Future<Result<void>> sendPasswordResetEmail(String email);
   Future<Result<AuthUser>> signInWithGoogle();
 }
