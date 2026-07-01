@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:skillbridge/core/locator/service_locator.dart';
+import 'package:skillbridge/core/services/auth/auth_service.dart';
 import 'package:skillbridge/core/theme/app_colors.dart';
 import 'package:skillbridge/core/theme/app_styles.dart';
+import 'package:skillbridge/core/utils/constants/app_strings.dart';
 import 'package:skillbridge/features/messages/data/models/chat_message.dart';
 import 'package:skillbridge/features/messages/data/models/conversation_model.dart';
 import 'package:skillbridge/features/messages/presentation/viewmodel/messages_cubit.dart';
 
 /// The current logged-in user's ID — inject via constructor or DI in production.
 /// Replace with your auth provider's `currentUser.uid`.
-const String _kCurrentUserId = 'provider-uid-001';
-
 class ChatDetailScreen extends StatefulWidget {
   const ChatDetailScreen({super.key});
 
@@ -20,6 +21,7 @@ class ChatDetailScreen extends StatefulWidget {
 class _ChatDetailScreenState extends State<ChatDetailScreen> {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  bool _loadingOlderMessages = false;
 
   @override
   void dispose() {
@@ -44,13 +46,24 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
     });
   }
 
+  void _loadOlderMessages() {
+    if (_loadingOlderMessages) return;
+    if (!_scrollController.hasClients) return;
+    if (_scrollController.position.pixels > 40) return;
+
+    _loadingOlderMessages = true;
+    context.read<MessagesCubit>().loadOlderMessages().whenComplete(() {
+      _loadingOlderMessages = false;
+    });
+  }
+
   Future<void> _send() async {
     final text = _controller.text;
     if (text.trim().isEmpty) return;
     _controller.clear();
     await context.read<MessagesCubit>().sendMessage(
       text: text,
-      senderId: _kCurrentUserId,
+      senderId: getIt<AuthService>().currentUser!.uid,
     );
     _scrollToBottom();
   }
@@ -71,7 +84,9 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
       builder: (context, state) {
         if (state is! MessagesLoaded || state.activeConversation == null) {
           return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
+            body: Center(
+              child: CircularProgressIndicator(color: AppColors.primaryColor),
+            ),
           );
         }
 
@@ -92,36 +107,58 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
               Expanded(
                 child: conversation.messages.isEmpty
                     ? const _EmptyChat()
-                    : ListView.separated(
-                        controller: _scrollController,
-                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
-                        itemCount: conversation.messages.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 10),
-                        itemBuilder: (context, index) {
-                          final message = conversation.messages[index];
-                          final previousMessage = index > 0
-                              ? conversation.messages[index - 1]
-                              : null;
-                          final showDateDivider =
-                              previousMessage == null ||
-                              !_isSameDay(
-                                message.sentAt,
-                                previousMessage.sentAt,
-                              );
-
-                          return Column(
-                            children: [
-                              if (showDateDivider)
-                                _DateDivider(date: message.sentAt),
-                              _MessageBubble(
-                                message: message,
-                                currentUserId: _kCurrentUserId,
-                              ),
-                            ],
-                          );
+                    : NotificationListener<ScrollNotification>(
+                        onNotification: (notification) {
+                          if (notification is ScrollUpdateNotification &&
+                              notification.metrics.pixels <= 40) {
+                            _loadOlderMessages();
+                          }
+                          return false;
                         },
+                        child: ListView.separated(
+                          controller: _scrollController,
+                          padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
+                          itemCount: conversation.messages.length,
+                          separatorBuilder: (_, __) =>
+                              const SizedBox(height: 10),
+                          itemBuilder: (context, index) {
+                            final message = conversation.messages[index];
+                            final previousMessage = index > 0
+                                ? conversation.messages[index - 1]
+                                : null;
+                            final showDateDivider =
+                                previousMessage == null ||
+                                !_isSameDay(
+                                  message.sentAt,
+                                  previousMessage.sentAt,
+                                );
+
+                            return Column(
+                              children: [
+                                if (showDateDivider)
+                                  _DateDivider(date: message.sentAt),
+                                _MessageBubble(
+                                  message: message,
+                                  currentUserId:
+                                      getIt<AuthService>().currentUser!.uid,
+                                ),
+                              ],
+                            );
+                          },
+                        ),
                       ),
               ),
+
+              if (state.isLoadingOlderMessages)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Text(
+                    AppStrings.loadingOlderMessages(context),
+                    style: AppStyles.font13w500.copyWith(
+                      color: AppColors.textLight,
+                    ),
+                  ),
+                ),
 
               // Input bar
               _MessageInputBar(
@@ -211,7 +248,7 @@ class _ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                 const SizedBox(height: 2),
                 Text(
                   conversation.isOnline
-                      ? 'Online now'
+                      ? AppStrings.onlineNow(context)
                       : conversation.customerHandle,
                   style: AppStyles.font13w500.copyWith(
                     color: AppColors.textLight,
@@ -230,17 +267,17 @@ class _ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
             status: status,
           ),
           itemBuilder: (_) => [
-            const PopupMenuItem(
+            PopupMenuItem(
               value: ConversationStatus.active,
-              child: Text('Mark as Active'),
+              child: Text(AppStrings.markAsActive(context)),
             ),
-            const PopupMenuItem(
+            PopupMenuItem(
               value: ConversationStatus.waiting,
-              child: Text('Mark as Waiting'),
+              child: Text(AppStrings.markAsWaiting(context)),
             ),
-            const PopupMenuItem(
+            PopupMenuItem(
               value: ConversationStatus.closed,
-              child: Text('Close Conversation'),
+              child: Text(AppStrings.closeConversation(context)),
             ),
           ],
         ),
@@ -353,22 +390,22 @@ class _StatusBadge extends StatelessWidget {
       ConversationStatus.newLead => (
         const Color(0xFFE6F4EA),
         const Color(0xFF15803D),
-        'New Lead',
+        AppStrings.newLead(context),
       ),
       ConversationStatus.active => (
         AppColors.primaryLight,
         AppColors.primaryColor,
-        'Active',
+        AppStrings.active(context),
       ),
       ConversationStatus.waiting => (
         const Color(0xFFFFF3D6),
         const Color(0xFFB7791F),
-        'Waiting',
+        AppStrings.waiting(context),
       ),
       ConversationStatus.closed => (
         const Color(0xFFF3F4F6),
         AppColors.textMedium,
-        'Closed',
+        AppStrings.closed(context),
       ),
     };
 
@@ -483,9 +520,9 @@ class _DateDivider extends StatelessWidget {
     String label;
 
     if (_isSameDay(date, now)) {
-      label = 'Today';
+      label = AppStrings.today(context);
     } else if (_isSameDay(date, now.subtract(const Duration(days: 1)))) {
-      label = 'Yesterday';
+      label = AppStrings.yesterday(context);
     } else {
       label = '${date.day}/${date.month}/${date.year}';
     }
@@ -538,14 +575,14 @@ class _EmptyChat extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            const Text(
-              'Start the conversation',
+            Text(
+              AppStrings.startConversation(context),
               style: AppStyles.font17Bold,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
             Text(
-              'Send a message to get things moving.',
+              AppStrings.sendMessagePrompt(context),
               textAlign: TextAlign.center,
               style: AppStyles.font14Regular.copyWith(
                 color: AppColors.textMedium,
@@ -587,7 +624,7 @@ class _MessageInputBar extends StatelessWidget {
                 maxLines: 5,
                 textCapitalization: TextCapitalization.sentences,
                 decoration: InputDecoration(
-                  hintText: 'Reply about this service…',
+                  hintText: AppStrings.sendMessageHint(context),
                   filled: true,
                   fillColor: AppColors.surfaceColor,
                   contentPadding: const EdgeInsets.symmetric(

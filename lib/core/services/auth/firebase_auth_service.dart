@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:logger/logger.dart';
 import 'package:skillbridge/core/errors/auth_exception.dart';
@@ -198,6 +199,15 @@ class FirebaseAuthService implements AuthService {
       "ACTION: Sign Out Called",
     );
     try {
+      final user = _auth.currentUser;
+      final token = await FirebaseMessaging.instance.getToken();
+      if (user != null && token != null) {
+        await service.updateUserToken(
+          userId: user.uid,
+          token: token,
+          add: false,
+        );
+      }
       await Future.wait([_auth.signOut(), _googleSignIn.signOut()]);
       _logger.i(" Sign Out Success ");
     } on FirebaseAuthException catch (e) {

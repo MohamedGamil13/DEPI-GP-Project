@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:skillbridge/core/theme/app_colors.dart';
+import 'package:skillbridge/core/utils/constants/app_strings.dart';
 import 'package:skillbridge/features/profile/data/models/user_profile_model.dart';
 
 /// Three stat cards in a row: Rating / Reviews / Posts.
@@ -14,11 +15,11 @@ class ProfileStatsWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        _StatCard(value: profile.rating.toString(), label: 'Rating'),
+        _StatCard(value: profile.rating.toString(), label: AppStrings.rating(context)),
         SizedBox(width: 12.w),
-        _StatCard(value: profile.reviews.toString(), label: 'Reviews'),
+        _StatCard(value: profile.reviews.toString(), label: AppStrings.reviews(context)),
         SizedBox(width: 12.w),
-        _StatCard(value: profile.postsCount.toString(), label: 'Posts'),
+        _StatCard(value: profile.postsCount.toString(), label: AppStrings.posts(context)),
       ],
     );
   }

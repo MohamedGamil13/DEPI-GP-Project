@@ -15,12 +15,13 @@ extension ConversationStatusX on ConversationStatus {
   }
 }
 
-enum MessageFilter { all, newLeads, active, waiting }
+enum MessageFilter { all, newLeads, active }
 
 class ConversationModel {
   final String id;
 
   // Participant info
+  final String providerId;
   final String customerId;
   final String customerName;
   final String customerHandle;
@@ -46,6 +47,7 @@ class ConversationModel {
 
   const ConversationModel({
     required this.id,
+    required this.providerId,
     required this.customerId,
     required this.customerName,
     required this.customerHandle,
@@ -75,6 +77,7 @@ class ConversationModel {
 
     return ConversationModel(
       id: id ?? map['id'] as String,
+      providerId: map['providerId'] as String? ?? '',
       customerId: map['customerId'] as String,
       customerName: map['customerName'] as String,
       customerHandle: map['customerHandle'] as String,
@@ -104,6 +107,7 @@ class ConversationModel {
 
   Map<String, dynamic> toMap() => {
     'id': id,
+    'providerId': providerId,
     'customerId': customerId,
     'customerName': customerName,
     'customerHandle': customerHandle,
@@ -132,13 +136,13 @@ class ConversationModel {
     MessageFilter.all => true,
     MessageFilter.newLeads => status == ConversationStatus.newLead,
     MessageFilter.active => status == ConversationStatus.active,
-    MessageFilter.waiting => status == ConversationStatus.waiting,
   };
 
   // ── copyWith ───────────────────────────────────────────────────────────────
 
   ConversationModel copyWith({
     String? id,
+    String? providerId,
     String? customerId,
     String? customerName,
     String? customerHandle,
@@ -158,6 +162,7 @@ class ConversationModel {
   }) {
     return ConversationModel(
       id: id ?? this.id,
+      providerId: providerId ?? this.providerId,
       customerId: customerId ?? this.customerId,
       customerName: customerName ?? this.customerName,
       customerHandle: customerHandle ?? this.customerHandle,

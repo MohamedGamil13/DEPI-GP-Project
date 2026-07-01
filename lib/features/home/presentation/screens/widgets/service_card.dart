@@ -9,7 +9,14 @@ import 'package:skillbridge/features/home/data/ad_model.dart';
 class ServiceCard extends StatelessWidget {
   final AdModel ad;
   final bool isFavorite;
-  const ServiceCard({super.key, required this.ad, required this.isFavorite});
+  final VoidCallback? onFavoriteToggle;
+
+  const ServiceCard({
+    super.key,
+    required this.ad,
+    required this.isFavorite,
+    this.onFavoriteToggle,
+  });
 
   static const String _fallbackImage = AppImages.defalutPostImage;
 
@@ -31,32 +38,33 @@ class ServiceCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          /// Image + Favorite
           Stack(
             children: [
               AdHeroImage(
-                adId: ad.adID, // ← Hero tag source
+                adId: ad.adID,
                 imageUrl: image,
                 height: 140,
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(20),
                 ),
               ),
-              const Positioned(top: 12, right: 12, child: _IsFavWidget()),
+              Positioned(
+                top: 12,
+                right: 12,
+                child: _FavoriteButton(
+                  isFavorite: isFavorite,
+                  onTap: onFavoriteToggle,
+                ),
+              ),
             ],
           ),
-
-          /// Content
           Padding(
             padding: const EdgeInsets.all(14),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                /// Tags
                 CategoryTag(label: ad.category.label),
                 const SizedBox(height: 8),
-
-                /// Title + Price
                 Row(
                   children: [
                     Expanded(
@@ -73,21 +81,19 @@ class ServiceCard extends StatelessWidget {
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 4),
-
-                /// Description
                 Text(
                   ad.description,
                   style: AppStyles.font14Regular.copyWith(
                     color: AppColors.textMedium,
                   ),
                 ),
-
                 const SizedBox(height: 10),
-
-                /// Info Row
-                _ServiceInfoRow(user: ad.city, rating: 4.5, reviews: 10),
+                _ServiceInfoRow(
+                  user: ad.city,
+                  rating: ad.averageRating,
+                  reviews: ad.totalReviews,
+                ),
               ],
             ),
           ),
@@ -103,9 +109,11 @@ class _ServiceInfoRow extends StatelessWidget {
     required this.rating,
     required this.reviews,
   });
+
   final String user;
   final double rating;
   final int reviews;
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -131,21 +139,16 @@ class _ServiceInfoRow extends StatelessWidget {
   }
 }
 
-class _IsFavWidget extends StatefulWidget {
-  const _IsFavWidget();
+class _FavoriteButton extends StatelessWidget {
+  final bool isFavorite;
+  final VoidCallback? onTap;
 
-  @override
-  State<_IsFavWidget> createState() => _IsFavWidgetState();
-}
+  const _FavoriteButton({required this.isFavorite, this.onTap});
 
-class _IsFavWidgetState extends State<_IsFavWidget> {
-  bool isFavorite = false;
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => setState(() {
-        isFavorite = !isFavorite;
-      }),
+      onTap: onTap,
       child: CircleAvatar(
         backgroundColor: Colors.black26,
         child: Icon(

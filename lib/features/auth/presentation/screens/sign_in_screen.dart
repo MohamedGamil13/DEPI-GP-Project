@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:skillbridge/core/routing/app_navigator.dart';
 import 'package:skillbridge/core/theme/app_colors.dart';
 import 'package:skillbridge/core/utils/constants/app_images.dart';
+import 'package:skillbridge/core/utils/constants/app_strings.dart';
 import 'package:skillbridge/core/utils/helpers/snackbar_manger.dart';
 import 'package:skillbridge/core/utils/validator/app_validator.dart';
 import 'package:skillbridge/features/auth/presentation/screens/widgets/auth_text_field.dart';
@@ -53,9 +54,9 @@ class _SignInScreenState extends State<SignInScreen> {
                         children: [
                           SizedBox(height: 40.h),
 
-                          const Text(
-                            'ServiMarket',
-                            style: TextStyle(
+                          Text(
+                            AppStrings.appName(context),
+                            style: const TextStyle(
                               fontSize: 30,
                               fontWeight: FontWeight.w800,
                               color: AppColors.primaryColor,
@@ -86,9 +87,9 @@ class _SignInScreenState extends State<SignInScreen> {
                             alignment: Alignment.centerRight,
                             child: TextButton(
                               onPressed: () => context.goForgetPassword(),
-                              child: const Text(
-                                'Forgotten Password?',
-                                style: TextStyle(
+                              child: Text(
+                                AppStrings.forgottenPassword(context),
+                                style: const TextStyle(
                                   color: AppColors.primaryColor,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -99,7 +100,7 @@ class _SignInScreenState extends State<SignInScreen> {
                           SizedBox(height: 32.h),
 
                           PrimaryButton(
-                            label: 'Sign In',
+                            label: AppStrings.signIn(context),
                             onTap: () {
                               if (_formKey.currentState!.validate()) {
                                 context.read<AuthCubit>().signIn(
@@ -157,7 +158,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                 children: [
                                   SizedBox(width: 10.w),
                                   Text(
-                                    'Continue with ',
+                                    AppStrings.continueWith(context),
                                     style: TextStyle(
                                       fontSize: 14.sp,
                                       fontWeight: FontWeight.w600,
@@ -188,9 +189,9 @@ class _SignInScreenState extends State<SignInScreen> {
                               ),
                               GestureDetector(
                                 onTap: () => context.gosignUp(),
-                                child: const Text(
-                                  'Sign Up',
-                                  style: TextStyle(
+                                child: Text(
+                                  AppStrings.signUp(context),
+                                  style: const TextStyle(
                                     fontSize: 13,
                                     color: AppColors.primaryColor,
                                     fontWeight: FontWeight.w700,

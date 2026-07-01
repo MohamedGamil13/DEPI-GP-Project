@@ -7,18 +7,27 @@ import 'package:skillbridge/features/home/presentation/screens/widgets/categorie
 import 'package:skillbridge/features/home/presentation/screens/widgets/home_header.dart';
 
 class HomeScreenBody extends StatelessWidget {
-  const HomeScreenBody({super.key});
+  final bool showCategories;
+
+  const HomeScreenBody({super.key, this.showCategories = true});
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<HomeCubit, HomeState>(
       builder: (context, state) {
-        return CustomScrollView(
-          slivers: [
-            const HomeHeader(),
-            const CategoriesSection(),
-            _buildPostsSliver(context, state),
-          ],
+        return RefreshIndicator(
+          onRefresh: () => context.read<HomeCubit>().refreshPosts(),
+          child: CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            slivers: [
+              HomeHeader(
+                searchQuery: state is HomeSuccess ? state.searchQuery : '',
+                onSearchChanged: context.read<HomeCubit>().searchPosts,
+              ),
+              if (showCategories) const CategoriesSection(),
+              _buildPostsSliver(context, state),
+            ],
+          ),
         );
       },
     );
@@ -48,7 +57,7 @@ class HomeScreenBody extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               ElevatedButton(
-                onPressed: () => context.read<HomeCubit>().getPosts(),
+                onPressed: () => context.read<HomeCubit>().refreshPosts(),
                 child: const Text('Retry'),
               ),
             ],
@@ -59,8 +68,15 @@ class HomeScreenBody extends StatelessWidget {
 
     if (state is HomeSuccess) {
       return state.posts.isEmpty
-          ? const SliverToBoxAdapter(child: NoPostsWidget())
-          : AdListSection(ads: state.posts);
+          ? const SliverFillRemaining(
+              hasScrollBody: false,
+              child: NoPostsWidget(),
+            )
+          : AdListSection(
+              ads: state.posts,
+              onFavoriteToggle: (postId) =>
+                  context.read<HomeCubit>().toggleFavorite(postId),
+            );
     }
 
     return SliverFillRemaining(

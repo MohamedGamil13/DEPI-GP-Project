@@ -67,11 +67,22 @@
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>LSApplicationQueriesSchemes</key>
-<array>
-  <string>sms</string>
-  <string>tel</string>
-</array>
+	<array>
+		<string>sms</string>
+		<string>tel</string>
+	</array>
 	<key>FirebaseMessagingAutoInitEnabled</key>
 	<true/>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>skillbridge</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>skillbridge</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>

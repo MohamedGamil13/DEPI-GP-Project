@@ -12,6 +12,9 @@ class AdModel {
   final AdCity adCity;
   final String? badge;
   final String userId;
+  final double averageRating;
+  final int totalReviews;
+  final bool isFavorite;
 
   AdModel({
     required this.title,
@@ -25,7 +28,13 @@ class AdModel {
     required this.adID,
     required this.userId,
     this.badge,
+    this.averageRating = 0,
+    this.totalReviews = 0,
+    this.isFavorite = false,
   });
+
+  String get serviceName => title;
+
   Map<String, dynamic> toJson() {
     return {
       "adID": adID,
@@ -38,6 +47,8 @@ class AdModel {
       "relevantSkills": relevantSkills?.map((skill) => skill.name).toList(),
       "adCity": adCity.name,
       "UserId": userId,
+      "averageRating": averageRating,
+      "totalReviews": totalReviews,
     };
   }
 
@@ -51,6 +62,10 @@ class AdModel {
     AdCategories? category,
     List<RelevantSkills>? relevantSkills,
     AdCity? adCity,
+    String? userId,
+    double? averageRating,
+    int? totalReviews,
+    bool? isFavorite,
   }) {
     return AdModel(
       adID: adID ?? this.adID,
@@ -62,11 +77,15 @@ class AdModel {
       category: category ?? this.category,
       relevantSkills: relevantSkills ?? this.relevantSkills,
       adCity: adCity ?? this.adCity,
-      userId: userId,
+      userId: userId ?? this.userId,
+      badge: badge,
+      averageRating: averageRating ?? this.averageRating,
+      totalReviews: totalReviews ?? this.totalReviews,
+      isFavorite: isFavorite ?? this.isFavorite,
     );
   }
 
-  factory AdModel.fromJson(Map<String, dynamic> json) {
+  factory AdModel.fromJson(Map<String, dynamic> json, {bool isFavorite = false}) {
     return AdModel(
       adID: json['adID'] as int,
       title: json['title'] as String,
@@ -90,7 +109,10 @@ class AdModel {
         (e) => e.name == json['adCity'],
         orElse: () => AdCity.cairo,
       ),
-      userId: json["UserId"],
+      userId: json["UserId"] as String,
+      averageRating: (json['averageRating'] as num?)?.toDouble() ?? 0,
+      totalReviews: (json['totalReviews'] as num?)?.toInt() ?? 0,
+      isFavorite: isFavorite,
     );
   }
 }

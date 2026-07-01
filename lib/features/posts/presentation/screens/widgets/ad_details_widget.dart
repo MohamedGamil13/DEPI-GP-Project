@@ -2,20 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:skillbridge/core/routing/app_navigator.dart';
 import 'package:skillbridge/core/theme/app_colors.dart';
-import 'package:skillbridge/core/utils/helpers/snackbar_manger.dart';
 import 'package:skillbridge/core/widgets/ad_image_widget.dart';
-import 'package:skillbridge/features/posts/presentation/viewModel/call_cubit/call_cubit.dart';
+import 'package:skillbridge/features/home/data/ad_model.dart';
+import 'package:skillbridge/features/posts/presentation/screens/widgets/add_review_sheet.dart';
+import 'package:skillbridge/features/posts/presentation/viewModel/ad_details_cubit/ad_details_cubit.dart';
 import 'package:skillbridge/features/posts/presentation/viewModel/user_data_cubit/user_data_cubit.dart';
+import 'package:skillbridge/generated/l10n.dart';
 
 class AdImageHeader extends StatelessWidget {
   const AdImageHeader({
     super.key,
-    required this.adId, // ← add this
+    required this.adId,
     required this.imageUrl,
+    required this.isFavorite,
+    required this.onFavoriteToggle,
   });
 
   final int adId;
   final String imageUrl;
+  final bool isFavorite;
+  final VoidCallback onFavoriteToggle;
 
   @override
   Widget build(BuildContext context) {
@@ -54,11 +60,11 @@ class AdImageHeader extends StatelessWidget {
                   CircleAvatar(
                     backgroundColor: Colors.black26,
                     child: IconButton(
-                      icon: const Icon(
-                        Icons.favorite_border,
-                        color: Colors.white,
+                      icon: Icon(
+                        isFavorite ? Icons.favorite : Icons.favorite_border,
+                        color: isFavorite ? AppColors.errorColor : Colors.white,
                       ),
-                      onPressed: () {},
+                      onPressed: onFavoriteToggle,
                     ),
                   ),
                 ],
@@ -125,7 +131,7 @@ class SellerCard extends StatelessWidget {
                             size: 16,
                           ),
                           Text(
-                            " ${user.rating} (${user.reviews} reviews)",
+                            ' ${user.rating} (${user.reviews} ${S.of(context).reviews})',
                             style: const TextStyle(color: Colors.grey),
                           ),
                         ],
@@ -134,8 +140,8 @@ class SellerCard extends StatelessWidget {
                   ),
                 ),
                 OutlinedButton(
-                  onPressed: () {},
-                  child: const Text("View Profile"),
+                  onPressed: () => context.goProfile(userId: authorId),
+                  child: Text(S.of(context).viewProfile),
                 ),
               ],
             );
@@ -149,7 +155,16 @@ class SellerCard extends StatelessWidget {
 }
 
 class ContactButtons extends StatelessWidget {
-  const ContactButtons({super.key});
+  final AdModel ad;
+  final bool isSubmittingReview;
+  final bool isCreatingConversation;
+
+  const ContactButtons({
+    super.key,
+    required this.ad,
+    required this.isSubmittingReview,
+    required this.isCreatingConversation,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -163,42 +178,50 @@ class ContactButtons extends StatelessWidget {
         ),
         child: Row(
           children: [
-            BlocConsumer<CallCubit, CallState>(
-              builder: (context, state) {
-                if (state is CallLoading) {
-                  return const CircularProgressIndicator(
-                    color: AppColors.primaryColor,
-                  );
-                }
-
-                return Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () {
-                      context.read<CallCubit>().call('01102535450');
-                    },
-                    icon: const Icon(Icons.call),
-                    label: const Text("Call"),
-                    style: OutlinedButton.styleFrom(
-                      minimumSize: const Size(0, 50),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+            Expanded(
+              child: OutlinedButton.icon(
+                onPressed: isSubmittingReview
+                    ? null
+                    : () => AddReviewSheet.show(
+                        context,
+                        isSubmitting: isSubmittingReview,
+                        onSubmit: (rating, comment) => context
+                            .read<AdDetailsCubit>()
+                            .submitReview(rating: rating, comment: comment),
                       ),
-                    ),
+                icon: isSubmittingReview
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.rate_review_outlined),
+                label: Text(S.of(context).review),
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size(0, 50),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                );
-              },
-              listener: (context, state) {
-                if (state is CallFailure) {
-                  AppSnackBar.error(context, state.errMessage);
-                }
-              },
+                ),
+              ),
             ),
             const SizedBox(width: 12),
             Expanded(
               child: ElevatedButton.icon(
-                onPressed: () {},
-                icon: const Icon(Icons.chat),
-                label: const Text("WhatsApp"),
+                onPressed: isCreatingConversation
+                    ? null
+                    : () => context.read<AdDetailsCubit>().messagePoster(),
+                icon: isCreatingConversation
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : const Icon(Icons.chat),
+                label: Text(S.of(context).messagePoster),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,
                   foregroundColor: Colors.white,

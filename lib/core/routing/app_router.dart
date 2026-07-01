@@ -5,12 +5,17 @@ import 'package:skillbridge/core/locator/service_locator.dart';
 import 'package:skillbridge/core/routing/app_screens.dart';
 import 'package:skillbridge/core/routing/routing_stream_refresh.dart';
 import 'package:skillbridge/core/services/auth/auth_service.dart';
+import 'package:skillbridge/core/services/chat/chat_service.dart';
+import 'package:skillbridge/core/theme/app_colors.dart';
+import 'package:skillbridge/core/utils/constants/app_strings.dart';
+import 'package:skillbridge/generated/l10n.dart';
 import 'package:skillbridge/features/auth/presentation/screens/forgot_password_screen.dart';
 import 'package:skillbridge/features/auth/presentation/screens/sign_in_screen.dart';
 import 'package:skillbridge/features/auth/presentation/screens/sign_up_screen.dart';
 import 'package:skillbridge/features/auth/presentation/viewmodel/auth_cubit.dart';
 import 'package:skillbridge/features/home/data/ad_model.dart';
 import 'package:skillbridge/features/home/presentation/cubits/home_cubit.dart';
+import 'package:skillbridge/features/home/presentation/screens/favorites_screen.dart';
 import 'package:skillbridge/features/home/presentation/screens/home_screen.dart';
 import 'package:skillbridge/features/messages/data/models/conversation_model.dart';
 import 'package:skillbridge/features/messages/presentation/screens/chat_detail_screen.dart';
@@ -20,7 +25,6 @@ import 'package:skillbridge/features/posts/data/repos/post_ad_repo.dart';
 import 'package:skillbridge/features/posts/presentation/screens/ad_details_screen.dart';
 import 'package:skillbridge/features/posts/presentation/screens/post_ad_screen.dart';
 import 'package:skillbridge/features/posts/presentation/viewModel/ad_posting_cubit/ad_posting_cubit.dart';
-import 'package:skillbridge/features/posts/presentation/viewModel/call_cubit/call_cubit.dart';
 import 'package:skillbridge/features/posts/presentation/viewModel/user_data_cubit/user_data_cubit.dart';
 import 'package:skillbridge/features/profile/data/repos/profile_repo_implementation.dart';
 import 'package:skillbridge/features/profile/presentation/screens/profile_screen.dart';
@@ -66,9 +70,26 @@ final GoRouter router = GoRouter(
     // == Home ==
     GoRoute(
       path: AppScreens.homeScreen,
-      builder: (context, state) => BlocProvider(
-        create: (_) => getIt<HomeCubit>()..getPosts(),
+      builder: (context, state) => BlocProvider.value(
+        value: getIt<HomeCubit>()..getPosts(),
         child: const HomeScreen(),
+      ),
+    ),
+
+    // == Favorites ==
+    GoRoute(
+      path: AppScreens.favoritesScreen,
+      builder: (context, state) => BlocProvider.value(
+        value: getIt<HomeCubit>()..getPosts(mode: HomeFeedMode.favorites),
+        child: Scaffold(
+          backgroundColor: AppColors.backgroundColor,
+          appBar: AppBar(
+            scrolledUnderElevation: 0,
+            backgroundColor: Colors.transparent,
+            title: Text(S.of(context).favorites),
+          ),
+          body: const FavoritesScreen(),
+        ),
       ),
     ),
 
@@ -84,10 +105,13 @@ final GoRouter router = GoRouter(
     // == Profile ==
     GoRoute(
       path: AppScreens.profileScreen,
-      builder: (context, state) => BlocProvider(
-        create: (_) => ProfileCubit(ProfileRepoImplementation()),
-        child: const ProfileScreen(),
-      ),
+      builder: (context, state) {
+        final userId = state.uri.queryParameters['userId'];
+        return BlocProvider(
+          create: (_) => ProfileCubit(ProfileRepoImplementation()),
+          child: ProfileScreen(userId: userId),
+        );
+      },
     ),
 
     // == Messages ==
@@ -110,37 +134,69 @@ final GoRouter router = GoRouter(
     GoRoute(
       path: AppScreens.chatDetailScreen,
       builder: (context, state) {
-        final conversation = state.extra;
+        final conversation = state.extra is ConversationModel
+            ? state.extra as ConversationModel
+            : null;
+        final conversationId = state.uri.queryParameters['conversationId'];
 
-        if (conversation is! ConversationModel) {
-          return const Scaffold(
-            body: Center(child: Text('Conversation unavailable')),
+        if (conversation == null && conversationId == null) {
+          return Scaffold(
+            body: Center(
+              child: Text(AppStrings.conversationUnavailable(context)),
+            ),
           );
         }
 
-        // Try to reuse the parent inbox cubit if it's already in the tree.
-        // If not (direct deep-link), spin up a fresh one and open the
-        // conversation immediately.
         final parentCubit = _tryReadCubit<MessagesCubit>(context);
-
-        if (parentCubit != null) {
-          // The cubit already has the conversation open (openConversation was
-          // called before pushing this route). Just share it downward.
+        if (parentCubit != null && conversation != null) {
           return BlocProvider.value(
             value: parentCubit,
             child: const ChatDetailScreen(),
           );
         }
 
-        // Deep-link / notification path: create a fresh cubit and open the
-        // conversation so the message stream starts immediately.
-        return BlocProvider(
-          create: (_) => getIt<MessagesCubit>()
-            ..openConversation(
-              conversationId: conversation.id,
-              currentUserId: getIt<AuthService>().currentUser!.uid,
-            ),
-          child: const ChatDetailScreen(),
+        if (conversation != null) {
+          return BlocProvider(
+            create: (_) => getIt<MessagesCubit>()
+              ..openConversation(
+                conversationId: conversation.id,
+                currentUserId: getIt<AuthService>().currentUser!.uid,
+              ),
+            child: const ChatDetailScreen(),
+          );
+        }
+
+        return FutureBuilder<ConversationModel?>(
+          future: getIt<IChatService>().getConversation(conversationId!),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState != ConnectionState.done) {
+              return const Scaffold(
+                body: Center(
+                  child: CircularProgressIndicator(
+                    color: AppColors.primaryColor,
+                  ),
+                ),
+              );
+            }
+
+            final fetchedConversation = snapshot.data;
+            if (fetchedConversation == null) {
+              return Scaffold(
+                body: Center(
+                  child: Text(AppStrings.conversationUnavailable(context)),
+                ),
+              );
+            }
+
+            return BlocProvider(
+              create: (_) => getIt<MessagesCubit>()
+                ..openConversation(
+                  conversationId: fetchedConversation.id,
+                  currentUserId: getIt<AuthService>().currentUser!.uid,
+                ),
+              child: const ChatDetailScreen(),
+            );
+          },
         );
       },
     ),
@@ -148,11 +204,8 @@ final GoRouter router = GoRouter(
     // == Ad Details ==
     GoRoute(
       path: AppScreens.adDetailsScreen,
-      builder: (context, state) => MultiBlocProvider(
-        providers: [
-          BlocProvider(create: (_) => CallCubit()),
-          BlocProvider(create: (_) => UserDataCubit(getIt<PostAdRepo>())),
-        ],
+      builder: (context, state) => BlocProvider(
+        create: (_) => UserDataCubit(getIt<PostAdRepo>()),
         child: AdDetailsScreen(ad: state.extra as AdModel),
       ),
     ),
