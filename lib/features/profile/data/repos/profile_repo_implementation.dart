@@ -40,10 +40,7 @@ class ProfileRepoImplementation extends ProfileRepo {
             return Success(UserProfileModel.fromAuthUser(authUser));
           }
           return const Failure(
-            AppException(
-              code: 'not-found',
-              message: 'User profile not found.',
-            ),
+            AppException(code: 'not-found', message: 'User profile not found.'),
           );
       }
     } on AppException catch (e) {

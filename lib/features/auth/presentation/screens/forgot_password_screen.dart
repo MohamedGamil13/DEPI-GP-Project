@@ -40,10 +40,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             }
 
             if (state is AuthSendPasswordSuccess) {
-              AppSnackBar.success(
-                context,
-                AppStrings.resetLinkSent(context),
-              );
+              AppSnackBar.success(context, AppStrings.resetLinkSent(context));
               context.gosignIn();
             }
           },
@@ -102,7 +99,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   Center(
                     child: Text(
                       AppStrings.forgotPassword(context),
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.w800,
                         color: AppColors.textDark,

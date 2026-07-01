@@ -198,10 +198,10 @@ class _PostAdScreenState extends State<PostAdScreen> {
   }
 
   AdCity _resolveAdCity(String? city, String? governorate) {
-    final candidates = [city, governorate]
-        .whereType<String>()
-        .map((value) => value.toLowerCase())
-        .toList();
+    final candidates = [
+      city,
+      governorate,
+    ].whereType<String>().map((value) => value.toLowerCase()).toList();
 
     for (final adCity in AdCity.values) {
       final label = adCity.label.toLowerCase();

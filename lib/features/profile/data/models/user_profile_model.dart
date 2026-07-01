@@ -70,7 +70,9 @@ class UserProfileModel {
       memberSince: DateTime.parse(json['memberSince']),
       avatarUrl: json['avatarUrl'] ?? '',
       isVerified: json['isVerified'] ?? false,
-      skills: json['skills'] != null ? List<String>.from(json['skills']) : const [],
+      skills: json['skills'] != null
+          ? List<String>.from(json['skills'])
+          : const [],
       lastSignedIn: json['lastSignedIn'] ?? '',
       fcmTokens: json['fcmTokens'] != null
           ? List<String>.from(json['fcmTokens'])

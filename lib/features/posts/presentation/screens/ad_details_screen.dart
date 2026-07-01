@@ -37,7 +37,9 @@ class AdDetailsScreen extends StatelessWidget {
         },
         builder: (context, state) {
           final loadedAd = state is AdDetailsLoaded ? state.ad : ad;
-          final isFavorite = state is AdDetailsLoaded ? state.isFavorite : ad.isFavorite;
+          final isFavorite = state is AdDetailsLoaded
+              ? state.isFavorite
+              : ad.isFavorite;
 
           return Scaffold(
             backgroundColor: AppColors.backgroundColor,

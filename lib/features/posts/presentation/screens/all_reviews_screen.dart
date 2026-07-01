@@ -16,11 +16,11 @@ class AllReviewsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
-        appBar: AppBar(
-          backgroundColor: AppColors.backgroundColor,
-          foregroundColor: AppColors.textDark,
-          title: Text(S.of(context).allReviews),
-        ),
+      appBar: AppBar(
+        backgroundColor: AppColors.backgroundColor,
+        foregroundColor: AppColors.textDark,
+        title: Text(S.of(context).allReviews),
+      ),
       body: BlocBuilder<AdDetailsCubit, AdDetailsState>(
         builder: (context, state) {
           if (state is AdDetailsLoading) {

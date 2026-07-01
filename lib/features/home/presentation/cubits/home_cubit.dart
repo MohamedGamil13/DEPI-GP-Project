@@ -205,7 +205,7 @@ class HomeCubit extends Cubit<HomeState> {
         ? await _firestoreService.removeFavorite(postId)
         : await _firestoreService.addFavorite(postId);
 
-    if (result case Failure(:final exception)) {
+    if (result case Failure()) {
       if (isCurrentlyFavorite) {
         _favoriteIds.add(postId);
       } else {

@@ -27,10 +27,7 @@ class ReviewItemWidget extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          CircleAvatar(
-            radius: 22,
-            backgroundImage: NetworkImage(imageUrl),
-          ),
+          CircleAvatar(radius: 22, backgroundImage: NetworkImage(imageUrl)),
           const SizedBox(width: 12),
           Expanded(
             child: Column(

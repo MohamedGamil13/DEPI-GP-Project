@@ -95,7 +95,10 @@ class AdModel {
     );
   }
 
-  factory AdModel.fromJson(Map<String, dynamic> json, {bool isFavorite = false}) {
+  factory AdModel.fromJson(
+    Map<String, dynamic> json, {
+    bool isFavorite = false,
+  }) {
     return AdModel(
       adID: json['adID'] as int,
       title: json['title'] as String,

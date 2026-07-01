@@ -237,7 +237,6 @@ class MessagesCubit extends Cubit<MessagesState> {
         }
       }
 
-      // TODO (post-deadline): add a `waiting` rule, e.g. flip to `waiting`
       // when the provider sends and is now waiting on the customer to reply.
       // The message stream will push the new message automatically.
     } on ChatServiceException catch (e) {

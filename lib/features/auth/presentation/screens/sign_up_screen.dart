@@ -109,7 +109,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                   SizedBox(height: 18.h),
 
-                  // â”€â”€ Bio â”€â”€ 
+                  // â”€â”€ Bio â”€â”€
                   const FieldLabel(label: 'Bio'),
                   AuthTextField(
                     controller: _bioController,

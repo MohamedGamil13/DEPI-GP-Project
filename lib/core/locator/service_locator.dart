@@ -13,6 +13,7 @@ import 'package:skillbridge/core/services/firestore/firestore_repo.dart';
 import 'package:skillbridge/core/services/firestore/firestore_repo_service.dart';
 import 'package:skillbridge/core/services/location/location_service.dart';
 import 'package:skillbridge/core/services/notifications/app_push_service.dart';
+import 'package:skillbridge/core/utils/locale_cubit.dart';
 import 'package:skillbridge/features/auth/data/repos/auth_repo.dart';
 import 'package:skillbridge/features/auth/data/repos/auth_repo_implementation.dart';
 import 'package:skillbridge/features/auth/presentation/viewmodel/auth_cubit.dart';
@@ -21,7 +22,6 @@ import 'package:skillbridge/features/messages/presentation/viewmodel/messages_cu
 import 'package:skillbridge/features/posts/data/repos/post_ad_repo.dart';
 import 'package:skillbridge/features/posts/data/repos/post_ad_repo_impl.dart';
 import 'package:skillbridge/features/posts/presentation/viewModel/ad_posting_cubit/ad_posting_cubit.dart';
-import 'package:skillbridge/core/utils/locale_cubit.dart';
 
 GetIt getIt = GetIt.instance;
 

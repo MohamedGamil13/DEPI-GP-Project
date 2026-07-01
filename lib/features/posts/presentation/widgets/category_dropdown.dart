@@ -34,10 +34,7 @@ class CategoryDropdown extends StatelessWidget {
         hintStyle: AppStyles.font14w600.copyWith(color: AppColors.textLight),
         filled: true,
         fillColor: AppColors.backgroundColor,
-        contentPadding: EdgeInsets.symmetric(
-          horizontal: 16.w,
-          vertical: 14.h,
-        ),
+        contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
           borderSide: const BorderSide(color: AppColors.border),

@@ -44,7 +44,11 @@ class FirebaseAuthService implements AuthService {
   }
 
   @override
-  Future<AuthUser> register(String email, String password, {String bio = ''}) async {
+  Future<AuthUser> register(
+    String email,
+    String password, {
+    String bio = '',
+  }) async {
     String? emailError = AppValidator.validateEmail(email);
 
     if (emailError != null) {
@@ -266,7 +270,8 @@ class FirebaseAuthService implements AuthService {
   AuthUser _mapUser(User user) => AuthUser.fromFirebaseUser(user);
 
   Future<Map<String, dynamic>> _locationFields() async {
-    final location = await locationService.getCachedLocation() ??
+    final location =
+        await locationService.getCachedLocation() ??
         await locationService.getCurrentLocation();
 
     return {

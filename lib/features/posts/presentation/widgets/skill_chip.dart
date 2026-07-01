@@ -61,11 +61,7 @@ class SkillChip extends StatelessWidget {
             if (isSelected)
               Padding(
                 padding: EdgeInsets.only(left: 6.w),
-                child: Icon(
-                  Icons.close,
-                  size: 13.sp,
-                  color: AppColors.white,
-                ),
+                child: Icon(Icons.close, size: 13.sp, color: AppColors.white),
               ),
           ],
         ),

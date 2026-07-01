@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+
 import 'package:app_links/app_links.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
@@ -20,10 +21,10 @@ class AppPushService {
     required StoreService storeService,
     required AuthService authService,
     required GoRouter router,
-  })  : _messaging = messaging,
-        _storeService = storeService,
-        _authService = authService,
-        _router = router;
+  }) : _messaging = messaging,
+       _storeService = storeService,
+       _authService = authService,
+       _router = router;
 
   final FirebaseMessaging _messaging;
   final StoreService _storeService;
@@ -124,14 +125,14 @@ class AppPushService {
       notification.hashCode,
       notification.title,
       notification.body,
-      NotificationDetails(
+      const NotificationDetails(
         android: AndroidNotificationDetails(
           'skillbridge_messages',
           'Messages',
           importance: Importance.max,
           priority: Priority.high,
         ),
-        iOS: const DarwinNotificationDetails(),
+        iOS: DarwinNotificationDetails(),
       ),
       payload: jsonEncode(message.data),
     );
