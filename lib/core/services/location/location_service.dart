@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:geocoding/geocoding.dart';
@@ -15,11 +16,10 @@ class LocationService {
       // تأكد أن خدمة الموقع مفعلة
       final serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
+        log("Location Service Disabled");
         return allowCached ? await _readCachedLocation() : null;
       }
-      log(
-        "Location Service Enabled: ${await Geolocator.isLocationServiceEnabled()}",
-      );
+
       // الصلاحيات
       var permission = await Geolocator.checkPermission();
       log("Permission Before: $permission");
@@ -33,15 +33,28 @@ class LocationService {
         return allowCached ? await _readCachedLocation() : null;
       }
 
-      // احصل دائماً على أحدث Location
+      // احصل على الموقع مع مهلة زمنية — بدون مهلة الطلب ممكن يعلق
+      // للأبد على أجهزة حقيقية داخل مبنى أو بإشارة GPS ضعيفة، حتى لو
+      // كانت الصلاحيات والخدمة مفعّلة (على عكس المحاكي اللي بيرجع
+      // موقع وهمي فوراً).
       final position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.best,
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+          timeLimit: Duration(seconds: 15),
+        ),
       );
 
       final placemarks = await placemarkFromCoordinates(
         position.latitude,
         position.longitude,
       );
+
+      if (placemarks.isEmpty) {
+        throw StateError(
+          'Could not resolve placemark for '
+          '(${position.latitude}, ${position.longitude})',
+        );
+      }
 
       final placemark = placemarks.first;
 
@@ -79,6 +92,12 @@ class LocationService {
       await _cacheLocation(location);
 
       return location;
+    } on TimeoutException catch (e) {
+      log('Location Timeout: $e');
+      if (allowCached) {
+        return await _readCachedLocation();
+      }
+      return null;
     } catch (e) {
       log('Location Error: $e');
 
@@ -95,9 +114,7 @@ class LocationService {
 
   Future<void> cacheLocation(LocationData location) => _cacheLocation(location);
 
-  Future<void> clearCachedLocation() async {
-    await _helper.readCachedLocation(_cacheKey); // no-op read removed below
-  }
+  Future<void> clearCachedLocation() => _helper.deleteCachedLocation(_cacheKey);
 
   double distanceBetween({
     required double startLatitude,

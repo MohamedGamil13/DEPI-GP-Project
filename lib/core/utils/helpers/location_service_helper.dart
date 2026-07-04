@@ -18,4 +18,9 @@ class LocationServiceHelper {
     final box = Hive.box(AppConstants.appSettingsBox);
     await box.put(cacheKey, location.toJson());
   }
+
+  Future<void> deleteCachedLocation(String cacheKey) async {
+    final box = Hive.box(AppConstants.appSettingsBox);
+    await box.delete(cacheKey);
+  }
 }
