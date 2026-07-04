@@ -6,6 +6,7 @@ import 'package:skillbridge/core/errors/auth_exception.dart';
 import 'package:skillbridge/core/services/auth/auth_service.dart';
 import 'package:skillbridge/core/services/firestore/firestore_repo.dart';
 import 'package:skillbridge/core/services/location/location_service.dart';
+import 'package:skillbridge/core/utils/helpers/auth_service_helper.dart';
 import 'package:skillbridge/core/utils/validator/app_validator.dart';
 import 'package:skillbridge/features/auth/data/models/auth_user_model.dart';
 import 'package:skillbridge/features/profile/data/models/user_profile_model.dart';
@@ -24,6 +25,11 @@ class FirebaseAuthService implements AuthService {
       colors: true,
       printEmojis: false,
     ),
+  );
+
+  late final AuthServiceHelper _helper = AuthServiceHelper(
+    locationService: locationService,
+    logger: _logger,
   );
 
   FirebaseAuthService(
@@ -268,55 +274,16 @@ class FirebaseAuthService implements AuthService {
     }
   }
 
-  AuthUser _mapUser(User user) => AuthUser.fromFirebaseUser(user);
+  AuthUser _mapUser(User user) => _helper.mapUser(user);
 
-  Future<Map<String, dynamic>> _locationFields() async {
-    final location =
-        await locationService.getCachedLocation() ??
-        await locationService.getCurrentLocation();
+  Future<Map<String, dynamic>> _locationFields() => _helper.locationFields();
 
-    return {
-      'city': location?.city ?? '',
-      'governorate': location?.governorate ?? '',
-      'country': location?.country ?? '',
-      'latitude': location?.latitude,
-      'longitude': location?.longitude,
-    };
-  }
+  void _validateInputs(String email, String password) =>
+      _helper.validateInputs(email, password);
 
-  void _validateInputs(String email, String password) {
-    if (email.trim().isEmpty || password.isEmpty) {
-      _logger.w(" Validation Failed: Email or Password field is empty");
-      throw const InvalidEmailException();
-    }
-  }
+  void _logAuthError(String action, FirebaseAuthException e) =>
+      _helper.logAuthError(action, e);
 
-  void _logAuthError(String action, FirebaseAuthException e) {
-    _logger.e(
-      "===============  FIREBASE AUTH ERROR ===============\n"
-      "ACTION: $action\n"
-      "CODE: ${e.code}\n"
-      "MESSAGE: ${e.message}",
-    );
-  }
-
-  AuthException _mapException(FirebaseAuthException e) {
-    return switch (e.code) {
-      'weak-password' => const WeakPasswordException(),
-      'email-already-in-use' => const EmailAlreadyInUseException(),
-      'user-not-found' ||
-      'wrong-password' ||
-      'invalid-credential' => const UnknownAuthException(
-        code: 'invalid-credential',
-        message: 'Email or password is incorrect.',
-      ),
-      'invalid-email' => const InvalidEmailException(),
-      'user-disabled' => const UserDisabledException(),
-      'too-many-requests' => const TooManyRequestsException(),
-      _ => UnknownAuthException(
-        code: e.code,
-        message: e.message ?? 'Unexpected authentication error.',
-      ),
-    };
-  }
+  AuthException _mapException(FirebaseAuthException e) =>
+      _helper.mapException(e);
 }

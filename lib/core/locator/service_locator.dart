@@ -7,6 +7,7 @@ import 'package:skillbridge/core/routing/app_router.dart';
 import 'package:skillbridge/core/services/auth/auth_service.dart';
 import 'package:skillbridge/core/services/auth/firebase_auth_service.dart';
 import 'package:skillbridge/core/services/chat/chat_service.dart';
+import 'package:skillbridge/core/services/chat/chat_service_impl.dart';
 import 'package:skillbridge/core/services/cloudinary/cloudinary_sotrage_service.dart';
 import 'package:skillbridge/core/services/cloudinary/storage_service.dart';
 import 'package:skillbridge/core/services/firestore/firestore_repo.dart';
@@ -34,9 +35,6 @@ void setupLocator() {
   );
   getIt.registerLazySingleton<Dio>(() => Dio());
 
-  // NEW: AuthUser — always derived live from the current Firebase user.
-  // registerFactory (not singleton) so it's never stale and never
-  // needs manual re-registration on login/logout.
   getIt.registerFactory<AuthUser>(() {
     final user = getIt<FirebaseAuth>().currentUser;
     if (user == null) {

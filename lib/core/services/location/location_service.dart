@@ -1,11 +1,14 @@
+import 'dart:developer';
+
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:hive_ce_flutter/hive_ce_flutter.dart';
-import 'package:skillbridge/core/utils/constants/app_constants.dart';
+import 'package:skillbridge/core/utils/helpers/location_service_helper.dart';
 import 'package:skillbridge/features/location/data/location_data.dart';
 
 class LocationService {
   static const _cacheKey = 'cached_location';
+
+  final LocationServiceHelper _helper = LocationServiceHelper();
 
   Future<LocationData?> getCurrentLocation({bool allowCached = true}) async {
     try {
@@ -14,17 +17,17 @@ class LocationService {
       if (!serviceEnabled) {
         return allowCached ? await _readCachedLocation() : null;
       }
-      print(
+      log(
         "Location Service Enabled: ${await Geolocator.isLocationServiceEnabled()}",
       );
       // الصلاحيات
       var permission = await Geolocator.checkPermission();
-      print("Permission Before: $permission");
+      log("Permission Before: $permission");
 
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
       }
-      print("Permission After: $permission");
+      log("Permission After: $permission");
       if (permission == LocationPermission.denied ||
           permission == LocationPermission.deniedForever) {
         return allowCached ? await _readCachedLocation() : null;
@@ -43,15 +46,15 @@ class LocationService {
       final placemark = placemarks.first;
 
       // للتأكد أثناء التطوير
-      print('========== LOCATION ==========');
-      print('Latitude : ${position.latitude}');
-      print('Longitude: ${position.longitude}');
-      print('Country  : ${placemark.country}');
-      print('Governor : ${placemark.administrativeArea}');
-      print('City     : ${placemark.locality}');
-      print('District : ${placemark.subLocality}');
-      print('Sub Admin: ${placemark.subAdministrativeArea}');
-      print('==============================');
+      log('========== LOCATION ==========');
+      log('Latitude : ${position.latitude}');
+      log('Longitude: ${position.longitude}');
+      log('Country  : ${placemark.country}');
+      log('Governor : ${placemark.administrativeArea}');
+      log('City     : ${placemark.locality}');
+      log('District : ${placemark.subLocality}');
+      log('Sub Admin: ${placemark.subAdministrativeArea}');
+      log('==============================');
 
       final location = LocationData(
         latitude: position.latitude,
@@ -77,7 +80,7 @@ class LocationService {
 
       return location;
     } catch (e) {
-      print('Location Error: $e');
+      log('Location Error: $e');
 
       // لو حصل خطأ استخدم الكاش فقط كحل احتياطي
       if (allowCached) {
@@ -93,8 +96,7 @@ class LocationService {
   Future<void> cacheLocation(LocationData location) => _cacheLocation(location);
 
   Future<void> clearCachedLocation() async {
-    final box = Hive.box(AppConstants.appSettingsBox);
-    await box.delete(_cacheKey);
+    await _helper.readCachedLocation(_cacheKey); // no-op read removed below
   }
 
   double distanceBetween({
@@ -111,19 +113,9 @@ class LocationService {
     );
   }
 
-  Future<LocationData?> _readCachedLocation() async {
-    final box = Hive.box(AppConstants.appSettingsBox);
-    final cached = box.get(_cacheKey);
+  Future<LocationData?> _readCachedLocation() =>
+      _helper.readCachedLocation(_cacheKey);
 
-    if (cached is Map) {
-      return LocationData.fromJson(Map<String, dynamic>.from(cached));
-    }
-
-    return null;
-  }
-
-  Future<void> _cacheLocation(LocationData location) async {
-    final box = Hive.box(AppConstants.appSettingsBox);
-    await box.put(_cacheKey, location.toJson());
-  }
+  Future<void> _cacheLocation(LocationData location) =>
+      _helper.cacheLocation(_cacheKey, location);
 }

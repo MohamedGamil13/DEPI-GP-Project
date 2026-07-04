@@ -4,6 +4,7 @@ import 'package:skillbridge/core/errors/database_exception.dart';
 import 'package:skillbridge/core/locator/service_locator.dart';
 import 'package:skillbridge/core/services/firestore/firestore_repo.dart';
 import 'package:skillbridge/core/utils/constants/app_constants.dart';
+import 'package:skillbridge/core/utils/helpers/firestore_service_helper.dart';
 import 'package:skillbridge/core/utils/validator/result.dart';
 import 'package:skillbridge/features/home/data/ad_model.dart';
 import 'package:skillbridge/features/posts/data/models/review_model.dart';
@@ -13,6 +14,8 @@ class FirestoreService implements StoreService {
   final FirebaseFirestore db;
 
   FirestoreService({required this.db});
+
+  final FirestoreServiceHelper _helper = FirestoreServiceHelper();
 
   String? get _currentUserId => getIt<FirebaseAuth>().currentUser?.uid;
 
@@ -27,41 +30,15 @@ class FirestoreService implements StoreService {
 
   Future<QueryDocumentSnapshot<Map<String, dynamic>>?> _getPostDocByAdId(
     int adId,
-  ) async {
-    final snapshot = await _posts.where('adID', isEqualTo: adId).limit(1).get();
-    if (snapshot.docs.isEmpty) return null;
-    return snapshot.docs.first;
-  }
+  ) => _helper.getPostDocByAdId(_posts, adId);
 
-  Future<Set<int>> _loadFavoriteIds() async {
-    final userId = _currentUserId;
-    if (userId == null) return {};
-
-    // جلب الوثائق من الـ Subcollection للمستخدم الحالي
-    final snapshot = await _userFavoritesRef(userId).get();
-
-    // استخدام snapshot.docs للوصول إلى كل وثيقة واستخراج الـ postId
-    return snapshot.docs
-        .map((doc) {
-          final data = doc.data();
-          return (data['postId'] as num?)?.toInt();
-        })
-        .whereType<int>() // تصفية أي قيم null
-        .toSet(); // تحويل النتيجة إلى Set لمنع التكرار
-  }
+  Future<Set<int>> _loadFavoriteIds() =>
+      _helper.loadFavoriteIds(_userFavoritesRef, _currentUserId);
 
   List<AdModel> _mapPostsWithFavorites(
     Iterable<QueryDocumentSnapshot<Map<String, dynamic>>> docs,
     Set<int> favoriteIds,
-  ) {
-    return docs.map((doc) {
-      final data = doc.data();
-      return AdModel.fromJson(
-        data,
-        isFavorite: favoriteIds.contains(data['adID'] as int?),
-      );
-    }).toList();
-  }
+  ) => _helper.mapPostsWithFavorites(docs, favoriteIds);
 
   @override
   Future<Result<List<AdModel>>> getAllPosts() async {
@@ -498,16 +475,6 @@ class FirestoreService implements StoreService {
     }
   }
 
-  DatabaseException _mapException(FirebaseException e) {
-    return switch (e.code) {
-      'not-found' => DocumentNotFoundException(),
-      'permission-denied' => PermissionDeniedException(),
-      'already-exists' => DataAlreadyExistsException(),
-      'unavailable' || 'network-request-failed' => DatabaseNetworkException(),
-      _ => UnknownDatabaseException(
-        code: e.code,
-        message: e.message ?? 'Unexpected database error.',
-      ),
-    };
-  }
+  DatabaseException _mapException(FirebaseException e) =>
+      _helper.mapException(e);
 }

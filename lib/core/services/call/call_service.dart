@@ -7,7 +7,7 @@ class CallService {
     try {
       if (path.isEmpty || path.length < 11) {
         return const Failure(InvalidPhoneNumberException());
-      } //to Ensure That The path (pohne Number is True)
+      }
       final Uri callLaunchUri = Uri(scheme: "tel", path: "2$path");
 
       if (await canLaunchUrl(callLaunchUri)) {

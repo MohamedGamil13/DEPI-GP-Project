@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:skillbridge/core/services/chat/chat_service.dart';
+import 'package:skillbridge/core/services/chat/chat_service_impl.dart';
 import 'package:skillbridge/features/messages/data/models/chat_message.dart';
 import 'package:skillbridge/features/messages/data/models/conversation_model.dart';
 

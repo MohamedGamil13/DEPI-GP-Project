@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:skillbridge/core/locator/service_locator.dart';
 import 'package:skillbridge/core/services/auth/auth_service.dart';
 import 'package:skillbridge/core/services/chat/chat_service.dart';
+import 'package:skillbridge/core/services/chat/chat_service_impl.dart';
 import 'package:skillbridge/core/services/firestore/firestore_repo.dart';
 import 'package:skillbridge/core/utils/validator/result.dart';
 import 'package:skillbridge/features/home/data/ad_model.dart';
