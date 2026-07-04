@@ -15,5 +15,4 @@ class GoRouterRefreshStream extends ChangeNotifier {
     super.dispose();
   }
 }
-//this is work as adapter for know firebasechage
 //reviewd

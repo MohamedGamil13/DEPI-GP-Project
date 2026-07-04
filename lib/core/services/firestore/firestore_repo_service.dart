@@ -407,6 +407,13 @@ class FirestoreService implements StoreService {
         .collection(AppConstants.reviewsSubCollection)
         .orderBy('createdAt', descending: true)
         .snapshots()
+        .handleError((error, stackTrace) {
+          if (error is FirebaseException && error.code == 'permission-denied') {
+            return;
+          }
+
+          throw error;
+        })
         .map(
           (snapshot) => snapshot.docs
               .map((doc) => ReviewModel.fromJson(doc.data(), id: doc.id))

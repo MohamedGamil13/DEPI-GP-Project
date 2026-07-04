@@ -35,6 +35,10 @@ class _PostAdScreenState extends State<PostAdScreen> {
   final _descriptionController = TextEditingController();
   final _priceController = TextEditingController();
 
+  // NEW: local flag so the button reacts instantly, even before
+  // the cubit emits AdPostingLoading (location fetch happens first).
+  bool _isSubmitting = false;
+
   static final List<String> _categories = AdCategories.values
       .map((e) => e.label)
       .toList();
@@ -60,7 +64,7 @@ class _PostAdScreenState extends State<PostAdScreen> {
       },
       builder: (context, state) {
         final cubit = context.read<AdPostingCubit>();
-        final isLoading = state is AdPostingLoading;
+        final isLoading = _isSubmitting || state is AdPostingLoading;
 
         return Scaffold(
           backgroundColor: AppColors.white,
@@ -154,39 +158,61 @@ class _PostAdScreenState extends State<PostAdScreen> {
       return;
     }
 
-    final AdCategories category = AdCategories.values.firstWhere(
-      (e) => e.label == state.selectedCategory,
-      orElse: () => AdCategories.services,
-    );
+    final price = double.tryParse(_priceController.text.trim());
+    if (price == null) {
+      AppSnackBar.error(context, 'Please enter a valid price');
+      return;
+    }
 
-    final selectedSkills = state.skills
-        .where((s) => s.isSelected)
-        .map(
-          (s) => RelevantSkills.values.firstWhere(
-            (e) => e.name == s.label,
-            orElse: () => RelevantSkills.web,
-          ),
-        )
-        .toList();
+    // Show feedback immediately, before the (potentially slow) location call.
+    setState(() => _isSubmitting = true);
 
-    final location = await getIt<LocationService>().getCurrentLocation();
+    try {
+      final AdCategories category = AdCategories.values.firstWhere(
+        (e) => e.label == state.selectedCategory,
+        orElse: () => AdCategories.services,
+      );
 
-    final ad = AdModel(
-      adID: DateTime.now().millisecondsSinceEpoch,
-      title: _titleController.text.trim(),
-      description: _descriptionController.text.trim(),
-      city: location?.city ?? '',
-      latitude: location?.latitude ?? 0,
-      longitude: location?.longitude ?? 0,
-      photos: [],
-      price: double.parse(_priceController.text.trim()),
-      category: category,
-      relevantSkills: selectedSkills,
-      adCity: _resolveAdCity(location?.city, location?.governorate),
-      userId: getIt<AuthUser>().uid,
-    );
+      final selectedSkills = state.skills
+          .where((s) => s.isSelected)
+          .map(
+            (s) => RelevantSkills.values.firstWhere(
+              (e) => e.name == s.label,
+              orElse: () => RelevantSkills.web,
+            ),
+          )
+          .toList();
 
-    await cubit.publishNewAd(adModel: ad);
+      // Timeout guards against a hung GPS fix / permission dialog.
+      final location = await getIt<LocationService>()
+          .getCurrentLocation()
+          .timeout(const Duration(seconds: 10), onTimeout: () => null);
+
+      final ad = AdModel(
+        adID: DateTime.now().millisecondsSinceEpoch,
+        title: _titleController.text.trim(),
+        description: _descriptionController.text.trim(),
+        city: location?.city ?? '',
+        latitude: location?.latitude ?? 0,
+        longitude: location?.longitude ?? 0,
+        photos: [],
+        price: price,
+        category: category,
+        relevantSkills: selectedSkills,
+        adCity: _resolveAdCity(location?.city, location?.governorate),
+        userId: getIt<AuthUser>().uid,
+      );
+
+      await cubit.publishNewAd(adModel: ad);
+    } catch (e) {
+      if (mounted) {
+        AppSnackBar.error(context, 'Something went wrong: $e');
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isSubmitting = false);
+      }
+    }
   }
 
   Future<void> _pickImages(AdPostingCubit cubit) async {

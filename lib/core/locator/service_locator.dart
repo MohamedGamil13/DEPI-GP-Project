@@ -14,6 +14,7 @@ import 'package:skillbridge/core/services/firestore/firestore_repo_service.dart'
 import 'package:skillbridge/core/services/location/location_service.dart';
 import 'package:skillbridge/core/services/notifications/app_push_service.dart';
 import 'package:skillbridge/core/utils/locale_cubit.dart';
+import 'package:skillbridge/features/auth/data/models/auth_user_model.dart'; // <-- NEW: adjust path if your real AuthUser lives elsewhere
 import 'package:skillbridge/features/auth/data/repos/auth_repo.dart';
 import 'package:skillbridge/features/auth/data/repos/auth_repo_implementation.dart';
 import 'package:skillbridge/features/auth/presentation/viewmodel/auth_cubit.dart';
@@ -32,6 +33,19 @@ void setupLocator() {
     () => FirebaseFirestore.instance,
   );
   getIt.registerLazySingleton<Dio>(() => Dio());
+
+  // NEW: AuthUser — always derived live from the current Firebase user.
+  // registerFactory (not singleton) so it's never stale and never
+  // needs manual re-registration on login/logout.
+  getIt.registerFactory<AuthUser>(() {
+    final user = getIt<FirebaseAuth>().currentUser;
+    if (user == null) {
+      throw StateError(
+        'AuthUser was requested but no user is currently signed in.',
+      );
+    }
+    return AuthUser.fromFirebaseUser(user);
+  });
 
   // ── Layer 2: Services ────────────────────────────────────────────────────
   getIt.registerLazySingleton<StoreService>(
@@ -94,8 +108,6 @@ void setupLocator() {
 
   getIt.registerLazySingleton<LocaleCubit>(() => LocaleCubit());
 
-  // Factory so each route gets a fresh cubit with its own stream subscriptions.
-  // IChatService is a singleton so no duplicate Firestore listeners are opened.
   getIt.registerFactory<MessagesCubit>(
     () => MessagesCubit(chatService: getIt<IChatService>()),
   );

@@ -53,7 +53,7 @@ class FirebaseAuthService implements AuthService {
     String? emailError = AppValidator.validateEmail(email);
 
     if (emailError != null) {
-      _logger.w("⚠️ Validation Failed: Invalid Email Format ($email)");
+      _logger.w(" Validation Failed: Invalid Email Format ($email)");
       throw const InvalidEmailException();
     }
 
@@ -71,8 +71,6 @@ class FirebaseAuthService implements AuthService {
 
       await credential.user!.updateDisplayName(name);
       await credential.user!.reload();
-
-      await credential.user!.sendEmailVerification();
 
       final firebaseUser = _auth.currentUser!;
       final tempUser = _mapUser(firebaseUser);
@@ -122,13 +120,6 @@ class FirebaseAuthService implements AuthService {
       );
 
       final user = credential.user!;
-
-      if (!user.emailVerified) {
-        _logger.w(" Sign In Blocked: Email not verified for ${user.email}");
-        await _auth.signOut();
-        throw const UnverifiedEmailException();
-      }
-
       final authUser = _mapUser(user);
 
       _logger.i(
