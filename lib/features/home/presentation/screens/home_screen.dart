@@ -16,7 +16,7 @@ class HomeScreen extends StatelessWidget {
         scrolledUnderElevation: 0,
         backgroundColor: Colors.transparent,
         title: const AppTitle(),
-        actions: const [_NotificationIcon()],
+        // actions: const [_NotificationIcon()],
       ),
       floatingActionButton: const _CustomFloatingActionButton(),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
@@ -26,20 +26,20 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-class _NotificationIcon extends StatelessWidget {
-  const _NotificationIcon();
+// class _NotificationIcon extends StatelessWidget {
+//   const _NotificationIcon();
 
-  @override
-  Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.only(right: 16),
-      child: CircleAvatar(
-        backgroundColor: AppColors.primaryLight,
-        child: Icon(Icons.notifications_none, color: AppColors.primaryColor),
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return const Padding(
+//       padding: EdgeInsets.only(right: 16),
+//       child: CircleAvatar(
+//         backgroundColor: AppColors.primaryLight,
+//         child: Icon(Icons.notifications_none, color: AppColors.primaryColor),
+//       ),
+//     );
+//   }
+// }
 
 class _CustomFloatingActionButton extends StatelessWidget {
   const _CustomFloatingActionButton();
