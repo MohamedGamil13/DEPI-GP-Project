@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
+import 'package:skillbridge/core/errors/app_exception.dart';
 import 'package:skillbridge/core/utils/validator/result.dart';
 import 'package:skillbridge/features/home/data/ad_model.dart';
 import 'package:skillbridge/features/profile/data/models/user_profile_model.dart';
@@ -21,7 +22,7 @@ class ProfileCubit extends Cubit<ProfileState> {
 
     switch (profileResult) {
       case Failure(:final exception):
-        emit(ProfileFailure(errorMessage: exception.message));
+        _emitFailure(exception);
         return;
       case Success(:var data):
         emit(
@@ -66,8 +67,12 @@ class ProfileCubit extends Cubit<ProfileState> {
             activityPosts: const [],
           ),
         );
+        // Posts were wiped out by the ProfileLoading/ProfileSuccess
+        // transitions above — reload them so the posts tab doesn't
+        // get stuck showing a spinner forever.
+        await loadCurrentUserPosts();
       case Failure(:final exception):
-        emit(ProfileFailure(errorMessage: exception.message));
+        _emitFailure(exception);
     }
   }
 
@@ -78,7 +83,11 @@ class ProfileCubit extends Cubit<ProfileState> {
       case Success():
         emit(ProfileInitial());
       case Failure(:final exception):
-        emit(ProfileFailure(errorMessage: exception.message));
+        _emitFailure(exception);
     }
+  }
+
+  void _emitFailure(AppException exception) {
+    emit(ProfileFailure(errorMessage: exception.message));
   }
 }
