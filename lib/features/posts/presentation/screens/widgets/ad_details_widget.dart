@@ -118,6 +118,8 @@ class SellerCard extends StatelessWidget {
                     children: [
                       Text(
                         user.name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
@@ -130,18 +132,33 @@ class SellerCard extends StatelessWidget {
                             color: Colors.orange,
                             size: 16,
                           ),
-                          Text(
-                            ' ${user.rating} (${user.reviews} ${S.of(context).reviews})',
-                            style: const TextStyle(color: Colors.grey),
+                          Flexible(
+                            child: Text(
+                              ' ${user.rating} (${user.reviews} ${S.of(context).reviews})',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(color: Colors.grey),
+                            ),
                           ),
                         ],
                       ),
                     ],
                   ),
                 ),
-                OutlinedButton(
-                  onPressed: () => context.goProfile(userId: authorId),
-                  child: Text(S.of(context).viewProfile),
+                const SizedBox(width: 8),
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 120),
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                    ),
+                    onPressed: () => context.goProfile(userId: authorId),
+                    child: Text(
+                      S.of(context).viewProfile,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
                 ),
               ],
             );
