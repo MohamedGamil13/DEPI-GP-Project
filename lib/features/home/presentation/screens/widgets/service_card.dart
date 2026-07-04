@@ -84,6 +84,7 @@ class ServiceCard extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   ad.description,
+                  maxLines: 2,
                   style: AppStyles.font14Regular.copyWith(
                     color: AppColors.textMedium,
                   ),
