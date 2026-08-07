@@ -1,80 +1,146 @@
-# ServiMarket 
+# SkillBridge (ServiMarket)
 
-A full-stack cross-platform service marketplace built with Flutter and Firebase, developed as a DEPI Final Project. ServiMarket connects service providers with buyers through smart matching, collaborative booking, and local discovery.
-
----
-
-## Features
-
-###  Core
-- **Authentication** — Email/password login & registration via Firebase Auth, with persistent session and role-based profiles (Student / Provider / Regular)
-- **Service Posting** — Create, edit, and delete service ads with title, description, category, price, city tag, and up to 3 images
-- **Home Feed + Search + Filters** — Real-time stream of posts with keyword search, category/city filters, and paginated loading (20 posts/batch)
-- **Service Detail Screen** — Full post view with swipeable image gallery, seller info, Call & WhatsApp contact buttons, and a comments section
-- **Favorites / Wishlist** — Save and unsave posts with real-time heart icon state updates
-
-###  Recommended
-- **CV / Skill Matcher** — Tag-based scoring system that matches users to relevant tech/student posts based on their skill profile. Posts are scored and labeled as *Great Match*, *Stretch*, or *Overqualified*
-- **Group Campaign** — Collaborative booking feature where multiple users join a service at a lower per-person price, powered by atomic Firestore transactions with a live countdown timer
-- **Student Services Section** — Dedicated tab for student-to-student academic help, filterable by subject, area, and free/paid status
-- **Local Services Filter** — Toggle to show only posts matching the user's saved city, with a planned GPS radius upgrade
-
-###  Nice to Have
-- Dark Mode with system-aware theming
-- Google Sign-In
-- Push Notifications via FCM
-- Ratings & Reviews
-- GPS-Based Location Filter
-- In-App Messaging / Chat
-- Premium / Promoted Ads
+A full-stack cross-platform **service marketplace** built with **Flutter** and **Firebase**, developed as a **DEPI (Digital Egypt Pioneers Initiative) Final Project**. SkillBridge connects service providers with buyers — enabling local discovery, in-app messaging, and secure transactions — all in one seamless mobile experience.
 
 ---
 
-## Tech Stack
+## ✨ Features
 
-| Layer | Technology |
-|---|---|
-| Framework | Flutter |
-| Backend | Firebase (Auth, Firestore, Storage) |
-| State Management | BLoC |
-| Architecture | Clean Architecture + MVVM |
-| Local Storage | — |
+### 🔐 Authentication
+
+- Email/password **sign in & sign up** via Firebase Auth
+- **Google Sign-In** integration
+- **Forgot password** flow with email reset
+- **Persistent session** management with automatic route guarding (GoRouter redirects)
+- Automatic user profile creation in Firestore on registration (including GPS-detected location)
+
+### 🏠 Home Feed & Discovery
+
+- **Real-time feed** of service ads loaded from Firestore
+- **Keyword search** across post titles, descriptions, and categories
+- **21 categories** with icons (Programming, Vehicles, Jobs, Games, Interns, Services, Events, Electronics, Real Estate, Fashion, Sports, Health, Education, Travel, Food, Books, Music, Furniture, Photography, Student Support)
+- **Location-aware sorting** — posts are sorted by distance from the user's GPS position
+- **Pull-to-refresh** with loading/error/empty states
+- **Favorites / Wishlist** — save and unsave posts with real-time heart icon state updates, with failure rollback
+
+### 📝 Post an Ad
+
+- Create service ads with **title, description, price, category, city**
+- Upload **1–3 photos** via the image picker (stored on **Cloudinary**)
+- Tag posts with **relevant skills** (20 skills: Mobile, Web, Cyber Security, Game Development, DevOps, AI, Data Science, UI/UX Design, Blockchain, Cloud Computing, Networking, SEO/Marketing, Content Writing, Digital Marketing, Graphic Design, Video Editing, Project Management, Accounting, Languages, Teaching)
+- **GPS-based location detection** using geolocator & reverse geocoding
+- **23 Egyptian governorates** supported
+
+### 📄 Ad Details
+
+- Full post view with **hero image header**
+- **Seller info card** with rating, reviews count, and "View Profile" shortcut
+- **Call** contact button (via `url_launcher` `tel:` scheme)
+- **Message Poster** — instantly creates/opens an in-app conversation
+- **Ratings & Reviews** — average rating, total reviews, add-review sheet, and "See All" reviews screen
+- **Badge** support for promoted/premium ads
+- Favorite toggle with share action
+
+### 💬 Messaging / Chat
+
+- **In-app messaging** with **real-time chat** via Firestore streams
+- Conversation inbox with **search** and **filters** (All / New Leads / Active)
+- Conversation statuses: **New Lead, Active, Waiting, Closed**
+- **Unread count badges**, online status indicators, and read receipts
+- Message pagination (load older messages) and timestamp formatting
+- **Deep links** (`skillbridge://chat?conversationId=...`) open conversations directly
+
+### 👤 Profile
+
+- Rich user profile with **avatar, name, bio, location, rating, and reviews**
+- **Skills profile** — add/remove skills with a searchable picker
+- Tabbed view of **user posts**
+- View **other users' profiles** from any ad
+- **Language switcher** (English / العربية) persisted locally
+
+### 🔔 Notifications
+
+- **Push notifications** via Firebase Cloud Messaging (FCM)
+- **Local notifications** via `flutter_local_notifications`
+- Foreground, background, and terminated-state message handling
+- FCM **token sync** with Firestore (add/remove on sign in/out)
+- **App Links** deep linking integration
+
+### 🌍 Localization
+
+- **English & Arabic (RTL)** support via `flutter_localizations`
+- Generated localization with `flutter gen-l10n`
+- Responsive UI with **flutter_screenutil** (design size 360×690)
 
 ---
 
-## Project Structure
+## 🛠 Tech Stack
+
+| Layer                    | Technology                                |
+| ------------------------ | ----------------------------------------- |
+| **Framework**            | Flutter (Dart SDK `^3.10.7`)              |
+| **Backend**              | Firebase (Auth, Firestore, Messaging)     |
+| **Image Storage**        | Cloudinary                                |
+| **State Management**     | BLoC (`flutter_bloc`)                     |
+| **Architecture**         | Clean Architecture + MVVM (feature-first) |
+| **Dependency Injection** | GetIt                                     |
+| **Routing**              | GoRouter                                  |
+| **Local Storage**        | Hive CE                                   |
+| **Networking**           | Dio                                       |
+| **Location**             | Geolocator + Geocoding                    |
+| **Animations**           | Lottie                                    |
+| **Icons**                | Font Awesome                              |
+
+---
+
+## 📁 Project Structure
 
 ```
 lib/
-├── core/             # Shared utilities, constants, theme
+├── core/                     # Shared utilities, services, theme, routing
+│   ├── errors/               # Custom exception classes (auth, storage, database, call)
+│   ├── locator/              # GetIt service locator
+│   ├── routing/              # GoRouter config & navigation
+│   ├── services/             # Auth, chat, cloudinary, firestore, location, notifications, call
+│   ├── theme/                # App colors & styles
+│   ├── utils/                # Constants, helpers, validators, observers
+│   └── widgets/              # Reusable UI components
 ├── features/
-│   ├── auth/         # Login, register, profile
-│   ├── feed/         # Home feed, search, filters
-│   ├── post/         # Post creation, detail, editing
-│   ├── matcher/      # CV/Skill Matcher logic
-│   ├── campaign/     # Group Campaign feature
-│   ├── student/      # Student Services section
-│   └── favorites/    # Wishlist screen
-└── main.dart
+│   ├── auth/                 # Sign in, sign up, forgot password
+│   ├── home/                 # Home feed, search, categories, favorites
+│   ├── location/             # Location data model
+│   ├── messages/             # Inbox, chat detail, conversations
+│   ├── posts/                # Post ad, ad details, reviews, call
+│   ├── profile/              # User profile & skills
+│   └── splash/               # Splash screen
+├── generated/                # Generated localization files
+├── l10n/                     # Localization strings (en/ar)
+├── firebase_options.dart     # Firebase config
+└── main.dart                 # App entry point
 ```
 
 ---
 
-## Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
-- Flutter SDK `>=3.0.0`
-- Firebase project with Auth, Firestore, and Storage enabled
+
+- Flutter SDK `^3.10.7`
+- Firebase project with **Auth**, **Firestore**, and **Messaging** enabled
+- Cloudinary account (for image uploads)
 
 ### Setup
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/servimarket.git
-cd servimarket
+git clone https://github.com/MohamedGamil13/DEPI-GP-Project.git
+cd DEPI-GP-Project
 
 # Install dependencies
 flutter pub get
+
+# Generate localization files
+flutter gen-l10n
 
 # Add your Firebase config
 # Download google-services.json → android/app/
@@ -86,25 +152,28 @@ flutter run
 
 ---
 
-## Skill Matcher Logic
+## 🧩 Key Models
 
-Each Tech/Student post is tagged with required skills and a skill level (Beginner / Mid / Senior).
+### Ad Categories (21)
 
-| Condition | Score |
-|---|---|
-| User's skill matches post requirement | +2 |
-| User is one level below requirement | +1 |
-| No match | 0 |
+Programming, Vehicles, Jobs, Games, Interns, Services, Events, Electronics, Real Estate, Fashion, Sports, Health, Education, Travel, Food, Books, Music, Furniture, Photography, Student Support
 
-Posts with score > 0 appear in the Matched Feed, sorted by best match first.
+### Relevant Skills (20)
+
+Mobile, Web, Cyber Security, Game Development, DevOps, AI, Data Science, UI/UX Design, Blockchain, Cloud Computing, Networking, SEO/Marketing, Content Writing, Digital Marketing, Graphic Design, Video Editing, Project Management, Accounting, Languages, Teaching
+
+### Supported Cities (23)
+
+All Egyptian governorates — Cairo, Giza, Alexandria, Port Said, Suez, Damietta, Dakahlia, Sharkia, Gharbia, Monufia, Beheira, Fayoum, Beni Suef, Minya, Assiut, Sohag, Qena, Luxor, Matrouh, Red Sea, North Sinai, South Sinai, Ismailia
 
 ---
 
-## Group Campaign Flow
+## 📄 License
 
-1. Any service post can have a Campaign launched on it
-2. Creator sets: target headcount, price per person, deadline
-3. Users join via an atomic Firestore transaction (safe for concurrent joins)
-4. Live counter updates in real time: `3 / 5 joined`
-5. Campaign auto-closes when target is reached and notifies all participants
+This project is developed as a **DEPI (Digital Egypt Pioneers Initiative) Final Project** for educational purposes.
 
+---
+
+## 👥 Contributors
+
+- **Mohamed Gamil** — [GitHub](https://github.com/MohamedGamil13)
